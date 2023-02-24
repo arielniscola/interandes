@@ -4,6 +4,14 @@ import cookieParser from "cookie-parser";
 import router from "./routes";
 const server = express();
 
+declare global {
+  namespace Express {
+    interface Request {
+      user: string;
+    }
+  }
+}
+
 server.use(bodyParser.urlencoded({ extended: true, limit: "50mb" }));
 server.use(bodyParser.json({ limit: "50mb" }));
 server.use(cookieParser());
