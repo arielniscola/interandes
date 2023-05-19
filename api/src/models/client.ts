@@ -34,6 +34,7 @@ export = (sequelize: any) => {
     },
     isDeleted: {
       type: DataTypes.BOOLEAN,
+      defaultValue: false,
     },
   });
 };

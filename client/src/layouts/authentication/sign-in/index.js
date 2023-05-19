@@ -1,33 +1,10 @@
-/**
-=========================================================
-* Material Dashboard 2 React - v2.1.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/material-dashboard-react
-* Copyright 2022 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 // react-router-dom components
 import { Link } from "react-router-dom";
 
 // @mui material components
 import Card from "@mui/material/Card";
-import Switch from "@mui/material/Switch";
-import Grid from "@mui/material/Grid";
-import MuiLink from "@mui/material/Link";
-
-// @mui icons
-import FacebookIcon from "@mui/icons-material/Facebook";
-import GitHubIcon from "@mui/icons-material/GitHub";
-import GoogleIcon from "@mui/icons-material/Google";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
@@ -40,11 +17,77 @@ import BasicLayout from "layouts/authentication/components/BasicLayout";
 
 // Images
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
+import { useDispatch, useSelector } from "react-redux";
+import toast, { Toaster } from "react-hot-toast";
+import { signin } from "redux/actions/actions";
 
 function Basic() {
-  const [rememberMe, setRememberMe] = useState(false);
+  const dispatch = useDispatch();
+  const { error, userLogged } = useSelector((state) => state);
+  const [inputs, setInputs] = useState({ mailaddress: "", password: "" });
 
-  const handleSetRememberMe = () => setRememberMe(!rememberMe);
+  // notifications
+  const notifyError = () => {
+    toast.error("Datos incorrectos", {
+      duration: 3000,
+      position: "bottom-right",
+    });
+  };
+  const notify = () => {
+    toast.success("Login correcto", {
+      duration: 1000,
+      position: "bottom-right",
+    });
+  };
+
+  useEffect(() => {
+    if (window.localStorage.getItem("token")) {
+      console.log("logged");
+    }
+  }, []);
+
+  useEffect(() => {
+    if (Object.keys(userLogged).length === 0) {
+      notify();
+    }
+  }, [userLogged]);
+
+  useEffect(() => {
+    if (Object.keys(error).length !== 0) {
+      notifyError();
+    }
+    return function () {
+      dispatch({ type: "DELETE_ERROR", payload: {} });
+    };
+  }, [error]);
+
+  const inputHandler = (event) => {
+    const { value, name } = event.target;
+    switch (name) {
+      case "mailaddress":
+        setInputs({
+          ...inputs,
+          [name]: value,
+        });
+        break;
+      case "password":
+        setInputs({
+          ...inputs,
+          [name]: value,
+        });
+        break;
+      default:
+        setInputs({
+          ...inputs,
+          [name]: value,
+        });
+        break;
+    }
+  };
+  const submitHandle = (event) => {
+    event.preventDefault();
+    dispatch(signin(inputs));
+  };
 
   return (
     <BasicLayout image={bgImage}>
@@ -63,46 +106,31 @@ function Basic() {
           <MDTypography variant="h4" fontWeight="medium" color="white" mt={1}>
             Sign in
           </MDTypography>
-          <Grid container spacing={3} justifyContent="center" sx={{ mt: 1, mb: 2 }}>
-            <Grid item xs={2}>
-              <MDTypography component={MuiLink} href="#" variant="body1" color="white">
-                <FacebookIcon color="inherit" />
-              </MDTypography>
-            </Grid>
-            <Grid item xs={2}>
-              <MDTypography component={MuiLink} href="#" variant="body1" color="white">
-                <GitHubIcon color="inherit" />
-              </MDTypography>
-            </Grid>
-            <Grid item xs={2}>
-              <MDTypography component={MuiLink} href="#" variant="body1" color="white">
-                <GoogleIcon color="inherit" />
-              </MDTypography>
-            </Grid>
-          </Grid>
         </MDBox>
         <MDBox pt={4} pb={3} px={3}>
           <MDBox component="form" role="form">
             <MDBox mb={2}>
-              <MDInput type="email" label="Email" fullWidth />
+              <MDInput
+                type="email"
+                name="mailaddress"
+                label="Email"
+                value={inputs.mailaddress}
+                onChange={inputHandler}
+                fullWidth
+              />
             </MDBox>
             <MDBox mb={2}>
-              <MDInput type="password" label="Password" fullWidth />
-            </MDBox>
-            <MDBox display="flex" alignItems="center" ml={-1}>
-              <Switch checked={rememberMe} onChange={handleSetRememberMe} />
-              <MDTypography
-                variant="button"
-                fontWeight="regular"
-                color="text"
-                onClick={handleSetRememberMe}
-                sx={{ cursor: "pointer", userSelect: "none", ml: -1 }}
-              >
-                &nbsp;&nbsp;Remember me
-              </MDTypography>
+              <MDInput
+                type="password"
+                label="Password"
+                name="password"
+                value={inputs.password}
+                onChange={inputHandler}
+                fullWidth
+              />
             </MDBox>
             <MDBox mt={4} mb={1}>
-              <MDButton variant="gradient" color="info" fullWidth>
+              <MDButton variant="gradient" color="info" onClick={submitHandle} fullWidth>
                 sign in
               </MDButton>
             </MDBox>
@@ -124,6 +152,7 @@ function Basic() {
           </MDBox>
         </MDBox>
       </Card>
+      <Toaster />
     </BasicLayout>
   );
 }

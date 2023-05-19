@@ -19,6 +19,7 @@
   10. The `title` key is only for the item with the type of `title` and its used for the title text on the Sidenav.
   10. The `component` key is used to store the component of its route.
 */
+import Icon from "@mui/material/Icon";
 
 // Material Dashboard 2 React layouts
 import Dashboard from "layouts/dashboard";
@@ -30,9 +31,9 @@ import Profile from "layouts/profile";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
 import Pricing from "layouts/pricing";
+import PricingForm from "./layouts/pricing/form";
 
 // @mui icons
-import Icon from "@mui/material/Icon";
 
 const routes = [
   {
@@ -106,6 +107,20 @@ const routes = [
     icon: <Icon fontSize="small">PriceChange</Icon>,
     route: "/pricing",
     component: <Pricing />,
+  },
+  {
+    type: "route",
+    name: "Signin",
+    key: "signin",
+    route: "/signin",
+    component: <SignIn />,
+  },
+  {
+    type: "route",
+    name: "Formulario Pricing",
+    key: "pricing",
+    route: "/pricing-form",
+    component: <PricingForm />,
   },
 ];
 

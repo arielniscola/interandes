@@ -9,6 +9,9 @@ export = (sequelize: any) => {
       primaryKey: true,
       unique: true,
     },
+    pricingnumber: {
+      type: DataTypes.INTEGER,
+    },
     companyname: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -21,6 +24,43 @@ export = (sequelize: any) => {
     },
     language: {
       type: DataTypes.STRING,
+    },
+    effectiveDate: {
+      type: DataTypes.DATE,
+    },
+    validate: {
+      type: DataTypes.DATE,
+    },
+    deleted: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+    observations: {
+      type: DataTypes.STRING(500),
+    },
+    conditions: {
+      type: DataTypes.STRING(500),
+    },
+    operationType: {
+      type: DataTypes.STRING,
+    },
+    stage: {
+      type: DataTypes.STRING(),
+      allowNull: false,
+    },
+    totalCost: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+    },
+    totalSale: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+    },
+    totalTax: {
+      type: DataTypes.FLOAT,
+    },
+    profit: {
+      type: DataTypes.FLOAT,
     },
   });
 };

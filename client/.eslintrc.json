@@ -21,6 +21,7 @@
     ],
     "react/prop-types": "off",
     "default-param-last": "off",
+    "arrow-body-style": "off",
     "react/react-in-jsx-scope": "off",
     "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
     "react/jsx-props-no-spreading": [
@@ -29,7 +30,8 @@
         "custom": "ignore"
       }
     ],
-    "react/jsx-curly-spacing": [2, "never"]
+    "react/jsx-curly-spacing": [2, "never"],
+    "no-underscore-dangle": "off"
   },
   "settings": { "import/resolver": { "node": { "paths": ["src"] } } }
 }

@@ -21,7 +21,6 @@ export const chekAuth = async (
   ) {
     try {
       token = req.headers.authorization.split(" ")[1];
-      console.log(token);
 
       const decoded = Jwt.verify(
         token,

@@ -51,10 +51,8 @@ export const signinController = async (req: Request, res: Response) => {
   try {
     const email: string = req.body.mailaddress;
     const password: string = req.body.password;
-    console.log(email);
-
-    const token = await signin(email, password);
-    res.header("authentification", token).json();
+    const { token, user } = await signin(email, password);
+    res.status(200).json({ user: user, token: token });
   } catch (error: any) {
     res.status(400).json({ message: error.message });
   }
