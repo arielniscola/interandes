@@ -1,7 +1,10 @@
 import { Sequelize } from "sequelize";
 import * as pg from "pg";
-import fs from "fs";
-import path from "path";
+import { Pricing, initPricingModel } from "./models/pricing";
+import { Client, initClientModel } from "./models/client";
+import { User, initUserModel } from "./models/user";
+import { Detail, initDetailModel } from "./models/detail";
+import { FileStructure, initFileStructureModel } from "./models/fileStructure";
 
 const DB_USER = "postgres";
 const DB_PASSWORD = "1234";
@@ -16,31 +19,16 @@ export const sequelize = new Sequelize(
   }
 );
 
-const basename = path.basename(__filename);
+/** Inicializar modelos */
 
-const modelDefiners: any = [];
+initPricingModel(sequelize);
+initClientModel(sequelize);
+initUserModel(sequelize);
+initDetailModel(sequelize);
+initFileStructureModel(sequelize);
 
-fs.readdirSync(path.join(__dirname, "/models"))
-  .filter(
-    (file) =>
-      file.indexOf(".") !== 0 && file !== basename && file.slice(-3) === ".ts"
-  )
-  .forEach((file) => {
-    modelDefiners.push(require(path.join(__dirname, "/models", file)));
-  });
-
-modelDefiners.forEach((model: any) => model(sequelize));
-
-let entries = Object.entries(sequelize.models);
-
-let capsEntries = entries.map((entry) => [
-  entry[0][0].toUpperCase() + entry[0].slice(1),
-  entry[1],
-]);
-(sequelize.models as any) = Object.fromEntries(capsEntries);
-
-export const { Client, Pricing, User } = sequelize.models;
-
+/** Pricing relations */
 Pricing.belongsTo(Client);
 Pricing.belongsTo(User);
-//relations
+FileStructure.belongsTo(Pricing);
+Detail.belongsTo(Pricing);

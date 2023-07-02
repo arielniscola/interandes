@@ -46,17 +46,12 @@ import {
 } from "examples/Navbars/DashboardNavbar/styles";
 
 // Material Dashboard 2 React context
-import {
-  useMaterialUIController,
-  setTransparentNavbar,
-  setMiniSidenav,
-  setOpenConfigurator,
-} from "context";
+import { useMaterialUIController, setTransparentNavbar, setMiniSidenav } from "context";
 
 function DashboardNavbar({ absolute, light, isMini }) {
   const [navbarType, setNavbarType] = useState();
   const [controller, dispatch] = useMaterialUIController();
-  const { miniSidenav, transparentNavbar, fixedNavbar, openConfigurator, darkMode } = controller;
+  const { miniSidenav, transparentNavbar, fixedNavbar, darkMode } = controller;
   const [openMenu, setOpenMenu] = useState(false);
   const route = useLocation().pathname.split("/").slice(1);
 
@@ -87,7 +82,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
   }, [dispatch, fixedNavbar]);
 
   const handleMiniSidenav = () => setMiniSidenav(dispatch, !miniSidenav);
-  const handleConfiguratorOpen = () => setOpenConfigurator(dispatch, !openConfigurator);
+  const handleConfiguratorOpen = () => window.location.replace("/configuration");
   const handleOpenMenu = (event) => setOpenMenu(event.currentTarget);
   const handleCloseMenu = () => setOpenMenu(false);
 

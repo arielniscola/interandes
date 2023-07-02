@@ -1,5 +1,4 @@
-import { User } from "../db";
-import { IUser } from "../interfaces/IUser";
+import { User } from "../models/user";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
@@ -48,7 +47,7 @@ export const getUserID = async (id: any) => {
   return user;
 };
 
-export const updateUser = async (user: IUser) => {
+export const updateUser = async (user: User) => {
   const userUpdated = await User.update(
     {
       username: user.username,
@@ -74,7 +73,7 @@ export const signin = async (email: string, password: string) => {
     attributes: {
       exclude: ["isActive", "deleted", "phonenumber"],
     },
-  })) as unknown as IUser;
+  })) as unknown as User;
 
   if (!userFind) throw new Error("Datos Incorrectos");
 

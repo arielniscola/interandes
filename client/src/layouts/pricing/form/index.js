@@ -6,7 +6,7 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import moment from "moment";
-import { getClients, createCliente } from "services/clientHook";
+
 import { createPricings } from "services/pricingHook";
 // @mui material components
 // import table Items
@@ -19,33 +19,19 @@ import InputLabel from "@mui/material/InputLabel";
 import Select from "@mui/material/Select";
 import { Grid } from "@mui/material";
 import TextField from "@mui/material/TextField";
-import Autocomplete from "@mui/material/Autocomplete";
+import ClientForm from "layouts/clients/form/form";
+
 import Datepicker from "components/Datepicker";
 import Icon from "@mui/material/Icon";
 import MDInput from "../../../components/MDInput";
 import MDButton from "../../../components/MDButton";
 import MDTypography from "../../../components/MDTypography";
+
 // Material Dashboard 2 React example components
 
 function Pricing() {
   const navigate = useNavigate();
-  const [clients, setClients] = useState([]);
 
-  useEffect(async () => {
-    const res = await getClients();
-    setClients(res);
-  }, []);
-
-  const [client, setClient] = useState({
-    _id: "",
-    taxID: "",
-    companyname: "",
-    direction: "",
-    contactperson: "",
-    mailaddress: "",
-    phonenumber: "",
-    category: "",
-  });
   const [pricing, setPricing] = useState({
     companyname: "",
     language: "",
@@ -59,6 +45,15 @@ function Pricing() {
     totalSale: 0,
     totalTax: 0,
     profit: 0,
+    totalCostDol: 0,
+    totalSaleDol: 0,
+    totalTaxDol: 0,
+    profitDol: 0,
+    totalCostEu: 0,
+    totalSaleEu: 0,
+    totalTaxEu: 0,
+    profitEu: 0,
+    client: "",
   });
   const columnsCost = [
     { Header: "Moneda", accessor: "currency", align: "center" },
@@ -104,10 +99,6 @@ function Pricing() {
     row: 1,
   });
 
-  const defaultOptions = {
-    options: clients.length > 0 ? clients : [],
-    getOptionLabel: (option) => option.companyname,
-  };
   const handleChangePricing = (e) => {
     const { name, value } = e.target;
     switch (name) {
@@ -119,42 +110,99 @@ function Pricing() {
         break;
     }
   };
-  const handleChangeClient = (e) => {
-    const { name, value } = e.target;
-    switch (name) {
-      default:
-        setClient({
-          ...client,
-          [name]: value,
-        });
-        break;
-    }
-  };
 
   const totalCalculations = () => {
+    let totalCostEu = 0;
+    let totalSaleEu = 0;
+    let totalTaxEu = 0;
+    let profitEu = 0;
+    let totalCostDol = 0;
+    let totalSaleDol = 0;
+    let totalTaxDol = 0;
+    let profitDol = 0;
     let totalCost = 0;
     let totalSale = 0;
     let totalTax = 0;
     let profit = 0;
+
     for (let i = 0; i < rowsCost.length; i += 1) {
-      totalCost += rowsCost[i].price;
+      switch (rowsCost[i].currency) {
+        case "USD":
+          totalCostDol += rowsCost[i].subtotal;
+          break;
+        case "EU":
+          totalCostEu += rowsCost[i].subtotal;
+          break;
+        case "ARS":
+          totalCost += rowsCost[i].subtotal;
+          break;
+        default:
+          break;
+      }
     }
     for (let j = 0; j < rowsSale.length; j += 1) {
-      totalSale += rowsSale[j].price;
+      switch (rowsSale[j].currency) {
+        case "USD":
+          totalSaleDol += rowsSale[j].subtotal;
+          break;
+        case "EU":
+          totalSaleEu += rowsSale[j].subtotal;
+          break;
+        case "ARS":
+          totalSale += rowsSale[j].subtotal;
+          break;
+        default:
+          break;
+      }
     }
     for (let n = 0; n < rowsTax.length; n += 1) {
-      totalTax += rowsTax[n].price;
+      switch (rowsTax[n].currency) {
+        case "USD":
+          totalTaxDol += rowsTax[n].subtotal;
+          break;
+        case "EU":
+          totalTaxEu += rowsTax[n].subtotal;
+          break;
+        case "ARS":
+          totalTax += rowsTax[n].subtotal;
+          break;
+        default:
+          break;
+      }
     }
-
     profit = totalSale - totalCost - totalTax;
-    setPricing({ ...pricing, totalCost, totalSale, totalTax, profit });
+    profitDol = totalSaleDol - totalCostDol - totalTaxDol;
+    profitEu = totalSaleEu - totalCostEu - totalTaxEu;
+    setPricing({
+      ...pricing,
+      totalCost,
+      totalSale,
+      totalTax,
+      profit,
+      totalCostEu,
+      totalSaleEu,
+      totalTaxEu,
+      profitEu,
+      totalCostDol,
+      totalSaleDol,
+      totalTaxDol,
+      profitDol,
+    });
   };
   useEffect(() => {
     totalCalculations();
   }, [rowsSale, rowsTax, rowsCost]);
 
-  const deleteItem = (e) => {
-    console.log(e);
+  const deleteItem = (row) => {
+    const resultTax = rowsTax.filter((i) => i.row !== row);
+    const resultCost = rowsCost.filter((i) => i.row !== row);
+    const resultSale = rowsSale.filter((i) => i.row !== row);
+
+    setRowsCost(resultCost);
+    setRowsSale(resultSale);
+    setRowsTax(resultTax);
+
+    totalCalculations();
   };
 
   const addItem = () => {
@@ -233,10 +281,6 @@ function Pricing() {
     }
   };
 
-  const submitHandlerClient = async () => {
-    const res = await createCliente(client);
-    console.log(res);
-  };
   const submitHandlerPricing = async () => {
     const res = await createPricings(pricing);
     if (res) navigate("/pricing");
@@ -251,146 +295,7 @@ function Pricing() {
   return (
     <DashboardLayout>
       <DashboardNavbar />
-      {/* Alta cliente / Busqueda */}
-      <MDBox pt={6} pb={3}>
-        <Card>
-          <MDBox
-            mx={2}
-            mt={-3}
-            py={2}
-            px={1}
-            variant="gradient"
-            bgColor="info"
-            borderRadius="lg"
-            coloredShadow="info"
-          >
-            <MDTypography variant="h6" color="white">
-              Buscar Cliente / Alta Cliente
-            </MDTypography>
-          </MDBox>
-          <MDBox pt={3}>
-            <MDBox pt={4} pb={3} px={3}>
-              <Autocomplete
-                {...defaultOptions}
-                id="client-select"
-                multiple={false}
-                style={{ width: 300, marginBottom: 8, marginTop: -20 }}
-                options={clients}
-                renderInput={(params) => (
-                  <TextField {...params} label="Buscar cliente" variant="outlined" />
-                )}
-                onChange={(event, newValue) => {
-                  if (!newValue) {
-                    setClient({
-                      taxID: "",
-                      companyname: "",
-                      direction: "",
-                      contactperson: "",
-                      mailaddress: "",
-                      phonenumber: "",
-                      category: "",
-                    });
-                  } else {
-                    setClient(newValue);
-                  }
-                }}
-              />
-              <MDBox component="form" role="form">
-                <Grid container spacing={2}>
-                  <Grid xs={6}>
-                    <MDBox mb={2} sx={{ m: 2 }}>
-                      <MDInput
-                        type="text"
-                        label="Razón Social"
-                        name="companyname"
-                        value={client.companyname}
-                        variant="outlined"
-                        fullWidth
-                        onChange={handleChangeClient}
-                      />
-                    </MDBox>
-                    <MDBox mb={2} sx={{ m: 2 }}>
-                      <MDInput
-                        type="text"
-                        label="Dirección"
-                        name="direction"
-                        value={client.direction}
-                        variant="outlined"
-                        fullWidth
-                        onChange={handleChangeClient}
-                      />
-                    </MDBox>
-                    <MDBox mb={2} sx={{ m: 2 }}>
-                      <MDInput
-                        type="text"
-                        label="ID Tributaria"
-                        name="taxID"
-                        value={client.taxID}
-                        variant="outlined"
-                        fullWidth
-                        onChange={handleChangeClient}
-                      />
-                    </MDBox>
-                    <MDBox mb={2} sx={{ m: 2 }}>
-                      <MDInput
-                        type="text"
-                        label="Persona de Contacto"
-                        name="contactperson"
-                        value={client.contactperson}
-                        variant="outlined"
-                        onChange={handleChangeClient}
-                        fullWidth
-                      />
-                    </MDBox>
-                  </Grid>
-                  <Grid xs={6}>
-                    <MDBox mb={2} sx={{ m: 2 }}>
-                      <MDInput
-                        type="mail"
-                        label="Mail"
-                        name="mailaddress"
-                        value={client.mailaddress}
-                        variant="outlined"
-                        fullWidth
-                        onChange={handleChangeClient}
-                      />
-                    </MDBox>
-                    <MDBox mb={2} sx={{ m: 2 }}>
-                      <MDInput
-                        type="text"
-                        label="Telefono"
-                        value={client.phonenumber}
-                        name="phonenumber"
-                        variant="outlined"
-                        fullWidth
-                        onChange={handleChangeClient}
-                      />
-                    </MDBox>
-                    <MDBox mb={2} sx={{ m: 2 }}>
-                      <MDInput
-                        type="text"
-                        label="Rubro"
-                        name="category"
-                        value={client.category}
-                        variant="outlined"
-                        fullWidth
-                        onChange={handleChangeClient}
-                      />
-                    </MDBox>
-                  </Grid>
-                </Grid>
-                <MDBox mt={4} mb={1}>
-                  {!client.id && (
-                    <MDButton variant="gradient" color="info" onClick={submitHandlerClient}>
-                      Crear Cliente
-                    </MDButton>
-                  )}
-                </MDBox>
-              </MDBox>
-            </MDBox>
-          </MDBox>
-        </Card>
-      </MDBox>
+      <ClientForm />
       <MDBox pt={6} pb={3}>
         <Card>
           <MDBox
@@ -527,7 +432,6 @@ function Pricing() {
                         <MenuItem value="USD">DOLAR</MenuItem>
                         <MenuItem value="ARS">PESO ARGENTINO</MenuItem>
                         <MenuItem value="EU">EURO</MenuItem>
-                        <MenuItem value="PESO CHI">PESO CHILENO</MenuItem>
                       </Select>
                     </MDBox>
                   </Grid>
@@ -727,19 +631,7 @@ function Pricing() {
             <MDBox pt={4} pb={3} px={3}>
               <MDBox component="form" role="form">
                 <Grid container spacing={2}>
-                  <Grid xs={12}>
-                    <MDBox mb={1} ml={5} mr={5}>
-                      <TextField
-                        id="filled-multiline-static"
-                        label="Total costo"
-                        name="totalCost"
-                        value={pricing.totalCost}
-                        variant="outlined"
-                        fullWidth
-                      />
-                    </MDBox>
-                  </Grid>
-                  <Grid xs={12}>
+                  <Grid xs={4}>
                     <MDBox mb={1} ml={5} mr={5}>
                       <TextField
                         id="filled-multiline-static"
@@ -750,8 +642,16 @@ function Pricing() {
                         fullWidth
                       />
                     </MDBox>
-                  </Grid>
-                  <Grid xs={12}>
+                    <MDBox mb={1} ml={5} mr={5}>
+                      <TextField
+                        id="filled-multiline-static"
+                        label="Total costo"
+                        name="totalCost"
+                        value={pricing.totalCost}
+                        variant="outlined"
+                        fullWidth
+                      />
+                    </MDBox>
                     <MDBox mb={1} ml={5} mr={5}>
                       <TextField
                         id="filled-multiline-static"
@@ -762,13 +662,93 @@ function Pricing() {
                         fullWidth
                       />
                     </MDBox>
-                  </Grid>
-                  <Grid xs={12}>
                     <MDBox mb={1} ml={5} mr={5}>
                       <TextField
                         id="filled-multiline-static"
                         label="Profit"
                         value={pricing.profit}
+                        variant="outlined"
+                        fullWidth
+                      />
+                    </MDBox>
+                  </Grid>
+                  <Grid xs={4}>
+                    <MDBox mb={1} ml={5} mr={5}>
+                      <TextField
+                        id="filled-multiline-static"
+                        label="Total Venta USD"
+                        name="totalSale"
+                        value={pricing.totalSaleDol}
+                        variant="outlined"
+                        fullWidth
+                      />
+                    </MDBox>
+                    <MDBox mb={1} ml={5} mr={5}>
+                      <TextField
+                        id="filled-multiline-static"
+                        label="Total costo USD"
+                        name="totalCost"
+                        value={pricing.totalCostDol}
+                        variant="outlined"
+                        fullWidth
+                      />
+                    </MDBox>
+                    <MDBox mb={1} ml={5} mr={5}>
+                      <TextField
+                        id="filled-multiline-static"
+                        label="Total impuestos USD"
+                        name="totalTax"
+                        value={pricing.totalTaxDol}
+                        variant="outlined"
+                        fullWidth
+                      />
+                    </MDBox>
+                    <MDBox mb={1} ml={5} mr={5}>
+                      <TextField
+                        id="filled-multiline-static"
+                        label="Profit USD"
+                        value={pricing.profitDol}
+                        variant="outlined"
+                        fullWidth
+                      />
+                    </MDBox>
+                  </Grid>
+                  <Grid xs={4}>
+                    <MDBox mb={1} ml={5} mr={5}>
+                      <TextField
+                        id="filled-multiline-static"
+                        label="Total Venta EU"
+                        name="totalSale"
+                        value={pricing.totalSaleEu}
+                        variant="outlined"
+                        fullWidth
+                      />
+                    </MDBox>
+                    <MDBox mb={1} ml={5} mr={5}>
+                      <TextField
+                        id="filled-multiline-static"
+                        label="Total costo EU"
+                        name="totalCost"
+                        value={pricing.totalCostEu}
+                        variant="outlined"
+                        fullWidth
+                      />
+                    </MDBox>
+                    <MDBox mb={1} ml={5} mr={5}>
+                      <TextField
+                        id="filled-multiline-static"
+                        label="Total impuestos EU"
+                        name="totalTax"
+                        value={pricing.totalTaxEu}
+                        variant="outlined"
+                        fullWidth
+                      />
+                    </MDBox>
+                    <MDBox mb={1} ml={5} mr={5}>
+                      <TextField
+                        id="filled-multiline-static"
+                        label="Profit Eu"
+                        value={pricing.profitEu}
                         variant="outlined"
                         fullWidth
                       />

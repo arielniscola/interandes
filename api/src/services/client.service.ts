@@ -1,5 +1,4 @@
-import { Client } from "../db";
-import { IClient } from "../interfaces/IClient";
+import { Client } from "../models/client";
 
 export const getAllClients = async () => {
   const clients = await Client.findAll({
@@ -41,7 +40,7 @@ export const createClient = async (client: any) => {
   return clientCreated;
 };
 
-export const updateClient = async (client: IClient) => {
+export const updateClient = async (client: Client) => {
   const userUpdated = await Client.update(
     {
       contactperson: client.contactperson,

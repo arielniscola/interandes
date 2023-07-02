@@ -1,5 +1,4 @@
-import { Pricing } from "../db";
-import { IPricing } from "../interfaces/IPricing";
+import { Pricing } from "../models/pricing";
 // import { IDetail } from "../interfaces/IDetail";
 
 export const getAllPricings = async () => {
@@ -14,7 +13,7 @@ export const getAllPricings = async () => {
   return pricings;
 };
 
-export const getPricingID = async (id: string) => {
+export const getPricingID = async (id: string): Promise<Object> => {
   const pricing = await Pricing.findByPk(id, {
     attributes: {
       exclude: ["deleted"],
@@ -25,7 +24,8 @@ export const getPricingID = async (id: string) => {
   return pricing;
 };
 
-export const createPricing = async (pricing: any) => {
+export const createPricing = async (pricing: Pricing) => {
+  pricing.pricingnumber = await generateID();
   const pricingCreated = await Pricing.create(pricing);
 
   if (!pricingCreated) throw new Error("Error in DB");
@@ -33,7 +33,7 @@ export const createPricing = async (pricing: any) => {
   return pricingCreated;
 };
 
-export const updatePricing = async (pricing: IPricing) => {
+export const updatePricing = async (pricing: Pricing) => {
   const userUpdated = await Pricing.update(
     {
       totalCost: pricing.totalCost,
@@ -47,4 +47,20 @@ export const updatePricing = async (pricing: IPricing) => {
 
   if (!userUpdated) throw "Error at update";
   return userUpdated;
+};
+
+/** generador de ID */
+const generateID = async () => {
+  try {
+    const prefijo = "PRI";
+    const lastPricing = await Pricing.findOne({
+      order: [["createdAt", "DESC"]],
+    });
+    if (!lastPricing) return `${prefijo}-1`;
+    const sequence = lastPricing.pricingnumber.split("-");
+    const id = `${prefijo}-${parseInt(sequence[1]) + 1}`;
+    return id;
+  } catch (error) {
+    throw error;
+  }
 };

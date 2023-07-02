@@ -31,9 +31,11 @@ import Profile from "layouts/profile";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
 import Pricing from "layouts/pricing";
+import Configuration from "layouts/configuration";
+import ClientTable from "layouts/clients";
+import ClientForm from "layouts/clients/form";
+import Files from "layouts/files";
 import PricingForm from "./layouts/pricing/form";
-
-// @mui icons
 
 const routes = [
   {
@@ -77,12 +79,28 @@ const routes = [
     component: <Notifications />,
   },
   {
-    type: "collapse",
+    type: "route",
     name: "CLIENTES",
     key: "profile",
     icon: <Icon fontSize="small">person</Icon>,
     route: "/profile",
     component: <Profile />,
+  },
+  {
+    type: "collapse",
+    name: "CLIENTES",
+    key: "profile",
+    icon: <Icon fontSize="small">person</Icon>,
+    route: "/clients",
+    component: <ClientTable />,
+  },
+  {
+    type: "route",
+    name: "CLIENTES",
+    key: "clientForm",
+    icon: <Icon fontSize="small">person</Icon>,
+    route: "/clients/form",
+    component: <ClientForm />,
   },
   {
     type: "collapse",
@@ -121,6 +139,20 @@ const routes = [
     key: "pricing",
     route: "/pricing-form",
     component: <PricingForm />,
+  },
+  {
+    type: "route",
+    name: "Configuración",
+    key: "configuration",
+    route: "/configuration",
+    component: <Configuration />,
+  },
+  {
+    type: "route",
+    name: "Files",
+    key: "files",
+    route: "/file-upload",
+    component: <Files />,
   },
 ];
 

@@ -1,28 +1,12 @@
-/**
-=========================================================
-* Material Dashboard 2 React - v2.1.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/material-dashboard-react
-* Copyright 2022 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
-
-// @mui material components
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 
 import { useEffect, useState } from "react";
-import { getPricings } from "services/pricingHook";
-// Material Dashboard 2 React components
+import { getClients } from "services/clientHook";
 import Icon from "@mui/material/Icon";
-// Material Dashboard 2 React example components
+// Material Dashboard 2 React components
 import { useMaterialUIController } from "context";
+// Material Dashboard 2 React example components
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
@@ -31,7 +15,7 @@ import MDButton from "../../components/MDButton";
 import MDBox from "../../components/MDBox";
 import MDTypography from "../../components/MDTypography";
 
-function PricingTable() {
+function ClientTable() {
   const [controller] = useMaterialUIController();
   const { darkMode } = controller;
 
@@ -53,23 +37,21 @@ function PricingTable() {
     });
     return itemsWithOptions;
   };
-
-  // const { columns, rows } = u;
   // const { columns: pColumns, rows: pRows } = ;
-  const [pricings, setPrincigs] = useState([]);
+  const [clients, setClients] = useState([]);
 
   useEffect(async () => {
-    const res = await getPricings();
+    const res = await getClients();
     const response = addOptions(res);
-    setPrincigs(response);
+    setClients(response);
   }, []);
 
   const columns = [
     { Header: "N°", accessor: "id", align: "center" },
-    { Header: "Compañia", accessor: "companyname", align: "center" },
-    { Header: "Creado", accessor: "createdAt", align: "center" },
-    { Header: "Estado", accessor: "stage", align: "center" },
-    { Header: "Importe Total", accessor: "profit", align: "center" },
+    { Header: "Nombre", accessor: "companyname", align: "center" },
+    { Header: "Contacto", accessor: "contactperson", align: "center" },
+    { Header: "Email", accessor: "mailaddress", align: "center" },
+    { Header: "Categoria", accessor: "category", align: "center" },
     { Header: "Opciones", accessor: "options", align: "center" },
   ];
 
@@ -80,7 +62,7 @@ function PricingTable() {
         <MDButton
           variant="gradient"
           color="success"
-          onClick={() => window.location.replace("/pricing-form")}
+          onClick={() => window.location.replace("/clients/form")}
         >
           Nuevo
         </MDButton>
@@ -100,11 +82,11 @@ function PricingTable() {
                 coloredShadow="info"
               >
                 <MDTypography variant="h6" color="white">
-                  Pricing
+                  Clientes
                 </MDTypography>
               </MDBox>
               <MDBox pt={3}>
-                <DataTable table={{ columns, rows: pricings }} noEndBorder />
+                <DataTable table={{ columns, rows: clients }} noEndBorder />
               </MDBox>
             </Card>
           </Grid>
@@ -115,4 +97,4 @@ function PricingTable() {
   );
 }
 
-export default PricingTable;
+export default ClientTable;
