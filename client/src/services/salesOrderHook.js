@@ -14,9 +14,9 @@ const notifyError = (message) => {
   });
 };
 
-export const getPricings = async () => {
+export const getSalesOrders = async () => {
   try {
-    const res = await fetch(`${URL_API}/pricing`, {
+    const res = await fetch(`${URL_API}/salesOrder`, {
       method: "GET",
       headers: { "Content-type": "application/json" },
     });
@@ -28,15 +28,15 @@ export const getPricings = async () => {
   }
 };
 
-export const createPricings = async (pricing) => {
+export const createSalesOrders = async (salesOrder) => {
   try {
-    const res = await fetch(`${URL_API}/pricing`, {
+    const res = await fetch(`${URL_API}/salesOrder`, {
       method: "POST",
       headers: { "Content-type": "application/json" },
-      body: JSON.stringify(pricing),
+      body: JSON.stringify(salesOrder),
     });
     const data = res.json();
-    if (data) notify("Pricing creado");
+    if (data) notify("Orden de venta creada");
     return data;
   } catch (error) {
     notifyError(error.message);
@@ -44,9 +44,9 @@ export const createPricings = async (pricing) => {
   }
 };
 
-export const getPricing = async (id) => {
+export const getsalesOrder = async (id) => {
   try {
-    const res = await fetch(`${URL_API}/pricing/${id}`, {
+    const res = await fetch(`${URL_API}/salesOrder/${id}`, {
       method: "GET",
       headers: { "Content-type": "application/json" },
     });

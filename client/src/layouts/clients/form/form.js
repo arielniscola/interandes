@@ -9,7 +9,7 @@ import MDInput from "../../../components/MDInput";
 import MDButton from "../../../components/MDButton";
 import MDTypography from "../../../components/MDTypography";
 
-function ClientForm() {
+function ClientForm({ onClientSelect }) {
   const [clients, setClients] = useState([]);
 
   useEffect(async () => {
@@ -43,7 +43,7 @@ function ClientForm() {
   };
   const submitHandlerClient = async () => {
     const res = await createCliente(client);
-    console.log(res);
+    onClientSelect(res);
   };
   return (
     <MDBox pt={6} pb={3}>
@@ -86,12 +86,13 @@ function ClientForm() {
                   });
                 } else {
                   setClient(newValue);
+                  onClientSelect(newValue);
                 }
               }}
             />
             <MDBox component="form" role="form">
               <Grid container spacing={2}>
-                <Grid xs={6}>
+                <Grid item xs={6}>
                   <MDBox mb={2} sx={{ m: 2 }}>
                     <MDInput
                       type="text"
@@ -137,7 +138,7 @@ function ClientForm() {
                     />
                   </MDBox>
                 </Grid>
-                <Grid xs={6}>
+                <Grid item xs={6}>
                   <MDBox mb={2} sx={{ m: 2 }}>
                     <MDInput
                       type="mail"

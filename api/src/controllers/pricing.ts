@@ -4,6 +4,7 @@ import {
   updatePricing,
   createPricing,
 } from "../services/pricing.service";
+import { createDetailPricing } from "../services/detail.service";
 import { Request, Response } from "express";
 import { generatePDF } from "../utils/pdf";
 
@@ -45,9 +46,13 @@ export const updatePricingController = async (req: Request, res: Response) => {
 
 export const createPricingController = async (req: Request, res: Response) => {
   try {
-    const pricingCreated = await createPricing(req.body);
+    const { pricing, details } = req.body;
+    const pricingCreated = await createPricing(pricing);
     if (!pricingCreated)
       res.status(404).json({ message: "Pricing not created" });
+    /** Crear detalles */
+    await createDetailPricing(details, pricingCreated.id);
+
     res.status(200).json(pricingCreated);
   } catch (error: any) {
     res.status(400).json({ message: error.message });

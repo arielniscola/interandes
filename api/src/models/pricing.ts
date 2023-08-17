@@ -1,6 +1,6 @@
 import { DataTypes, Model, Sequelize } from "sequelize";
 
-interface IPricing {
+export interface IPricing {
   id?: string;
   pricingnumber: string;
   companyname: string;

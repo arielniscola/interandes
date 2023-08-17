@@ -9,7 +9,7 @@ import MDButton from "components/MDButton";
 // Material Dashboard 2 React context
 import { useMaterialUIController } from "context";
 
-function FileCard({ name, company, noGutter }) {
+function FileCard({ file, noGutter }) {
   const [controller] = useMaterialUIController();
   const { darkMode } = controller;
 
@@ -34,7 +34,7 @@ function FileCard({ name, company, noGutter }) {
           mb={2}
         >
           <MDTypography variant="button" fontWeight="medium" textTransform="capitalize">
-            {name}
+            Archivo
           </MDTypography>
 
           <MDBox display="flex" alignItems="center" mt={{ xs: 2, sm: 0 }} ml={{ xs: -1.5, sm: 0 }}>
@@ -47,9 +47,13 @@ function FileCard({ name, company, noGutter }) {
         </MDBox>
         <MDBox mb={1} lineHeight={0}>
           <MDTypography variant="caption" color="text">
-            Company Name:&nbsp;&nbsp;&nbsp;
+            Nombre:&nbsp;
             <MDTypography variant="caption" fontWeight="medium" textTransform="capitalize">
-              {company}
+              {file.name}
+            </MDTypography>
+            &nbsp; Tamaño(kb): &nbsp;
+            <MDTypography variant="caption" fontWeight="medium" textTransform="capitalize">
+              {file.size}
             </MDTypography>
           </MDTypography>
         </MDBox>

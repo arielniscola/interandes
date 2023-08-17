@@ -5,6 +5,8 @@ import { Client, initClientModel } from "./models/client";
 import { User, initUserModel } from "./models/user";
 import { Detail, initDetailModel } from "./models/detail";
 import { FileStructure, initFileStructureModel } from "./models/fileStructure";
+import { SalesOrder, initSalesOrderModel } from "./models/salesOrder";
+import { Container, initContainerModel } from "./models/container";
 
 const DB_USER = "postgres";
 const DB_PASSWORD = "1234";
@@ -26,9 +28,16 @@ initClientModel(sequelize);
 initUserModel(sequelize);
 initDetailModel(sequelize);
 initFileStructureModel(sequelize);
+initSalesOrderModel(sequelize);
+initContainerModel(sequelize);
 
 /** Pricing relations */
 Pricing.belongsTo(Client);
 Pricing.belongsTo(User);
 FileStructure.belongsTo(Pricing);
-Detail.belongsTo(Pricing);
+Pricing.hasMany(Detail);
+
+/** Sales Order relations */
+SalesOrder.hasMany(Container);
+SalesOrder.belongsTo(Client);
+SalesOrder.belongsTo(User);

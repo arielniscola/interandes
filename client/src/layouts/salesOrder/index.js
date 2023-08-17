@@ -18,7 +18,7 @@ import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 
 import { useEffect, useState } from "react";
-import { getPricings } from "services/pricingHook";
+import { getSalesOrders } from "services/salesOrderHook";
 // Material Dashboard 2 React components
 import Icon from "@mui/material/Icon";
 // Material Dashboard 2 React example components
@@ -31,7 +31,7 @@ import MDButton from "../../components/MDButton";
 import MDBox from "../../components/MDBox";
 import MDTypography from "../../components/MDTypography";
 
-function PricingTable() {
+function SalesOrdersTable() {
   const [controller] = useMaterialUIController();
   const { darkMode } = controller;
 
@@ -56,12 +56,12 @@ function PricingTable() {
 
   // const { columns, rows } = u;
   // const { columns: pColumns, rows: pRows } = ;
-  const [pricings, setPrincigs] = useState([]);
+  const [salesOrders, setsalesOrders] = useState([]);
 
   useEffect(async () => {
-    const res = await getPricings();
+    const res = await getSalesOrders();
     const response = addOptions(res);
-    setPrincigs(response);
+    setsalesOrders(response);
   }, []);
 
   const columns = [
@@ -80,7 +80,7 @@ function PricingTable() {
         <MDButton
           variant="gradient"
           color="success"
-          onClick={() => window.location.replace("/pricing-form")}
+          onClick={() => window.location.replace("/salesOrder-form")}
         >
           Nuevo
         </MDButton>
@@ -100,11 +100,11 @@ function PricingTable() {
                 coloredShadow="info"
               >
                 <MDTypography variant="h6" color="white">
-                  Pricing
+                  Orden de venta
                 </MDTypography>
               </MDBox>
               <MDBox pt={3}>
-                <DataTable table={{ columns, rows: pricings }} noEndBorder />
+                <DataTable table={{ columns, rows: salesOrders }} noEndBorder />
               </MDBox>
             </Card>
           </Grid>
@@ -115,4 +115,4 @@ function PricingTable() {
   );
 }
 
-export default PricingTable;
+export default SalesOrdersTable;

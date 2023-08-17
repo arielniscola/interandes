@@ -35,6 +35,8 @@ import Configuration from "layouts/configuration";
 import ClientTable from "layouts/clients";
 import ClientForm from "layouts/clients/form";
 import Files from "layouts/files";
+import SalesOrdersTable from "layouts/salesOrder";
+import SalesOrder from "layouts/salesOrder/form";
 import PricingForm from "./layouts/pricing/form";
 
 const routes = [
@@ -139,6 +141,21 @@ const routes = [
     key: "pricing",
     route: "/pricing-form",
     component: <PricingForm />,
+  },
+  {
+    type: "route",
+    name: "Formulario Orden de Venta",
+    key: "salesOrder",
+    route: "/sales-order",
+    component: <SalesOrder />,
+  },
+  {
+    type: "collapse",
+    name: "ORDEN DE VENTA",
+    key: "salesOrder",
+    icon: <Icon fontSize="small">receipt_long</Icon>,
+    route: "/sales-order",
+    component: <SalesOrdersTable />,
   },
   {
     type: "route",

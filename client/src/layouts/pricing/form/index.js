@@ -28,10 +28,17 @@ import MDButton from "../../../components/MDButton";
 import MDTypography from "../../../components/MDTypography";
 
 // Material Dashboard 2 React example components
+const getPricing = (id) => {
+  const pricingBD = getPricing(id);
+  console.log(pricingBD);
+};
 
-function Pricing() {
+function Pricing({ match }) {
   const navigate = useNavigate();
-
+  if (match) {
+    const { id } = match.params;
+    if (id) getPricing(id);
+  }
   const [pricing, setPricing] = useState({
     companyname: "",
     language: "",
@@ -282,7 +289,8 @@ function Pricing() {
   };
 
   const submitHandlerPricing = async () => {
-    const res = await createPricings(pricing);
+    const data = { pricing, details: { ...rowsCost, ...rowsSale, ...rowsTax } };
+    const res = await createPricings(data);
     if (res) navigate("/pricing");
   };
   const handleChangeDate = (e) => {
@@ -292,10 +300,14 @@ function Pricing() {
     setPricing({ ...pricing, revalidated: e });
   };
 
+  // Relaciono cliente
+  const handleClientSelect = (client) => {
+    setPricing({ ...pricing, client: client.id });
+  };
   return (
     <DashboardLayout>
       <DashboardNavbar />
-      <ClientForm />
+      <ClientForm onClientSelect={handleClientSelect} />
       <MDBox pt={6} pb={3}>
         <Card>
           <MDBox

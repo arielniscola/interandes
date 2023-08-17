@@ -10,6 +10,7 @@ interface IDetail {
   price: number;
   subtotal: number;
   unitType?: string;
+  pricingId?: string;
 }
 
 class Detail extends Model<IDetail> {
@@ -22,6 +23,7 @@ class Detail extends Model<IDetail> {
   price: number;
   subtotal: number;
   unitType?: string;
+  pricingId?: string;
 }
 
 export function initDetailModel(sequelize: Sequelize): void {
@@ -61,7 +63,7 @@ export function initDetailModel(sequelize: Sequelize): void {
     },
     {
       sequelize,
-      modelName: "Client",
+      modelName: "Detail",
       timestamps: true,
     }
   );

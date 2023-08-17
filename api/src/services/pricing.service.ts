@@ -1,4 +1,6 @@
 import { Pricing } from "../models/pricing";
+import { Client } from "../models/client";
+import { Detail } from "../models/detail";
 // import { IDetail } from "../interfaces/IDetail";
 
 export const getAllPricings = async () => {
@@ -18,6 +20,7 @@ export const getPricingID = async (id: string): Promise<Object> => {
     attributes: {
       exclude: ["deleted"],
     },
+    include: [{ model: Client }, { model: Detail }],
   });
 
   if (!pricing) throw new Error("Not found");
