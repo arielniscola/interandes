@@ -146,7 +146,7 @@ const routes = [
     type: "route",
     name: "Formulario Orden de Venta",
     key: "salesOrder",
-    route: "/sales-order",
+    route: "/salesOrder-form",
     component: <SalesOrder />,
   },
   {
@@ -154,7 +154,7 @@ const routes = [
     name: "ORDEN DE VENTA",
     key: "salesOrder",
     icon: <Icon fontSize="small">receipt_long</Icon>,
-    route: "/sales-order",
+    route: "/salesOrder",
     component: <SalesOrdersTable />,
   },
   {

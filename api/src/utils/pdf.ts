@@ -1,6 +1,7 @@
 import PDFDocument from "pdfkit";
 import fs from "fs";
 import { Detail } from "../models/detail";
+import moment from "moment";
 
 export const generatePDF = async (data: any, items: Detail[] | any) => {
   try {
@@ -10,8 +11,8 @@ export const generatePDF = async (data: any, items: Detail[] | any) => {
     const doc = new PDFDocument();
 
     // Stream for writing to a file
-    const stream = fs.createWriteStream("files/invoice.pdf");
-
+    const stream = fs.createWriteStream("files/cotizacion.pdf");
+    doc.page.margins.bottom = 0;
     // Document setup
     doc.pipe(stream);
     const pageWidth = doc.page.width;
@@ -58,118 +59,97 @@ export const generatePDF = async (data: any, items: Detail[] | any) => {
     doc
       .font("Helvetica-Bold")
       .fontSize(20)
-      .text("Invoice", { align: "center" });
+      .text("Cotización", { align: "center" });
     const imagePath = "./assets/allin.png"; // Reemplaza con la ruta de tu imagen
-    const mx = -8;
+    const mx = 0;
     const my = -20;
     doc.image(imagePath, mx, my, {
       fit: [180, 180], // Ancho y alto de la imagen en puntos
       align: "center",
       valign: "center",
     });
+    function drawCell(
+      text: string,
+      x: number,
+      y: number,
+      width: number,
+      height: number,
+      align?: string,
+      fontType?: string
+    ) {
+      doc.fontSize(8);
+      doc.font(fontType || "Helvetica-Bold");
+      doc.lineWidth(0.5);
+      doc.rect(x, y, width, height).stroke();
+      doc.text(text, x + 5, y + 5, {
+        width: width - 20,
+        align: align || "left",
+      });
+    }
     doc.moveDown();
 
     // Invoice details
-    doc.font("Helvetica").fontSize(12).text(`Fecha: ${data.effectiveDate}`);
-    doc.text(`Vigencia: ${data.revalidate}`, { align: "left" });
-    doc.moveDown();
-
-    // Definir los estilos de la tabla
-    doc.font("Helvetica-Bold").fontSize(12);
-    const margenSuperior = 200;
-    const margenIzquierdo = 50;
-    const margenDerecho = 50;
-
-    // Definir los datos de la tabla
-    const data2 = [
-      ["Cliente", "BODEGA LUIGI BOSCA	"],
-      ["Tipo de Servicio", "Flete Terrestre Container Full Expo"],
-      ["Cantidad", "20DC / 40DC / 40HC carga general NO IMO	"],
-      ["Sale Term", "CPT CHILE"],
-      ["Origen", "Mendoza City Limits"],
-      ["Destino Final", "San Antonio o Valparaiso"],
-      ["Transit Time", "2"],
-    ];
-    const data3 = [
-      ["Costo", ""],
-      ["Tipo de Servicio", "Flete Terrestre Container Full Expo"],
-      ["Cantidad", "20DC / 40DC / 40HC carga general NO IMO	"],
-      ["Sale Term", "CPT CHILE"],
-      ["Origen", "Mendoza City Limits"],
-      ["Destino Final", "San Antonio o Valparaiso"],
-      ["Transit Time", "2"],
-    ];
-
-    // Definir la posición inicial de la tabla
-    let y = margenSuperior;
-
-    // Definir el ancho de cada columna
-    const columnWidth = (doc.page.width - margenIzquierdo - margenDerecho) / 2;
     doc
-      .font("Helvetica-Bold")
-      .fontSize(14)
-      .text(`Presupuesto: N° 2`, { align: "right" });
-    // Definir los estilos de la tabla
-    doc.font("Helvetica-Bold").fontSize(12);
-
-    // Recorrer los datos y dibujar la tabla
-    data3.forEach((row) => {
-      let x = margenIzquierdo;
-
-      row.forEach((cell) => {
-        // Dibujar el texto en la celda
-        doc.text(cell, x + 5, y + 5, {
-          width: columnWidth - 10,
-          align: "left",
-        });
-
-        // Dibujar los bordes de la celda
-        doc.rect(x, y, columnWidth, 20).stroke();
-
-        x += columnWidth;
-      });
-
-      y += 20; // Espacio entre filas
-    });
-
-    let yt2 = 400;
-
-    // Definir el ancho de cada columna
-    const columnWidth2 = (doc.page.width - margenIzquierdo - margenDerecho) / 2;
-
-    // Recorrer los datos y dibujar la tabla
-    data2.forEach((row) => {
-      let x = margenIzquierdo;
-
-      row.forEach((cell) => {
-        // Dibujar el texto en la celda
-        doc.text(cell, x + 5, yt2 + 5, {
-          width: columnWidth2 - 10,
-          align: "left",
-        });
-
-        // Dibujar los bordes de la celda
-        doc.rect(x, yt2, columnWidth2, 20).stroke();
-
-        x += columnWidth;
-      });
-
-      yt2 += 20; // Espacio entre filas
-    });
-
-    doc.moveDown();
-
-    // Invoice total
-    doc
-      .font("Helvetica-Bold")
-      .fontSize(14)
-      .text(`Total: $${data.profit.toFixed(2)}`, { align: "right" });
-    doc.moveDown();
-    doc
-      .font("Helvetica-Bold")
+      .font("Helvetica")
       .fontSize(12)
-      .text(`Observaciones: $${data.observations}`, { align: "left" });
-    doc.moveDown(2);
+      .text(
+        `Fecha: ${moment(data.effectiveDate).format("DD/MM/YYYY")}`,
+        30,
+        140
+      );
+    doc
+      .font("Helvetica")
+      .fontSize(12)
+      .text(
+        `Vigencia: ${moment(data.revalidate).format("DD/MM/YYYY")}`,
+        350,
+        140
+      );
+
+    // Definir los estilos de la tabla
+    doc.font("Helvetica-Bold").fontSize(10);
+
+    drawCell("CLIENTE", 30, 170, 250, 15, "left");
+    drawCell(``, 280, 170, 250, 15, "center", "Helvetica");
+    drawCell("TIPO DE SERVICIO", 30, 185, 250, 15, "left");
+    drawCell(``, 280, 185, 250, 15, "center", "Helvetica");
+    drawCell("CANTIDAD", 30, 200, 250, 15, "left");
+    drawCell(``, 280, 200, 250, 15, "center", "Helvetica");
+    drawCell("SALE TERM", 30, 215, 250, 15, "left");
+    drawCell(``, 280, 215, 250, 15, "center", "Helvetica");
+    drawCell("ORIGEN", 30, 230, 250, 15, "left");
+    drawCell(``, 280, 230, 250, 15, "center", "Helvetica");
+    drawCell("ADUANA DESTINO", 30, 245, 250, 15, "left");
+    drawCell(``, 280, 245, 250, 15, "center", "Helvetica");
+    drawCell("DESTINO FINAL", 30, 260, 250, 15, "left");
+    drawCell(``, 280, 260, 250, 15, "center", "Helvetica");
+    drawCell("TRANSIT TIME ESTIMADO", 30, 275, 250, 15, "left");
+    drawCell(``, 280, 275, 90, 15, "center", "Helvetica");
+    drawCell("TRASBORDO", 370, 275, 90, 15, "left");
+    drawCell(``, 460, 275, 70, 15, "center", "Helvetica");
+    drawCell("", 30, 290, 500, 20);
+    // Items
+    drawCell("TARIFA", 30, 310, 500, 15, "left");
+    drawCell("Concepto", 30, 325, 125, 15, "center", "Helvetica");
+    drawCell("Unitario", 155, 325, 125, 15, "center", "Helvetica");
+    drawCell("Cantidad", 280, 325, 125, 15, "center", "Helvetica");
+    drawCell("Total", 405, 325, 125, 15, "center", "Helvetica");
+    drawCell("Flete Terrestre", 30, 340, 125, 15, "center", "Helvetica");
+    drawCell("USD 2.090,00", 155, 340, 125, 15, "center", "Helvetica");
+    drawCell("1", 280, 340, 125, 15, "center", "Helvetica");
+    drawCell("USD 2.090,00", 405, 340, 125, 15, "center", "Helvetica");
+    drawCell("Emisión MIC /CRT", 30, 355, 125, 15, "center", "Helvetica");
+    drawCell("USD 50,00", 155, 355, 125, 15, "center", "Helvetica");
+    drawCell("1", 280, 355, 125, 15, "center", "Helvetica");
+    drawCell("USD 50,00", 405, 355, 125, 15, "center", "Helvetica");
+    drawCell("", 30, 370, 500, 20);
+    drawCell("MONTO TOTAL", 30, 390, 250, 20, "", "Helvetica-Bold");
+    drawCell("USD 2.190,00", 280, 390, 250, 20, "center", "Helvetica-Bold");
+    //Incluye y no Incluye
+    drawCell("INCLUYE", 30, 410, 500, 20);
+    drawCell("", 30, 430, 500, 100);
+    drawCell("NO INCLUYE", 30, 530, 500, 20);
+    drawCell("", 30, 550, 500, 100);
     doc
       .font("Times-Italic")
       .fontSize(11)
@@ -179,7 +159,9 @@ export const generatePDF = async (data: any, items: Detail[] | any) => {
           Tel: 2615-54554545
           www.is-sa.com.ar
         `,
-        { align: "center" }
+        350,
+        680,
+        { align: "right" }
       );
     // Save and close the PDF
     doc.end();

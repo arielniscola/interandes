@@ -5,6 +5,9 @@ import {
   createSalesOrder,
 } from "../services/salesOrder.service";
 import { Request, Response } from "express";
+import { generateSalesOrderPDF } from "../utils/salesOrderPdf";
+import { generateInstructivoPDF } from "../utils/instructivoExpo";
+import { IContainer } from "../models/container";
 
 export const getAllSalesOrdersController = async (
   _req: Request,
@@ -61,6 +64,46 @@ export const createSalesOrderController = async (
     /** Crear detalles */
 
     res.status(200).json(salesOrderCreated);
+  } catch (error: any) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+export const pdfSalesOrderController = async (_req: Request, res: Response) => {
+  try {
+    // const id = req.params.id;
+    // const pricingRes = await getPricingID(id);
+    await generateSalesOrderPDF();
+    res.status(200).json({ message: "ok" });
+  } catch (error: any) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+export const generateInstructivoController = async (
+  _req: Request,
+  res: Response
+) => {
+  try {
+    // const id = req.params.id;
+    const container: IContainer[] = [
+      {
+        containerNumber: "NASA23",
+        ptoLinea: "sdad",
+        ptoAduana: "asdddddg",
+        otherSeals: "asdggg1",
+        poRef: "gcina",
+        driver: "gustabo",
+        dni: "3621912",
+        truckPlate: "asdasd",
+        semiPlate: "asdfa",
+        containerType: "asdad",
+        hasTemp: false,
+      },
+    ];
+    // const pricingRes = await getPricingID(id);
+    await generateInstructivoPDF(container);
+    res.status(200).json({ message: "ok" });
   } catch (error: any) {
     res.status(400).json({ message: error.message });
   }

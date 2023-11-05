@@ -1,12 +1,14 @@
 // import { Link } from "react-router-dom";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { getClients } from "services/clientHook";
+import Autocomplete from "@mui/material/Autocomplete";
 import { useNavigate } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import moment from "moment";
-import { createPricings } from "services/pricingHook";
+import { createSalesOrders } from "services/salesOrderHook";
 // import table Items
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
@@ -15,21 +17,45 @@ import { Grid } from "@mui/material";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import InputLabel from "@mui/material/InputLabel";
-import ClientForm from "layouts/clients/form/form";
+import Divider from "@mui/material/Divider";
 import Datepicker from "components/Datepicker";
+import Icon from "@mui/material/Icon";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
+import TextField from "@mui/material/TextField";
+import ConsigneeForm from "layouts/consignee/form";
 import MDInput from "../../../components/MDInput";
 import MDTypography from "../../../components/MDTypography";
 import MDButton from "../../../components/MDButton";
+import DataTable from "../../../examples/Tables/DataTable";
 
 // Material Dashboard 2 React example components
 function SalesOrder({ match }) {
   const navigate = useNavigate();
+  const [clients, setClients] = useState([]);
   if (match) {
     const { id } = match.params;
     console.log(id);
   }
+  useEffect(async () => {
+    const res = await getClients();
+    setClients(res);
+  }, []);
+
+  const [client, setClient] = useState({
+    _id: "",
+    taxID: "",
+    companyname: "",
+    direction: "",
+    contactperson: "",
+    mailaddress: "",
+    phonenumber: "",
+    category: "",
+  });
+  const defaultOptions = {
+    options: clients.length > 0 ? clients : [],
+    getOptionLabel: (option) => option.companyname,
+  };
   const [saleOrder, setSaleOrder] = useState({
     merchandise: "",
     originOfCharge: "",
@@ -55,7 +81,7 @@ function SalesOrder({ match }) {
     landedATA: "",
     hasHBL: "",
     hblNumber: "",
-    containerStruk: 0,
+    containerStruk: "",
     chargeLCL: false,
     unity: "",
     weigth: "",
@@ -78,15 +104,14 @@ function SalesOrder({ match }) {
     semiPlate: "",
     containerType: "",
     hasTemp: false,
-    temperature: 0,
+    temperature: "",
     ventilation: "",
-    humidity: 0,
+    humidity: "",
+    actions: "",
   });
 
   const handleChangeSaleOrder = (e) => {
     const { name, value } = e.target;
-    console.log(name);
-    console.log(value);
 
     switch (name) {
       case "chargeLCL":
@@ -106,31 +131,106 @@ function SalesOrder({ match }) {
 
   const submitHandlerSaleOrder = async () => {
     const data = { saleOrder };
-    const res = await createPricings(data);
+    const res = await createSalesOrders(data);
     if (res) navigate("/sales-order");
   };
-  const handleChangeDate = (e) => {
-    setSaleOrder({ ...saleOrder, effectiveDate: e });
-  };
-  const handleChangeDateRevalidate = (e) => {
-    setSaleOrder({ ...saleOrder, revalidated: e });
+  const handleChangeDate = (field, date) => {
+    setSaleOrder({ ...saleOrder, [field]: date });
   };
   // Cambio en contenerdors
   const handleChangeContainer = (e) => {
-    console.log(container);
-    console.log(containers);
-    setContainer(e);
-    setContainers();
+    const { name, value } = e.target;
+    switch (name) {
+      default:
+        setContainer({
+          ...container,
+          [name]: value,
+        });
+        break;
+    }
   };
+  // Eliminar contenedor
+  const deleteContainer = (row) => {
+    const result = containers.filter((i) => i.containerNumber !== row);
+    setContainers(result);
+  };
+  // Agregar contenedor
+  const addContainer = () => {
+    container.actions = (
+      <MDBox mr={1}>
+        <MDButton
+          id={container.containerNumber}
+          variant="text"
+          onClick={() => deleteContainer(container.containerNumber)}
+          color="error"
+        >
+          <Icon>delete</Icon>
+        </MDButton>
+      </MDBox>
+    );
+    setContainers([...containers, container]);
+    setContainer({
+      containerNumber: "",
+      ptoLinea: "",
+      ptoAduana: "",
+      otherSeals: "",
+      poRef: "",
+      driver: "",
+      dni: "",
+      truckPlate: "",
+      semiPlate: "",
+      containerType: "",
+      hasTemp: "",
+      temperature: "",
+      ventilation: "",
+      humidity: "",
+      actions: "",
+    });
+  };
+
   // Relaciono cliente
-  const handleClientSelect = (client) => {
-    setSaleOrder({ ...saleOrder, client: client.id });
-    handleChangeContainer();
+  const onClientSelect = (clientSelected) => {
+    setSaleOrder({ ...saleOrder, client: clientSelected.id });
   };
+  // Borrar form de container
+  const deleteFormContainer = () => {
+    setContainer({
+      containerNumber: "",
+      ptoLinea: "",
+      ptoAduana: "",
+      otherSeals: "",
+      poRef: "",
+      driver: "",
+      dni: "",
+      truckPlate: "",
+      semiPlate: "",
+      containerType: "",
+      hasTemp: false,
+      temperature: "",
+      ventilation: "",
+      humidity: "",
+    });
+  };
+  const columns = [
+    { Header: "N°", accessor: "containerNumber", align: "center" },
+    { Header: "PTO Linea", accessor: "ptoLinea", align: "center" },
+    { Header: "PTO Aduana", accessor: "ptoAduana", align: "center" },
+    { Header: "Otros Sellos", accessor: "otherSeals", align: "center" },
+    { Header: "PO/REF", accessor: "poRef", align: "center" },
+    { Header: "Conductor", accessor: "driver", align: "center" },
+    { Header: "DNI", accessor: "dni", align: "center" },
+    { Header: "Patente Tractor", accessor: "truckPlate", align: "center" },
+    { Header: "Patente Semi", accessor: "semiPlate", align: "center" },
+    { Header: "Tipo Contenedor", accessor: "containerType", align: "center" },
+    { Header: "Tiene Temp", accessor: "hasTemp", align: "center" },
+    { Header: "Temperatura", accessor: "temperature", align: "center" },
+    { Header: "Humedad", accessor: "humidity", align: "center" },
+    { Header: "Ventilacion", accessor: "ventilation", align: "center" },
+    { Header: "Opciones", accessor: "actions", align: "center" },
+  ];
   return (
     <DashboardLayout>
       <DashboardNavbar />
-      <ClientForm onClientSelect={handleClientSelect} />
       <MDBox pt={6} pb={3}>
         <Card>
           <MDBox
@@ -147,12 +247,65 @@ function SalesOrder({ match }) {
               Orden de Venta
             </MDTypography>
           </MDBox>
+          <Grid container spacing={2} marginBottom={-2} sx={{ m: 1 }}>
+            <Grid item xs={4}>
+              <MDBox mb={1} sx={{ mt: 3 }}>
+                <Autocomplete
+                  {...defaultOptions}
+                  id="client-select"
+                  multiple={false}
+                  style={{ width: 300, marginBottom: 8, marginTop: -20 }}
+                  options={clients}
+                  renderInput={(params) => (
+                    <TextField {...params} label="Buscar cliente" variant="outlined" />
+                  )}
+                  onChange={(event, newValue) => {
+                    if (!newValue) {
+                      setClient({
+                        taxID: "",
+                        companyname: "",
+                        direction: "",
+                        contactperson: "",
+                        mailaddress: "",
+                        phonenumber: "",
+                        category: "",
+                      });
+                    } else {
+                      setClient(newValue);
+                      onClientSelect(newValue);
+                    }
+                  }}
+                />
+              </MDBox>
+            </Grid>
+            <Grid item xs={4}>
+              <MDBox mb={1} sx={{ m: 1 }}>
+                <MDInput
+                  disable
+                  type="text"
+                  name="clientName"
+                  label="Contacto"
+                  value={client.contactperson}
+                  fullWidth
+                />
+              </MDBox>
+            </Grid>
+          </Grid>
+          <Grid container spacing={2} marginBottom={-2} sx={{ m: 1 }}>
+            <Grid item xs={5}>
+              <ConsigneeForm title="Consignee" />
+            </Grid>
+            <Grid item xs={5}>
+              <ConsigneeForm title="Notify" />
+            </Grid>
+          </Grid>
           <MDBox pt={3}>
             <MDBox component="form" role="form">
               <Grid container spacing={2}>
                 <Grid item xs={6}>
                   <MDBox mb={2} sx={{ m: 2 }}>
                     <MDInput
+                      disable
                       type="text"
                       name="merchandise"
                       label="Mercaderia"
@@ -284,10 +437,10 @@ function SalesOrder({ match }) {
                   <MDBox mt={3} mb={1} sx={{ m: 2 }}>
                     <InputLabel id="demo-simple-select-helper-label">Posee HBL</InputLabel>
                     <Select
-                      labelId="stage-price"
+                      labelId="hasHBL"
                       value={saleOrder.hasHBL}
-                      name="stage"
-                      id="stage-price"
+                      name="hasHBL"
+                      id="hasHBL"
                       label="Posee HBL"
                       onChange={handleChangeSaleOrder}
                       style={{ height: 40, marginTop: 8, width: 300 }}
@@ -310,20 +463,23 @@ function SalesOrder({ match }) {
                   )}
                 </Grid>
                 <Grid item xs={6}>
-                  <Grid container spacing={2} marginBottom={-2}>
+                  <Grid container spacing={2} marginBottom={-2} sx={{ m: 1 }}>
                     <MDBox mb={2} sx={{ m: 2 }}>
                       <InputLabel id="demo-simple-select-helper-label" style={{ marginBottom: 4 }}>
                         Fecha de Carga
                       </InputLabel>
-                      <Datepicker value={saleOrder.dischargeDate} onChange={handleChangeDate} />
+                      <Datepicker
+                        value={saleOrder.chargeDate}
+                        onChange={(selectedDate) => handleChangeDate("chargeDate", selectedDate)}
+                      />
                     </MDBox>
                     <MDBox mb={2} sx={{ m: 2 }}>
                       <InputLabel id="demo-simple-select-helper-label" style={{ marginBottom: 4 }}>
                         Fecha de descarga
                       </InputLabel>
                       <Datepicker
-                        value={saleOrder.chargeDate}
-                        onChange={handleChangeDateRevalidate}
+                        value={saleOrder.dischargeDate}
+                        onChange={(selectedDate) => handleChangeDate("dischargeDate", selectedDate)}
                       />
                     </MDBox>
                   </Grid>
@@ -384,7 +540,9 @@ function SalesOrder({ match }) {
                       </InputLabel>
                       <Datepicker
                         value={saleOrder.loadingPortDepartureDate}
-                        onChange={handleChangeDate}
+                        onChange={(selectedDate) =>
+                          handleChangeDate("loadingPortDepartureDate", selectedDate)
+                        }
                       />
                     </MDBox>
                     <MDBox mb={2} sx={{ m: 2 }}>
@@ -393,7 +551,9 @@ function SalesOrder({ match }) {
                       </InputLabel>
                       <Datepicker
                         value={saleOrder.dischargePortArrivalDate}
-                        onChange={handleChangeDateRevalidate}
+                        onChange={(selectedDate) =>
+                          handleChangeDate("dischargePortArrivalDate", selectedDate)
+                        }
                       />
                     </MDBox>
                   </Grid>
@@ -404,7 +564,9 @@ function SalesOrder({ match }) {
                       </InputLabel>
                       <Datepicker
                         value={saleOrder.physicalCutOffDate}
-                        onChange={handleChangeDate}
+                        onChange={(selectedDate) =>
+                          handleChangeDate("physicalCutOffDate", selectedDate)
+                        }
                       />
                     </MDBox>
                     <MDBox mb={2} sx={{ m: 2 }}>
@@ -413,16 +575,23 @@ function SalesOrder({ match }) {
                       </InputLabel>
                       <Datepicker
                         value={saleOrder.documentaryCutOffDate}
-                        onChange={handleChangeDateRevalidate}
+                        onChange={(selectedDate) =>
+                          handleChangeDate("documentaryCutOffDate", selectedDate)
+                        }
                       />
                     </MDBox>
                   </Grid>
                   <MDBox mb={2} sx={{ m: 2 }}>
                     <FormControlLabel
-                      control={<Checkbox checked={saleOrder.chargeLCL} />}
+                      control={
+                        <Checkbox
+                          name="chargeLCL"
+                          checked={saleOrder.chargeLCL}
+                          onChange={handleChangeSaleOrder}
+                        />
+                      }
                       label="Carga LCL"
                       name="chargeLCL"
-                      onChange={handleChangeSaleOrder}
                     />
                   </MDBox>
                   {saleOrder.chargeLCL && (
@@ -482,185 +651,225 @@ function SalesOrder({ match }) {
                     </Card>
                   )}
                 </Grid>
-                <MDBox mt={4} mb={1} sx={{ m: 2 }}>
-                  <MDButton variant="gradient" color="info" onClick={submitHandlerSaleOrder}>
-                    Guardar
-                  </MDButton>
-                </MDBox>
               </Grid>
             </MDBox>
           </MDBox>
         </Card>
       </MDBox>
-      <MDBox pt={6} pb={3}>
-        <Card>
-          <MDBox
-            mx={2}
-            mt={-3}
-            py={1}
-            px={1}
-            variant="gradient"
-            bgColor="error"
-            borderRadius="lg"
-            coloredShadow="error"
-          >
-            <MDTypography variant="h6" color="white">
-              Camiones/Contenerdores
-            </MDTypography>
-          </MDBox>
-          <MDBox pt={3}>
-            <MDBox component="form" role="form">
-              <Grid container spacing={1}>
-                <Grid item xs={0.8}>
-                  <MDInput
-                    type="text"
-                    name="containerNumber"
-                    label="Numero"
-                    value={container.containerNumber}
-                    onChange={handleChangeSaleOrder}
-                    fullWidth
-                  />
-                </Grid>
-                <Grid item xs={0.8}>
-                  <MDInput
-                    type="text"
-                    name="ptoLinea"
-                    label="PTO Linea"
-                    value={container.ptoLinea}
-                    onChange={handleChangeSaleOrder}
-                    fullWidth
-                  />
-                </Grid>
-                <Grid item xs={0.8}>
-                  <MDInput
-                    type="text"
-                    name="ptoAduana"
-                    label="Volumen"
-                    value={container.ptoAduana}
-                    onChange={handleChangeSaleOrder}
-                    fullWidth
-                  />
-                </Grid>
-                <Grid item xs={0.8}>
-                  <MDInput
-                    type="text"
-                    name="otherSeals"
-                    label="Otros Sellos"
-                    value={container.otherSeals}
-                    onChange={handleChangeSaleOrder}
-                    fullWidth
-                  />
-                </Grid>
-                <Grid item xs={0.8}>
-                  <MDInput
-                    type="text"
-                    name="poRef"
-                    label="PO/REF"
-                    value={saleOrder.poRef}
-                    onChange={handleChangeSaleOrder}
-                    fullWidth
-                  />
-                </Grid>
-                <Grid item xs={0.8}>
-                  <MDInput
-                    type="text"
-                    name="poRef"
-                    label="PO/REF"
-                    value={container.poRef}
-                    onChange={handleChangeSaleOrder}
-                    fullWidth
-                  />
-                </Grid>
-                <Grid item xs={0.8}>
-                  <MDInput
-                    type="text"
-                    name="driver"
-                    label="Conductor"
-                    value={container.driver}
-                    onChange={handleChangeSaleOrder}
-                    fullWidth
-                  />
-                </Grid>
-                <Grid item xs={0.8}>
-                  <MDInput
-                    type="text"
-                    name="dni"
-                    label="DNI"
-                    value={container.dni}
-                    onChange={handleChangeSaleOrder}
-                    fullWidth
-                  />
-                </Grid>
-                <Grid item xs={0.8}>
-                  <MDInput
-                    type="text"
-                    name="truckPlate"
-                    label="Patente tractor"
-                    value={container.truckPlate}
-                    onChange={handleChangeSaleOrder}
-                    fullWidth
-                  />
-                </Grid>
-                <Grid item xs={0.8}>
-                  <MDInput
-                    type="text"
-                    name="semiPlate"
-                    label="Patente semi"
-                    value={container.semiPlate}
-                    onChange={handleChangeSaleOrder}
-                    fullWidth
-                  />
-                </Grid>
-                <Grid item xs={0.8}>
-                  <MDInput
-                    type="text"
-                    name="containerType"
-                    label="PO/REF"
-                    value={container.containerType}
-                    onChange={handleChangeSaleOrder}
-                    fullWidth
-                  />
-                </Grid>
-                <Grid item xs={0.8}>
-                  <MDInput
-                    type="text"
-                    name="poRef"
-                    label="PO/REF"
-                    value={saleOrder.poRef}
-                    onChange={handleChangeSaleOrder}
-                    fullWidth
-                  />
-                </Grid>
-                <Grid item xs={0.8}>
-                  <MDInput
-                    type="text"
-                    name="poRef"
-                    label="PO/REF"
-                    value={saleOrder.poRef}
-                    onChange={handleChangeSaleOrder}
-                    fullWidth
-                  />
-                </Grid>
-                <Grid item xs={0.8}>
-                  <MDInput
-                    type="text"
-                    name="poRef"
-                    label="PO/REF"
-                    value={saleOrder.poRef}
-                    onChange={handleChangeSaleOrder}
-                    fullWidth
-                  />
-                </Grid>
-                <Grid style={{ marginTop: 8, marginLeft: 2 }}>
-                  <MDButton variant="gradient" color="primary" onClick={submitHandlerSaleOrder}>
-                    Borrar
-                  </MDButton>
-                </Grid>
-              </Grid>
+      {saleOrder.containerStruk > 0 && (
+        <MDBox pt={6} pb={3}>
+          <Card>
+            <MDBox
+              mx={2}
+              mt={-3}
+              py={1}
+              px={1}
+              variant="gradient"
+              bgColor="error"
+              borderRadius="lg"
+              coloredShadow="error"
+            >
+              <MDTypography variant="h6" color="white">
+                Camiones/Contenerdores - Faltan agregar{" "}
+                {saleOrder.containerStruk - containers.length}
+              </MDTypography>
             </MDBox>
+            <MDBox pt={3} style={{ margin: 7 }}>
+              <MDBox component="form" role="form">
+                <Grid container spacing={1}>
+                  <Grid item xs={1.5}>
+                    <MDInput
+                      type="text"
+                      name="containerNumber"
+                      label="Numero"
+                      value={container.containerNumber}
+                      onChange={handleChangeContainer}
+                      fullWidth
+                    />
+                  </Grid>
+                  <Grid item xs={1.5}>
+                    <MDInput
+                      type="text"
+                      name="ptoLinea"
+                      label="PTO Linea"
+                      value={container.ptoLinea}
+                      onChange={handleChangeContainer}
+                      fullWidth
+                    />
+                  </Grid>
+                  <Grid item xs={1.5}>
+                    <MDInput
+                      type="text"
+                      name="ptoAduana"
+                      label="PTO Aduana"
+                      value={container.ptoAduana}
+                      onChange={handleChangeContainer}
+                      fullWidth
+                    />
+                  </Grid>
+                  <Grid item xs={1.5}>
+                    <MDInput
+                      type="text"
+                      name="otherSeals"
+                      label="Otros Sellos"
+                      value={container.otherSeals}
+                      onChange={handleChangeContainer}
+                      fullWidth
+                    />
+                  </Grid>
+                  <Grid item xs={1.5}>
+                    <MDInput
+                      type="text"
+                      name="poRef"
+                      label="PO/REF"
+                      value={saleOrder.poRef}
+                      onChange={handleChangeContainer}
+                      fullWidth
+                    />
+                  </Grid>
+                  <Grid item xs={1.5}>
+                    <MDInput
+                      type="text"
+                      name="driver"
+                      label="Conductor"
+                      value={container.driver}
+                      onChange={handleChangeContainer}
+                      fullWidth
+                    />
+                  </Grid>
+                  <Grid item xs={1.5}>
+                    <MDInput
+                      type="text"
+                      name="dni"
+                      label="DNI"
+                      value={container.dni}
+                      onChange={handleChangeContainer}
+                      fullWidth
+                    />
+                  </Grid>
+                  <Grid item xs={1.5}>
+                    <MDInput
+                      type="text"
+                      name="truckPlate"
+                      label="Patente tractor"
+                      value={container.truckPlate}
+                      onChange={handleChangeContainer}
+                      fullWidth
+                    />
+                  </Grid>
+                  <Grid item xs={1.5}>
+                    <MDInput
+                      type="text"
+                      name="semiPlate"
+                      label="Patente semi"
+                      value={container.semiPlate}
+                      onChange={handleChangeContainer}
+                      fullWidth
+                    />
+                  </Grid>
+                  <Grid item xs={1.5}>
+                    <MDInput
+                      type="text"
+                      name="containerType"
+                      label="Tipo Contenedor"
+                      value={container.containerType}
+                      onChange={handleChangeContainer}
+                      fullWidth
+                    />
+                  </Grid>
+                  <Grid item xs={1.5}>
+                    <MDInput
+                      type="text"
+                      name="hasTemp"
+                      label="Temperatura"
+                      value={saleOrder.hasTemp}
+                      onChange={handleChangeContainer}
+                      fullWidth
+                    />
+                  </Grid>
+                  <Grid item xs={1.5}>
+                    <MDInput
+                      type="text"
+                      name="temperature"
+                      label="Temperatura"
+                      value={saleOrder.temperature}
+                      onChange={handleChangeContainer}
+                      fullWidth
+                    />
+                  </Grid>
+                  <Grid item xs={1.5}>
+                    <MDInput
+                      type="text"
+                      name="ventilation"
+                      label="Ventilacion"
+                      value={saleOrder.ventilation}
+                      onChange={handleChangeContainer}
+                      fullWidth
+                    />
+                  </Grid>
+                  <Grid item xs={1.5}>
+                    <MDInput
+                      type="text"
+                      name="humidity"
+                      label="Humedad"
+                      value={container.humidity}
+                      onChange={handleChangeContainer}
+                      fullWidth
+                    />
+                  </Grid>
+                  <Grid style={{ marginTop: 8, marginLeft: 10 }}>
+                    <MDButton
+                      variant="gradient"
+                      color="success"
+                      size="small"
+                      onClick={addContainer}
+                    >
+                      Agregar
+                    </MDButton>
+                  </Grid>
+                  <Grid style={{ marginTop: 8, marginLeft: 10 }}>
+                    <MDButton
+                      variant="gradient"
+                      color="primary"
+                      size="small"
+                      onClick={deleteFormContainer}
+                    >
+                      Borrar
+                    </MDButton>
+                  </Grid>
+                </Grid>
+                <Divider />
+              </MDBox>
+              <MDBox pt={3}>
+                <DataTable
+                  table={{ columns, rows: containers }}
+                  isSorted={false}
+                  canSearch={false}
+                  entriesPerPage={false}
+                  showTotalEntries={false}
+                />
+              </MDBox>
+            </MDBox>
+          </Card>
+        </MDBox>
+      )}
+      <Grid container spacing={2}>
+        <Grid item xs={3}>
+          <MDBox mt={4} mb={1} sx={{ m: 2 }}>
+            <MDButton variant="gradient" color="info" onClick={submitHandlerSaleOrder}>
+              Guardar
+            </MDButton>
           </MDBox>
-        </Card>
-      </MDBox>
+        </Grid>
+        <Grid item xs={3}>
+          <MDBox mt={4} mb={1} sx={{ m: 2 }}>
+            <MDButton variant="gradient" color="warning" onClick={submitHandlerSaleOrder}>
+              Cancelar
+            </MDButton>
+          </MDBox>
+        </Grid>
+      </Grid>
+
       <Toaster />
       <Footer />
     </DashboardLayout>

@@ -7,6 +7,7 @@ import { Detail, initDetailModel } from "./models/detail";
 import { FileStructure, initFileStructureModel } from "./models/fileStructure";
 import { SalesOrder, initSalesOrderModel } from "./models/salesOrder";
 import { Container, initContainerModel } from "./models/container";
+import { initiConsignee } from "./models/consignee";
 
 const DB_USER = "postgres";
 const DB_PASSWORD = "1234";
@@ -30,6 +31,7 @@ initDetailModel(sequelize);
 initFileStructureModel(sequelize);
 initSalesOrderModel(sequelize);
 initContainerModel(sequelize);
+initiConsignee(sequelize);
 
 /** Pricing relations */
 Pricing.belongsTo(Client);
