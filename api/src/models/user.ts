@@ -12,7 +12,7 @@ interface IUser {
   deleted: boolean;
 }
 
-class User extends Model<IUser> {
+export class User extends Model<IUser> {
   public id?: string;
   public company: string;
   public username: string;
@@ -87,5 +87,3 @@ export function initUserModel(sequelize: Sequelize): void {
     }
   );
 }
-
-export { User };

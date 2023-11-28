@@ -32,7 +32,7 @@ function Configuration() {
           coloredShadow="info"
         >
           <MDTypography variant="h6" color="white">
-            Buscar Cliente / Alta Cliente
+            Configuración
           </MDTypography>
         </MDBox>
         <MDBox pb={3} ml={10} width="80%">
@@ -50,9 +50,24 @@ function Configuration() {
           <Divider />
           <MDBox display="flex" justifyContent="space-between" alignItems="center" lineHeight={1}>
             <MDTypography variant="h6">Modo: Claro / Oscuro</MDTypography>
-
             <Switch checked={darkMode} onChange={handleDarkMode} />
           </MDBox>
+        </MDBox>
+      </Card>
+      <Card>
+        <MDBox
+          mx={2}
+          mt={3}
+          py={2}
+          px={1}
+          variant="gradient"
+          bgColor="info"
+          borderRadius="lg"
+          coloredShadow="info"
+        >
+          <MDTypography variant="h6" color="white">
+            Usuarios
+          </MDTypography>
         </MDBox>
       </Card>
       <Footer />

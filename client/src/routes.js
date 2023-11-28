@@ -37,6 +37,8 @@ import ClientForm from "layouts/clients/form";
 import Files from "layouts/files";
 import SalesOrdersTable from "layouts/salesOrder";
 import SalesOrder from "layouts/salesOrder/form";
+import OperationsTable from "layouts/operations";
+import OperationTimeLine from "layouts/operations/timeline";
 import PricingForm from "./layouts/pricing/form";
 
 const routes = [
@@ -170,6 +172,21 @@ const routes = [
     key: "files",
     route: "/file-upload",
     component: <Files />,
+  },
+  {
+    type: "collapse",
+    name: "OPERACIONES",
+    icon: <Icon fontSize="small">dashboard</Icon>,
+    key: "operation",
+    route: "/operations",
+    component: <OperationsTable />,
+  },
+  {
+    type: "route",
+    name: "OPERACIONES",
+    key: "operations",
+    route: "/operations/timeline",
+    component: <OperationTimeLine />,
   },
 ];
 

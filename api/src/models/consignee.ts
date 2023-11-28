@@ -22,7 +22,7 @@ export class Consignee extends Model<IConsignee> {
   public notify: boolean;
 }
 
-export function initiConsignee(sequelize: Sequelize): void {
+export function initConsignee(sequelize: Sequelize): void {
   Consignee.init(
     {
       id: {
