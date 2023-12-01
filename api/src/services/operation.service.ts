@@ -3,7 +3,6 @@ import {
   IHistoryOperation,
 } from "../models/historyOperation";
 import { IOperation, Operation } from "../models/operation";
-import { Task } from "../models/task";
 import { TypeOperation } from "../models/typeOperation";
 import { ITasksList, TaskList } from "../models/workList";
 
@@ -27,7 +26,9 @@ export const getOperations = async (): Promise<Operation[]> => {
   }
 };
 
-export const createOperation = async (operationType: string) => {
+export const createOperation = async (
+  operationType: string
+): Promise<IOperation> => {
   try {
     // Obtener tipo de operacion para listar tareas
     const typeOperationTasks = await TypeOperation.findOne({
@@ -48,10 +49,14 @@ export const createOperation = async (operationType: string) => {
         taks: typeOperationTasks.tasks.map((task) => {
           return { task: task.description, done: false };
         }),
+        operation_id: op.id,
       };
       await TaskList.create(taskList);
     }
-  } catch (error) {}
+    return op;
+  } catch (error) {
+    throw error;
+  }
 };
 
 export const addHistoryOperation = async (
@@ -63,6 +68,7 @@ export const addHistoryOperation = async (
     const operationHistory: IHistoryOperation = {
       dateTime: new Date(),
       method,
+      operation_id: idOperation,
     };
     await HistoryOperation.create(operationHistory);
   } catch (error) {

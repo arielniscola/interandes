@@ -30,8 +30,10 @@ import DataTable from "../../examples/Tables/DataTable";
 import MDButton from "../../components/MDButton";
 import MDBox from "../../components/MDBox";
 import MDTypography from "../../components/MDTypography";
+import useSnackbar from "../../services/snackbarHook";
 
 function SalesOrdersTable() {
+  const { showSnackbar, renderSnackbar } = useSnackbar();
   const [controller] = useMaterialUIController();
   const { darkMode } = controller;
 
@@ -60,8 +62,16 @@ function SalesOrdersTable() {
 
   useEffect(async () => {
     const res = await getSalesOrders();
-    const response = addOptions(res);
-    setsalesOrders(response);
+    if (!res.ack) {
+      showSnackbar({
+        title: "Orden de Venta",
+        content: res.message,
+        icon: res.ack ? "error" : "success",
+      });
+    } else {
+      const response = addOptions(res.data);
+      setsalesOrders(response);
+    }
   }, []);
 
   const columns = [
@@ -110,6 +120,7 @@ function SalesOrdersTable() {
           </Grid>
         </Grid>
       </MDBox>
+      {renderSnackbar}
       <Footer />
     </DashboardLayout>
   );

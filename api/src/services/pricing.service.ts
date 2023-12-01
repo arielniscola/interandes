@@ -1,4 +1,4 @@
-import { Pricing } from "../models/pricing";
+import { IPricing, Pricing } from "../models/pricing";
 import { Client } from "../models/client";
 import { Detail } from "../models/detail";
 // import { IDetail } from "../interfaces/IDetail";
@@ -27,13 +27,17 @@ export const getPricingID = async (id: string): Promise<Object> => {
   return pricing;
 };
 
-export const createPricing = async (pricing: Pricing) => {
-  pricing.pricingnumber = await generateID();
-  const pricingCreated = await Pricing.create(pricing);
+export const createPricing = async (pricing: IPricing) => {
+  try {
+    pricing.pricingnumber = await generateID();
+    const pricingCreated = await Pricing.create(pricing);
 
-  if (!pricingCreated) throw new Error("Error in DB");
+    if (!pricingCreated) throw new Error("Error in DB");
 
-  return pricingCreated;
+    return pricingCreated;
+  } catch (error) {
+    throw error;
+  }
 };
 
 export const updatePricing = async (pricing: Pricing) => {

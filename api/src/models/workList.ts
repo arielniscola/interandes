@@ -4,6 +4,7 @@ export interface ITasksList {
   id?: string;
   code: string;
   taks: { task: string; done: boolean }[];
+  operation_id?: string;
 }
 
 export class TaskList extends Model<ITasksList> {
@@ -27,7 +28,7 @@ export function initTaskListModel(sequelize: Sequelize): void {
         allowNull: false,
       },
       taks: {
-        type: DataTypes.ARRAY,
+        type: DataTypes.ARRAY(DataTypes.JSONB),
       },
     },
     {

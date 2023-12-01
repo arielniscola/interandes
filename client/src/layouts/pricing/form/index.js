@@ -1,17 +1,13 @@
-// import { Link } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Toaster } from "react-hot-toast";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import moment from "moment";
 
 import { createPricings } from "services/pricingHook";
-// @mui material components
 // import table Items
 import DataTable from "examples/Tables/DataTable";
-// Material Dashboard 2 React components
 import MDBox from "components/MDBox";
 import Card from "@mui/material/Card";
 import MenuItem from "@mui/material/MenuItem";
@@ -26,14 +22,15 @@ import Icon from "@mui/material/Icon";
 import MDInput from "../../../components/MDInput";
 import MDButton from "../../../components/MDButton";
 import MDTypography from "../../../components/MDTypography";
+import useSnackbar from "../../../services/snackbarHook";
 
-// Material Dashboard 2 React example components
 const getPricing = (id) => {
   const pricingBD = getPricing(id);
   console.log(pricingBD);
 };
 
 function Pricing({ match }) {
+  const { showSnackbar, renderSnackbar } = useSnackbar();
   const navigate = useNavigate();
   if (match) {
     const { id } = match.params;
@@ -291,7 +288,12 @@ function Pricing({ match }) {
   const submitHandlerPricing = async () => {
     const data = { pricing, details: { ...rowsCost, ...rowsSale, ...rowsTax } };
     const res = await createPricings(data);
-    if (res) navigate("/pricing");
+    showSnackbar({
+      title: "Pricing",
+      content: res.message,
+      icon: res.ack ? "error" : "success",
+    });
+    if (!res.ack) navigate("/pricing");
   };
   const handleChangeDate = (e) => {
     setPricing({ ...pricing, effectiveDate: e });
@@ -332,7 +334,7 @@ function Pricing({ match }) {
                   <Select
                     fullWidth
                     labelId="demo-simple-select-helper-label"
-                    id="demo-simple-select-helper"
+                    id="demo-simple-select"
                     name="companyname"
                     label="Empresa"
                     value={pricing.companyname}
@@ -834,7 +836,7 @@ function Pricing({ match }) {
           </MDBox>
         </Card>
       </MDBox>
-      <Toaster />
+      {renderSnackbar}
       <Footer />
     </DashboardLayout>
   );

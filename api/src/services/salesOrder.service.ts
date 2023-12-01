@@ -15,7 +15,7 @@ export const getAllSalesOrders = async () => {
   return salesOrders;
 };
 
-export const getSalesOrderID = async (id: string): Promise<Object> => {
+export const getSalesOrderID = async (id: string): Promise<SalesOrder> => {
   const salesOrder = await SalesOrder.findByPk(id, {
     attributes: {
       exclude: ["deleted"],

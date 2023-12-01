@@ -1,17 +1,7 @@
-import toast from "react-hot-toast";
 import URL_API from "../config";
 
-const notify = (message) => {
-  toast.success(message, {
-    duration: 2000,
-    position: "bottom-right",
-  });
-};
 const notifyError = (message) => {
-  toast.error(message, {
-    duration: 3000,
-    position: "bottom-right",
-  });
+  console.log(message);
 };
 
 export const getPricings = async () => {
@@ -35,11 +25,9 @@ export const createPricings = async (pricing) => {
       headers: { "Content-type": "application/json" },
       body: JSON.stringify(pricing),
     });
-    const data = res.json();
-    if (data) notify("Pricing creado");
+    const data = await res.json();
     return data;
   } catch (error) {
-    notifyError(error.message);
     return null;
   }
 };

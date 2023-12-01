@@ -7,6 +7,10 @@ import {
 import { createDetailPricing } from "../services/detail.service";
 import { Request, Response } from "express";
 import { generatePDF } from "../utils/pdf";
+import { createOperation } from "../services/operation.service";
+import { IPricing } from "../models/pricing";
+import { IDetail } from "../models/detail";
+import { ResponseApi } from "../utils/responseApi";
 
 export const getAllPricingsController = async (
   _req: Request,
@@ -44,18 +48,28 @@ export const updatePricingController = async (req: Request, res: Response) => {
   }
 };
 
-export const createPricingController = async (req: Request, res: Response) => {
+export const createPricingController = async (
+  req: Request<{}, {}, { pricing: IPricing; details: IDetail[] }>,
+  res: Response
+) => {
   try {
+    // Crear operacion principal
     const { pricing, details } = req.body;
+    const operation = await createOperation(pricing.operationType);
+    pricing.operation_id = operation.id;
     const pricingCreated = await createPricing(pricing);
     if (!pricingCreated)
-      res.status(404).json({ message: "Pricing not created" });
+      res.status(200).json(new ResponseApi(1, "Error al crear pricing"));
     /** Crear detalles */
     await createDetailPricing(details, pricingCreated.id);
 
-    res.status(200).json(pricingCreated);
+    res.status(200).json(new ResponseApi(0, "Pricing creado correctamente"));
   } catch (error: any) {
-    res.status(400).json({ message: error.message });
+    res
+      .status(200)
+      .json(
+        new ResponseApi(1, `Error en creacion de pricing: ${error.message}`)
+      );
   }
 };
 

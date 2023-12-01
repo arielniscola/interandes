@@ -4,6 +4,7 @@ export interface IHistoryOperation {
   id?: string;
   dateTime: Date;
   method: string;
+  operation_id?: string;
 }
 
 export class HistoryOperation extends Model<IHistoryOperation> {

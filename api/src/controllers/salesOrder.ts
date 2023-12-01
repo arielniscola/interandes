@@ -8,19 +8,25 @@ import { Request, Response } from "express";
 import { generateSalesOrderPDF } from "../utils/salesOrderPdf";
 import { generateInstructivoPDF } from "../utils/instructivoExpo";
 import { IContainer } from "../models/container";
+import { ResponseApi } from "../utils/responseApi";
 
 export const getAllSalesOrdersController = async (
   _req: Request,
   res: Response
 ) => {
   try {
-    const SalesOrders = await getAllSalesOrders();
-    if (!SalesOrders)
-      res.status(404).json({ message: "SalesOrders not found" });
-
-    res.status(200).json(SalesOrders);
+    const salesOrders = await getAllSalesOrders();
+    if (!salesOrders.length) {
+      res
+        .status(200)
+        .json(new ResponseApi(0, "No se encontraron tareas creadas"));
+    } else {
+      res.status(200).json(new ResponseApi(0, "", salesOrders));
+    }
   } catch (error: any) {
-    res.status(404).json({ message: error.message });
+    res
+      .status(200)
+      .json(new ResponseApi(1, `Error en obtener ordenes de venta: ${error}`));
   }
 };
 
@@ -30,11 +36,14 @@ export const getSalesOrderIDController = async (
 ) => {
   try {
     const salesOrder = await getSalesOrderID(req.params.id);
-    if (!salesOrder) res.status(404).json({ message: "SalesOrder not found" });
+    if (!salesOrder)
+      res.status(200).json(new ResponseApi(1, "No se encontro orden de venta"));
 
-    res.status(200).json(salesOrder);
+    res.status(200).json(new ResponseApi(0, "", salesOrder));
   } catch (error: any) {
-    res.status(404).json({ message: error.message });
+    res
+      .status(200)
+      .json(new ResponseApi(1, `Error en obetner orden de venta: ${error}`));
   }
 };
 
@@ -45,10 +54,16 @@ export const updateSalesOrderController = async (
   try {
     const salesOrderUpdated = await updateSalesOrder(req.body);
     if (!salesOrderUpdated)
-      res.status(404).json({ message: "SalesOrder not updated" });
-    res.status(200).json(salesOrderUpdated);
+      res
+        .status(200)
+        .json(new ResponseApi(1, `Error a actualizar orden de venta`));
+    res
+      .status(200)
+      .json(new ResponseApi(0, "Orden de Venta creada correctamente"));
   } catch (error: any) {
-    res.status(404).json({ message: error.message });
+    res
+      .status(200)
+      .json(new ResponseApi(1, `Error a actualizar orden: ${error}`));
   }
 };
 
@@ -60,12 +75,16 @@ export const createSalesOrderController = async (
     const { salesOrder } = req.body;
     const salesOrderCreated = await createSalesOrder(salesOrder);
     if (!salesOrderCreated)
-      res.status(404).json({ message: "SalesOrder not created" });
+      res.status(404).json(new ResponseApi(1, "SalesOrder not created"));
     /** Crear detalles */
 
-    res.status(200).json(salesOrderCreated);
+    res
+      .status(200)
+      .json(new ResponseApi(0, "Orden de venta generada correctamente"));
   } catch (error: any) {
-    res.status(400).json({ message: error.message });
+    res
+      .status(400)
+      .json(new ResponseApi(1, `Error al crear Orden de venta: ${error}`));
   }
 };
 

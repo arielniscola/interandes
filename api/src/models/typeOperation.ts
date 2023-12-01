@@ -29,7 +29,7 @@ export function initTypeOperationModel(sequelize: Sequelize): void {
         unique: true,
       },
       tasks: {
-        type: DataTypes.ARRAY,
+        type: DataTypes.ARRAY(DataTypes.JSONB),
       },
     },
     {

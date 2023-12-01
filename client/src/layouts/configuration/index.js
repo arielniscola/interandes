@@ -1,31 +1,26 @@
-// Material Dashboard 2 React components
-import Switch from "@mui/material/Switch";
-// Material Dashboard 2 React example components
-import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
-import { useMaterialUIController, setFixedNavbar, setDarkMode } from "context";
-import DashboardNavbar from "examples/Navbars/DashboardNavbar";
-import Divider from "@mui/material/Divider";
+import React, { useState } from "react";
+import Button from "@mui/material/Button";
+import ButtonGroup from "@mui/material/ButtonGroup";
 import Card from "@mui/material/Card";
-import Footer from "examples/Footer";
+import DashboardNavbar from "examples/Navbars/DashboardNavbar";
+import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
+import Task from "layouts/task";
 import MDBox from "../../components/MDBox";
 import MDTypography from "../../components/MDTypography";
+import Configuration from "./generalConfigs";
 
-function Configuration() {
-  const [controller, dispatch] = useMaterialUIController();
-  const { fixedNavbar, darkMode } = controller;
-
-  const handleFixedNavbar = () => setFixedNavbar(dispatch, !fixedNavbar);
-  const handleDarkMode = () => setDarkMode(dispatch, !darkMode);
-
+export default function BasicButtonGroup() {
+  const [menu, setMenu] = useState("users");
+  const changeMenu = (menuSelected) => setMenu(menuSelected);
   return (
     <DashboardLayout>
       <DashboardNavbar />
       <Card>
         <MDBox
-          mx={2}
-          mt={3}
+          mx={5}
+          mt={-1}
           py={2}
-          px={1}
+          px={4}
           variant="gradient"
           bgColor="info"
           borderRadius="lg"
@@ -35,44 +30,47 @@ function Configuration() {
             Configuración
           </MDTypography>
         </MDBox>
-        <MDBox pb={3} ml={10} width="80%">
-          <MDBox
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-            mt={3}
-            lineHeight={1}
-          >
-            <MDTypography variant="h6">Navegador fijo</MDTypography>
-
-            <Switch checked={fixedNavbar} onChange={handleFixedNavbar} />
-          </MDBox>
-          <Divider />
-          <MDBox display="flex" justifyContent="space-between" alignItems="center" lineHeight={1}>
-            <MDTypography variant="h6">Modo: Claro / Oscuro</MDTypography>
-            <Switch checked={darkMode} onChange={handleDarkMode} />
-          </MDBox>
-        </MDBox>
-      </Card>
-      <Card>
         <MDBox
           mx={2}
           mt={3}
-          py={2}
-          px={1}
           variant="gradient"
-          bgColor="info"
+          bgColor="primary"
           borderRadius="lg"
-          coloredShadow="info"
+          coloredShadow="primary"
         >
-          <MDTypography variant="h6" color="white">
-            Usuarios
-          </MDTypography>
+          <ButtonGroup
+            size="large"
+            variant="text"
+            aria-label="text  button group"
+            color="secondary"
+          >
+            <Button onClick={() => changeMenu("users")}>
+              <MDTypography variant="h6" color="white">
+                Usuarios
+              </MDTypography>
+            </Button>
+            <Button onClick={() => changeMenu("tasks")}>
+              <MDTypography variant="h6" color="white">
+                Tareas
+              </MDTypography>
+            </Button>
+            <Button onClick={() => changeMenu("typeOperations")}>
+              <MDTypography variant="h6" color="white">
+                Tipo de Operación
+              </MDTypography>
+            </Button>
+            <Button onClick={() => changeMenu("configurations")}>
+              <MDTypography variant="h6" color="white">
+                Configuraciones
+              </MDTypography>
+            </Button>
+          </ButtonGroup>
         </MDBox>
+        {(menu === "users" && <div>vacio</div>) ||
+          (menu === "users" && <div>vacio</div>) ||
+          (menu === "tasks" && <Task />) ||
+          (menu === "configurations" && <Configuration />)}
       </Card>
-      <Footer />
     </DashboardLayout>
   );
 }
-
-export default Configuration;

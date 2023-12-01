@@ -1,6 +1,6 @@
 import { DataTypes, Model, Sequelize } from "sequelize";
 
-interface IDetail {
+export interface IDetail {
   id?: string;
   currency: string;
   item: string;
@@ -10,7 +10,7 @@ interface IDetail {
   price: number;
   subtotal: number;
   unitType?: string;
-  pricingId?: string;
+  pricing_id?: string;
 }
 
 class Detail extends Model<IDetail> {
@@ -23,7 +23,7 @@ class Detail extends Model<IDetail> {
   price: number;
   subtotal: number;
   unitType?: string;
-  pricingId?: string;
+  pricing_id?: string;
 }
 
 export function initDetailModel(sequelize: Sequelize): void {

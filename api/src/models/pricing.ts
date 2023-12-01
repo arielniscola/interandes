@@ -25,9 +25,10 @@ export interface IPricing {
   totalSaleDol: number;
   totalTaxDol: number;
   profitDol: number;
+  operation_id?: string;
 }
 
-class Pricing extends Model<IPricing> {
+export class Pricing extends Model<IPricing> {
   public id?: string;
   public pricingnumber: string;
   public companyname: string;
@@ -143,5 +144,3 @@ export function initPricingModel(sequelize: Sequelize): void {
     }
   );
 }
-
-export { Pricing };
