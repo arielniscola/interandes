@@ -2,14 +2,11 @@ import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 
 import { useEffect, useState } from "react";
-import { getClients } from "services/clientHook";
 import Icon from "@mui/material/Icon";
-// Material Dashboard 2 React components
+import PageviewIcon from "@mui/icons-material/Pageview";
 import { useMaterialUIController } from "context";
-// Material Dashboard 2 React example components
-import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
-import DashboardNavbar from "examples/Navbars/DashboardNavbar";
-import Footer from "examples/Footer";
+
+import { getUsers } from "services/userHook";
 import DataTable from "../../examples/Tables/DataTable";
 import MDButton from "../../components/MDButton";
 import MDBox from "../../components/MDBox";
@@ -26,10 +23,10 @@ function UsersTable() {
         options: (
           <div>
             <MDButton variant="text" color={darkMode ? "white" : "dark"}>
-              <Icon>VisibilityIcon</Icon>
+              <Icon color="warning">edit</Icon>
             </MDButton>
             <MDButton variant="text" color={darkMode ? "white" : "dark"}>
-              <Icon>DeleteIcon</Icon>
+              <PageviewIcon color="info" />
             </MDButton>
           </div>
         ),
@@ -41,33 +38,21 @@ function UsersTable() {
   const [users, setUsers] = useState([]);
 
   useEffect(async () => {
-    const res = await users();
+    const res = await getUsers();
     const response = addOptions(res);
     setUsers(response);
   }, []);
 
   const columns = [
-    { Header: "N°", accessor: "id", align: "center" },
     { Header: "Nombre", accessor: "username", align: "center" },
     { Header: "Correo", accessor: "mailaddress", align: "center" },
     { Header: "Numero telefono", accessor: "phonenumber", align: "center" },
     { Header: "Rol", accessor: "role", align: "center" },
-    { Header: "Activo", accessor: "isActive", align: "center" },
     { Header: "Opciones", accessor: "options", align: "center" },
   ];
 
   return (
-    <DashboardLayout>
-      <DashboardNavbar />
-      <MDBox mt={4} mb={1}>
-        <MDButton
-          variant="gradient"
-          color="success"
-          onClick={() => window.location.replace("/clients/form")}
-        >
-          Nuevo
-        </MDButton>
-      </MDBox>
+    <div>
       <MDBox pt={6} pb={3}>
         <Grid container spacing={6}>
           <Grid item xs={12}>
@@ -75,7 +60,7 @@ function UsersTable() {
               <MDBox
                 mx={2}
                 mt={-3}
-                py={3}
+                py={1}
                 px={2}
                 variant="gradient"
                 bgColor="info"
@@ -85,15 +70,15 @@ function UsersTable() {
                 <MDTypography variant="h6" color="white">
                   Usuarios
                 </MDTypography>
-                <MDBox mt={4} mb={1}>
-                  <MDButton
-                    variant="gradient"
-                    color="success"
-                    onClick={() => window.location.replace("/clients/form")}
-                  >
-                    Nuevo
-                  </MDButton>
-                </MDBox>
+              </MDBox>
+              <MDBox sx={{ margin: 2 }}>
+                <MDButton
+                  variant="gradient"
+                  color="success"
+                  onClick={() => window.location.replace("/clients/form")}
+                >
+                  Nuevo
+                </MDButton>
               </MDBox>
               <MDBox pt={3}>
                 <DataTable table={{ columns, rows: users }} noEndBorder />
@@ -102,8 +87,7 @@ function UsersTable() {
           </Grid>
         </Grid>
       </MDBox>
-      <Footer />
-    </DashboardLayout>
+    </div>
   );
 }
 

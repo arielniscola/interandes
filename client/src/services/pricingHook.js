@@ -32,7 +32,7 @@ export const createPricings = async (pricing) => {
   }
 };
 
-export const getPricing = async (id) => {
+export const getPricingServices = async (id) => {
   try {
     const res = await fetch(`${URL_API}/pricing/${id}`, {
       method: "GET",

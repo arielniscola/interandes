@@ -27,9 +27,9 @@ export const getTasks = async () => {
   }
 };
 
-export const getTasksOperation = async (id) => {
+export const getOperationType = async (id) => {
   try {
-    const res = await fetch(`${URL_API}/task/operation/${id}`, {
+    const res = await fetch(`${URL_API}/operationType/${id}`, {
       method: "GET",
       headers: { "Content-type": "application/json" },
     });
@@ -58,6 +58,34 @@ export const getTypeOperations = async () => {
     const res = await fetch(`${URL_API}/operationType`, {
       method: "GET",
       headers: { "Content-type": "application/json" },
+    });
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    return error;
+  }
+};
+
+export const createOperationType = async (opType) => {
+  try {
+    const res = await fetch(`${URL_API}/operationType`, {
+      method: "POST",
+      headers: { "Content-type": "application/json" },
+      body: JSON.stringify(opType),
+    });
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    return error;
+  }
+};
+
+export const updateOperationTypeService = async (opType) => {
+  try {
+    const res = await fetch(`${URL_API}/operationType`, {
+      method: "PUT",
+      headers: { "Content-type": "application/json" },
+      body: JSON.stringify(opType),
     });
     const data = await res.json();
     return data;

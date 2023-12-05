@@ -1,16 +1,15 @@
 import { DataTypes, Model, Sequelize } from "sequelize";
-import { ITask } from "./task";
 
-interface ITypeOperation {
+export interface ITypeOperation {
   id?: string;
   code: string;
-  tasks: ITask[];
+  tasks: string[];
 }
 
 export class TypeOperation extends Model<ITypeOperation> {
   public id?: string;
   public code: string;
-  public tasks: ITask[];
+  public tasks: string[];
 }
 
 export function initTypeOperationModel(sequelize: Sequelize): void {
@@ -29,12 +28,13 @@ export function initTypeOperationModel(sequelize: Sequelize): void {
         unique: true,
       },
       tasks: {
-        type: DataTypes.ARRAY(DataTypes.JSONB),
+        type: DataTypes.ARRAY(DataTypes.STRING),
       },
     },
     {
       sequelize,
       modelName: "TypeOperation",
+      timestamps: false,
     }
   );
 }

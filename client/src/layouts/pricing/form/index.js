@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
@@ -23,26 +23,19 @@ import MDInput from "../../../components/MDInput";
 import MDButton from "../../../components/MDButton";
 import MDTypography from "../../../components/MDTypography";
 import useSnackbar from "../../../services/snackbarHook";
+import { getPricingServices } from "../../../services/pricingHook";
 
-const getPricing = (id) => {
-  const pricingBD = getPricing(id);
-  console.log(pricingBD);
-};
-
-function Pricing({ match }) {
+function Pricing() {
   const { showSnackbar, renderSnackbar } = useSnackbar();
+  const { id } = useParams();
   const navigate = useNavigate();
-  if (match) {
-    const { id } = match.params;
-    if (id) getPricing(id);
-  }
   const [pricing, setPricing] = useState({
     companyname: "",
     language: "",
     effectiveDate: moment.utc(),
     revalidated: moment.utc(),
     observations: "",
-    typeServices: "",
+    operationType: "",
     conditions: "",
     stage: "",
     totalCost: 0,
@@ -197,6 +190,13 @@ function Pricing({ match }) {
     totalCalculations();
   }, [rowsSale, rowsTax, rowsCost]);
 
+  useEffect(async () => {
+    if (id) {
+      const res = await getPricingServices(id);
+      // Setear todos los datos
+      console.log(res);
+    }
+  }, []);
   const deleteItem = (row) => {
     const resultTax = rowsTax.filter((i) => i.row !== row);
     const resultCost = rowsCost.filter((i) => i.row !== row);
@@ -286,7 +286,8 @@ function Pricing({ match }) {
   };
 
   const submitHandlerPricing = async () => {
-    const data = { pricing, details: { ...rowsCost, ...rowsSale, ...rowsTax } };
+    const data = { pricing, details: [...rowsCost, ...rowsSale, ...rowsTax] };
+
     const res = await createPricings(data);
     showSnackbar({
       title: "Pricing",
@@ -370,8 +371,8 @@ function Pricing({ match }) {
                     labelId="demo-simple-select-helper-label"
                     id="demo-simple-select-helper"
                     label="Tipo de Servicio"
-                    name="typeServices"
-                    value={pricing.typeServices}
+                    name="operationType"
+                    value={pricing.operationType}
                     onChange={handleChangePricing}
                     style={{ height: 40, marginTop: 5 }}
                   >
@@ -380,7 +381,9 @@ function Pricing({ match }) {
                       {" "}
                       E.1 - MARITIMO - FCL / LCL
                     </MenuItem>
-                    <MenuItem value="TERRESTRE - FCL / LCL"> E.2 - TERRESTRE - FCL / LCL</MenuItem>
+                    <MenuItem value="E.2 - TERRESTRE - FCL / LCL">
+                      E.2 - TERRESTRE - FCL / LCL
+                    </MenuItem>
                     <MenuItem value="E.3 - MULTIMODAL - FCL / LCL">
                       {" "}
                       E.3 - MULTIMODAL - FCL / LCL

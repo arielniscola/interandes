@@ -1,24 +1,10 @@
-/**
-=========================================================
-* Material Dashboard 2 React - v2.1.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/material-dashboard-react
-* Copyright 2022 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 
 // @mui material components
 import Card from "@mui/material/Card";
-import Icon from "@mui/material/Icon";
 import Grid from "@mui/material/Grid";
-
+import moment from "moment";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 // Material Dashboard 2 React components
@@ -33,23 +19,41 @@ import Checkbox from "@mui/material/Checkbox";
 
 // Material Dashboard 2 React example components
 import TimelineItem from "examples/Timeline/TimelineItem";
+import { getOperationID } from "services/operationHook";
+import MDButton from "components/MDButton";
+import useSnackbar from "../../../services/snackbarHook";
 
 function OperationTimeLine() {
-  const [checked, setChecked] = useState([1]);
+  const { showSnackbar, renderSnackbar } = useSnackbar();
+  const { id } = useParams();
+  const [operation, setOperation] = useState({});
+  const [tasks, setTasks] = useState([]);
 
   const handleToggle = (value) => () => {
-    const currentIndex = checked.indexOf(value);
-    const newChecked = [...checked];
-
-    if (currentIndex === -1) {
-      newChecked.push(value);
-    } else {
-      newChecked.splice(currentIndex, 1);
-    }
-
-    setChecked(newChecked);
+    const newArray = tasks.map((el) => {
+      if (el.task === value.task) {
+        return { ...el, done: !value.done };
+      }
+      return { ...el };
+    });
+    setTasks(newArray);
   };
-
+  useEffect(async () => {
+    if (id) {
+      const res = await getOperationID(id);
+      if (res.ack) {
+        showSnackbar({
+          title: "Operación",
+          content: res.message,
+          color: res.ack ? "error" : "success",
+          icon: res.ack ? "warning" : "check",
+        });
+      } else {
+        setOperation(res.data);
+        setTasks(res.data.TaskList.taks);
+      }
+    }
+  }, []);
   return (
     <DashboardLayout>
       <DashboardNavbar />
@@ -66,7 +70,19 @@ function OperationTimeLine() {
             Datos de Operación
           </MDTypography>
         </MDBox>
+        <MDBox sx={{ margin: 2 }}>
+          <MDTypography variant="h6" color="gray">
+            {`Numero de Operación: N° ${operation.operationNumber}`}
+          </MDTypography>
+          <MDTypography variant="h6" color="gray">
+            Fecha de Creación: {`${moment.utc(operation.date).format("DD-MM-YYYY")}`}
+          </MDTypography>
+          <MDTypography variant="h6" color="gray">
+            Tipo de Operación: {`${operation.typeOperation}`}
+          </MDTypography>
+        </MDBox>
       </Card>
+
       <Grid container spacing={2}>
         <Grid item xs={6}>
           <Card sx={{ height: "100%" }}>
@@ -74,53 +90,20 @@ function OperationTimeLine() {
               <MDTypography variant="h6" fontWeight="medium">
                 Historial Operación
               </MDTypography>
-              <MDBox mt={0} mb={2}>
-                <MDTypography variant="button" color="text" fontWeight="regular">
-                  <MDTypography display="inline" variant="body2" verticalAlign="middle">
-                    <Icon sx={{ color: ({ palette: { success } }) => success.main }}>
-                      arrow_upward
-                    </Icon>
-                  </MDTypography>
-                  &nbsp;
-                  <MDTypography variant="button" color="text" fontWeight="medium">
-                    24%
-                  </MDTypography>{" "}
-                  this month
-                </MDTypography>
-              </MDBox>
             </MDBox>
             <MDBox p={2}>
-              <TimelineItem
-                color="success"
-                icon="notifications"
-                title="$2400, Design changes"
-                dateTime="22 DEC 7:20 PM"
-              />
-              <TimelineItem
-                color="error"
-                icon="inventory_2"
-                title="New order #1832412"
-                dateTime="21 DEC 11 PM"
-              />
-              <TimelineItem
-                color="info"
-                icon="shopping_cart"
-                title="Server payments for April"
-                dateTime="21 DEC 9:34 PM"
-              />
-              <TimelineItem
-                color="warning"
-                icon="payment"
-                title="New card added for order #4395133"
-                dateTime="20 DEC 2:20 AM"
-              />
-              <TimelineItem
-                color="primary"
-                icon="vpn_key"
-                title="New card added for order #4395133"
-                dateTime="18 DEC 4:54 AM"
-                lastItem
-              />
+              {operation &&
+                operation.HistoryOperations &&
+                operation?.HistoryOperations.map((item) => {
+                  return (
+                    <TimelineItem
+                      color="success"
+                      icon="south"
+                      title={item.method}
+                      dateTime={moment.utc(item.date).format("DD-MM-YY HH-MM")}
+                    />
+                  );
+                })}
             </MDBox>
           </Card>
         </Grid>
@@ -131,32 +114,39 @@ function OperationTimeLine() {
                 Lista de tareas
               </MDTypography>
               <List dense sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }}>
-                {[0, 1, 2, 3].map((value) => {
-                  const labelId = `checkbox-list-secondary-label-${value}`;
-                  return (
-                    <ListItem
-                      key={value}
-                      secondaryAction={
-                        <Checkbox
-                          edge="end"
-                          onChange={handleToggle(value)}
-                          checked={checked.indexOf(value) !== -1}
-                          inputProps={{ "aria-labelledby": labelId }}
-                        />
-                      }
-                      disablePadding
-                    >
-                      <ListItemButton>
-                        <ListItemText id={labelId} primary={`Line item ${value + 1}`} />
-                      </ListItemButton>
-                    </ListItem>
-                  );
-                })}
+                {operation &&
+                  tasks.map((value) => {
+                    const labelId = `checkbox-list-secondary-label-${value.task}`;
+                    return (
+                      <ListItem
+                        key={value.task}
+                        secondaryAction={
+                          <Checkbox
+                            edge="end"
+                            onChange={handleToggle(value)}
+                            checked={value.done}
+                            inputProps={{ "aria-labelledby": labelId }}
+                          />
+                        }
+                        disablePadding
+                      >
+                        <ListItemButton>
+                          <ListItemText id={labelId} primary={`${value.task}`} />
+                        </ListItemButton>
+                      </ListItem>
+                    );
+                  })}
               </List>
+            </MDBox>
+            <MDBox sx={{ margin: 4 }}>
+              <MDButton variant="gradient" color="info">
+                Actualizar Lista
+              </MDButton>
             </MDBox>
           </Card>
         </Grid>
       </Grid>
+      {renderSnackbar}
     </DashboardLayout>
   );
 }

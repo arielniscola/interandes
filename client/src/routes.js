@@ -23,13 +23,9 @@ import Icon from "@mui/material/Icon";
 
 // Material Dashboard 2 React layouts
 import Dashboard from "layouts/dashboard";
-import Tables from "layouts/tables";
-import Billing from "layouts/billing";
-import RTL from "layouts/rtl";
 import Notifications from "layouts/notifications";
 import Profile from "layouts/profile";
 import SignIn from "layouts/authentication/sign-in";
-import SignUp from "layouts/authentication/sign-up";
 import Pricing from "layouts/pricing";
 import Configuration from "layouts/configuration";
 import ClientTable from "layouts/clients";
@@ -49,30 +45,6 @@ const routes = [
     icon: <Icon fontSize="small">dashboard</Icon>,
     route: "/dashboard",
     component: <Dashboard />,
-  },
-  {
-    type: "collapse",
-    name: "ORDEN DE VENTA",
-    key: "tables",
-    icon: <Icon fontSize="small">table_view</Icon>,
-    route: "/tables",
-    component: <Tables />,
-  },
-  {
-    type: "collapse",
-    name: "INTRUCTIVO",
-    key: "billing",
-    icon: <Icon fontSize="small">receipt_long</Icon>,
-    route: "/billing",
-    component: <Billing />,
-  },
-  {
-    type: "collapse",
-    name: "BL",
-    key: "rtl",
-    icon: <Icon fontSize="small">format_textdirection_r_to_l</Icon>,
-    route: "/rtl",
-    component: <RTL />,
   },
   {
     type: "collapse",
@@ -111,16 +83,8 @@ const routes = [
     name: "FACTURACION",
     key: "sign-in",
     icon: <Icon fontSize="small">login</Icon>,
-    route: "/authentication/sign-in",
+    route: "/",
     component: <SignIn />,
-  },
-  {
-    type: "collapse",
-    name: "SERVICIOS",
-    key: "sign-up",
-    icon: <Icon fontSize="small">assignment</Icon>,
-    route: "/authentication/sign-up",
-    component: <SignUp />,
   },
   {
     type: "collapse",
@@ -142,6 +106,13 @@ const routes = [
     name: "Formulario Pricing",
     key: "pricing",
     route: "/pricing-form",
+    component: <PricingForm />,
+  },
+  {
+    type: "route",
+    name: "Formulario Pricing",
+    key: "pricingEdit",
+    route: "/pricing-form/:id",
     component: <PricingForm />,
   },
   {
@@ -185,7 +156,7 @@ const routes = [
     type: "route",
     name: "OPERACIONES",
     key: "operations",
-    route: "/operations/timeline",
+    route: "/operations/timeline/:id",
     component: <OperationTimeLine />,
   },
 ];

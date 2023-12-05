@@ -2,13 +2,14 @@ import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 
 import { useEffect, useState } from "react";
-import Icon from "@mui/material/Icon";
+import PageviewIcon from "@mui/icons-material/Pageview";
 // Material Dashboard 2 React components
 import { useMaterialUIController } from "context";
 // Material Dashboard 2 React example components
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
+import { getOperations } from "services/operationHook";
 import DataTable from "../../examples/Tables/DataTable";
 import MDButton from "../../components/MDButton";
 import MDBox from "../../components/MDBox";
@@ -18,17 +19,23 @@ function OperationsTable() {
   const [controller] = useMaterialUIController();
   const { darkMode } = controller;
 
+  const detailView = (id) => {
+    window.location.replace(`/operations/timeline/${id}`);
+  };
+
   const addOptions = (items) => {
     const itemsWithOptions = items.map((item) => {
       return {
         ...item,
         options: (
           <div>
-            <MDButton variant="text" color={darkMode ? "white" : "dark"}>
-              <Icon>VisibilityIcon</Icon>
-            </MDButton>
-            <MDButton variant="text" color={darkMode ? "white" : "dark"}>
-              <Icon>DeleteIcon</Icon>
+            <MDButton
+              variant="text"
+              size="large"
+              color={darkMode ? "white" : "dark"}
+              onClick={() => detailView(item.id)}
+            >
+              <PageviewIcon color="info" />
             </MDButton>
           </div>
         ),
@@ -37,36 +44,24 @@ function OperationsTable() {
     return itemsWithOptions;
   };
   // const { columns: pColumns, rows: pRows } = ;
-  const [users, setUsers] = useState([]);
+  const [operations, setOperations] = useState([]);
 
   useEffect(async () => {
-    const res = await users();
-    const response = addOptions(res);
-    setUsers(response);
+    const res = await getOperations();
+    const response = addOptions(res.data);
+    setOperations(response);
   }, []);
 
   const columns = [
-    { Header: "N°", accessor: "id", align: "center" },
-    { Header: "Nombre", accessor: "username", align: "center" },
-    { Header: "Correo", accessor: "mailaddress", align: "center" },
-    { Header: "Numero telefono", accessor: "phonenumber", align: "center" },
-    { Header: "Rol", accessor: "role", align: "center" },
-    { Header: "Activo", accessor: "isActive", align: "center" },
+    { Header: "N°", accessor: "operationNumber", align: "center" },
+    { Header: "Fecha Creación", accessor: "date", align: "center" },
+    { Header: "Tipo de Operación", accessor: "typeOperation", align: "center" },
     { Header: "Opciones", accessor: "options", align: "center" },
   ];
 
   return (
     <DashboardLayout>
       <DashboardNavbar />
-      <MDBox mt={4} mb={1}>
-        <MDButton
-          variant="gradient"
-          color="success"
-          onClick={() => window.location.replace("/operations/timeline")}
-        >
-          Nuevo
-        </MDButton>
-      </MDBox>
       <MDBox pt={6} pb={3}>
         <Grid container spacing={6}>
           <Grid item xs={12}>
@@ -86,7 +81,7 @@ function OperationsTable() {
                 </MDTypography>
               </MDBox>
               <MDBox pt={3}>
-                <DataTable table={{ columns, rows: users }} noEndBorder />
+                <DataTable table={{ columns, rows: operations }} noEndBorder />
               </MDBox>
             </Card>
           </Grid>

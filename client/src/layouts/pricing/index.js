@@ -21,6 +21,8 @@ import { useEffect, useState } from "react";
 import { getPricings } from "services/pricingHook";
 // Material Dashboard 2 React components
 import Icon from "@mui/material/Icon";
+import PostAddIcon from "@mui/icons-material/PostAdd";
+import PageviewIcon from "@mui/icons-material/Pageview";
 // Material Dashboard 2 React example components
 import { useMaterialUIController } from "context";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
@@ -35,6 +37,14 @@ function PricingTable() {
   const [controller] = useMaterialUIController();
   const { darkMode } = controller;
 
+  const generateSalesOrder = (id) => {
+    console.log(id);
+    window.location.replace(`/salesOrder-form`);
+  };
+  const viewDetailPricing = (id) => {
+    console.log(id);
+    window.location.replace(`/pricing-form/${id}`);
+  };
   const addOptions = (items) => {
     const itemsWithOptions = items.map((item) => {
       return {
@@ -42,10 +52,21 @@ function PricingTable() {
         options: (
           <div>
             <MDButton variant="text" color={darkMode ? "white" : "dark"}>
-              <Icon>edit</Icon>
+              <Icon color="warning">edit</Icon>
             </MDButton>
-            <MDButton variant="text" color={darkMode ? "white" : "dark"}>
-              <Icon>launchOutlinedIcon</Icon>
+            <MDButton
+              variant="text"
+              color={darkMode ? "white" : "dark"}
+              onClick={() => generateSalesOrder(item.id)}
+            >
+              <PostAddIcon color="success" />
+            </MDButton>
+            <MDButton
+              variant="text"
+              color={darkMode ? "white" : "dark"}
+              onClick={() => viewDetailPricing(item.id)}
+            >
+              <PageviewIcon color="info" />
             </MDButton>
           </div>
         ),

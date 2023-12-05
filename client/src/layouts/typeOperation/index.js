@@ -4,34 +4,37 @@ import React, { useState, useEffect } from "react";
 // import table Items
 import MDBox from "components/MDBox";
 
-import DeleteIcon from "@mui/icons-material/Delete";
+import Autocomplete from "@mui/material/Autocomplete";
 
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import { createTask, getTypeOperations } from "services/taskHook";
 import Typography from "@mui/material/Typography";
-import ListItemAvatar from "@mui/material/ListItemAvatar";
-import ListItemText from "@mui/material/ListItemText";
+import TextField from "@mui/material/TextField";
+
 import Grid from "@mui/material/Grid";
-import IconButton from "@mui/material/IconButton";
-import CheckIcon from "@mui/icons-material/Check";
-import MDTypography from "../../components/MDTypography";
+
+import { createOperationType, getTypeOperations } from "services/taskHook";
 import useSnackbar from "../../services/snackbarHook";
 import MDInput from "../../components/MDInput";
 import MDButton from "../../components/MDButton";
+import MDTypography from "../../components/MDTypography";
+import TransferList from "./tranferList";
+import { updateOperationTypeService } from "../../services/taskHook";
 
-function Task() {
+function TypeOperation() {
   const { showSnackbar, renderSnackbar } = useSnackbar();
-  const [tasks, setTasks] = useState([]);
   const [typeOperations, setTypeOperations] = useState([]);
   const [operationType, setOperationType] = useState({
+    id: "",
     code: "",
+    tasks: [],
   });
+
+  // Obtener todos los tipos de operacion
   useEffect(async () => {
     const res = await getTypeOperations();
-    if (!res.ack) {
+    console.log("tipo de operacion", res);
+    if (res.ack) {
       showSnackbar({
-        title: "Lista de Tareas",
+        title: "Tipo de Operación",
         content: res.message,
         color: res.ack ? "error" : "success",
         icon: res.ack ? "warning" : "check",
@@ -40,41 +43,55 @@ function Task() {
       setTypeOperations(res.data);
     }
   }, []);
-
-  const handleTask = (e) => {
+  console.log("ASasdsad");
+  console.log(operationType);
+  const operationHandler = (e) => {
     const { name, value } = e.target;
 
     switch (name) {
-      case "description":
-        setTask({
-          ...task,
+      case "code":
+        setOperationType({
+          ...operationType,
           [name]: value,
         });
         break;
       default:
-        setTask({
-          ...task,
+        setOperationType({
+          ...operationType,
           [name]: value,
         });
         break;
     }
   };
   const submitTypeOperation = async () => {
-    const res = await createTask(task);
+    const res = await createOperationType(operationType);
     showSnackbar({
-      title: "Tarea",
+      title: "Tipo de Operacion",
       content: res.message,
       color: res.ack ? "error" : "success",
       icon: res.ack ? "warning" : "check",
     });
-    setTask({ description: "" });
-  };
-  const deleteTask = async (id) => {
-    console.log(id);
+    setOperationType({ code: "", id: "", tasks: [] });
   };
   const defaultOptions = {
-    options: typeOperations.length > 0 ? typeOperations : [],
+    options: typeOperations?.length > 0 ? typeOperations : [],
     getOptionLabel: (option) => option.code,
+  };
+  const updateOperationType = async (tasks = []) => {
+    // Actualizar en servidor
+    const newtasks = tasks.map((el) => el.description);
+    const opType = { ...operationType };
+    opType.tasks = newtasks;
+    console.log(tasks);
+    const res = await updateOperationTypeService(opType);
+    if (res) {
+      showSnackbar({
+        title: "Tipo de Operación",
+        content: res.message,
+        color: res.ack ? "error" : "success",
+        icon: res.ack ? "warning" : "check",
+      });
+    }
   };
   return (
     <div>
@@ -93,84 +110,74 @@ function Task() {
             Tipo de Operación
           </MDTypography>
         </MDBox>
-        <MDBox>
-          <Autocomplete
-            {...defaultOptions}
-            id="operation-select"
-            multiple={false}
-            style={{ width: 300, marginBottom: 8, marginTop: -20 }}
-            options={typeOperations}
-            renderInput={(params) => (
-              <TextField {...params} label="Tipo de Operacion" variant="outlined" />
-            )}
-            onChange={(event, newValue) => {
-              if (!newValue) {
-                setClient({
-                  code: "",
-                });
-              } else {
-                setOperationType(newValue);
-                onClientSelect(newValue);
-              }
-            }}
-          />
-        </MDBox>
         <Grid container spacing={4}>
           <Grid item xs={8} md={4} margin={5}>
-            <MDBox pt={3}>
-              <Typography sx={{ mt: 2, mb: 2 }} variant="h6">
-                Tareas:
+            <MDBox>
+              <Typography sx={{ mb: 5 }} variant="h6">
+                Seleccionar Tipo de Operación
               </Typography>
-              <List>
-                {tasks.map((el) => {
-                  return (
-                    <ListItem
-                      id={el.id}
-                      divider="true"
-                      alignItems="center"
-                      secondaryAction={
-                        <IconButton onClick={() => deleteTask(el.id)} aria-label="delete">
-                          <DeleteIcon color="error" />
-                        </IconButton>
-                      }
-                    >
-                      <ListItemAvatar>
-                        <CheckIcon color="success" />
-                      </ListItemAvatar>
-                      <ListItemText primary={el.description} />
-                    </ListItem>
-                  );
-                })}
-              </List>
+              <MDBox>
+                <Autocomplete
+                  {...defaultOptions}
+                  id="operation-select"
+                  multiple={false}
+                  style={{ width: 300, marginBottom: 8, marginTop: -20 }}
+                  options={typeOperations}
+                  renderInput={(params) => (
+                    <TextField {...params} label="Tipo de Operacion" variant="outlined" />
+                  )}
+                  onChange={(event, newValue) => {
+                    if (!newValue) {
+                      setOperationType({
+                        code: "",
+                        id: "",
+                        tasks: [],
+                      });
+                    } else {
+                      setOperationType(newValue);
+                    }
+                  }}
+                />
+              </MDBox>
             </MDBox>
           </Grid>
-          <Grid item xs={8} md={4} margin={3}>
+          <Grid item xs={8} md={4} margin={2}>
             <MDBox pt={3}>
-              <Typography sx={{ mt: 2, mb: 2 }} variant="h6">
-                Agregar Tarea:
+              <Typography sx={{ mb: 2 }} variant="h6">
+                Nuevo Tipo de Operación
               </Typography>
               <MDBox component="form" role="form">
                 <Grid container spacing={2}>
                   <Grid item xs={12}>
-                    <MDBox mb={2} sx={{ m: 2 }}>
+                    <MDBox mb={2} sx={{ m: 1 }}>
                       <MDInput
                         disable
                         type="text"
-                        name="description"
+                        name="code"
                         label="Agregar Descripcion:"
                         value={operationType.code}
-                        onChange={handleTask}
+                        onChange={operationHandler}
                         fullWidth
                       />
                     </MDBox>
                     <MDBox mb={2} sx={{ m: 2 }}>
-                      <MDButton variant="gradient" color="info" onClick={submitTask}>
-                        Agregar Tarea
+                      <MDButton variant="gradient" color="info" onClick={submitTypeOperation}>
+                        {operationType.id ? "Actualizar" : "Agregar"}
                       </MDButton>
                     </MDBox>
                   </Grid>
                 </Grid>
               </MDBox>
+            </MDBox>
+          </Grid>
+        </Grid>
+        <Grid container spacing={4}>
+          <Grid item xs={8} md={12} margin={5}>
+            <MDBox pt={3}>
+              <Typography sx={{ mt: 2 }} variant="h6" textTransform="uppercase" color="GrayText">
+                Actualización de Tareas:
+              </Typography>
+              <TransferList tasksOP={operationType.tasks} onUpdateList={updateOperationType} />
             </MDBox>
           </Grid>
         </Grid>
@@ -180,4 +187,4 @@ function Task() {
   );
 }
 
-export default Task;
+export default TypeOperation;

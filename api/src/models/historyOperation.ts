@@ -4,6 +4,7 @@ export interface IHistoryOperation {
   id?: string;
   dateTime: Date;
   method: string;
+  username: string;
   operation_id?: string;
 }
 
@@ -11,6 +12,7 @@ export class HistoryOperation extends Model<IHistoryOperation> {
   public id?: string;
   public dateTime: Date;
   public method: string;
+  public username: string;
 }
 
 export function initHistoryOperation(sequelize: Sequelize) {
@@ -30,10 +32,14 @@ export function initHistoryOperation(sequelize: Sequelize) {
       method: {
         type: DataTypes.STRING,
       },
+      username: {
+        type: DataTypes.STRING,
+      },
     },
     {
       sequelize,
       modelName: "HistoryOperation",
+      timestamps: false,
     }
   );
 }

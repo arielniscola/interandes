@@ -5,6 +5,8 @@ import Card from "@mui/material/Card";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import Task from "layouts/task";
+import TypeOperation from "layouts/typeOperation";
+import UsersTable from "layouts/users";
 import MDBox from "../../components/MDBox";
 import MDTypography from "../../components/MDTypography";
 import Configuration from "./generalConfigs";
@@ -66,8 +68,8 @@ export default function BasicButtonGroup() {
             </Button>
           </ButtonGroup>
         </MDBox>
-        {(menu === "users" && <div>vacio</div>) ||
-          (menu === "users" && <div>vacio</div>) ||
+        {(menu === "users" && <UsersTable />) ||
+          (menu === "typeOperations" && <TypeOperation />) ||
           (menu === "tasks" && <Task />) ||
           (menu === "configurations" && <Configuration />)}
       </Card>

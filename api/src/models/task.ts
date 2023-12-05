@@ -28,6 +28,7 @@ export function initTaskModel(sequelize: Sequelize): void {
     {
       sequelize,
       modelName: "Task",
+      timestamps: false
     }
   );
 }
