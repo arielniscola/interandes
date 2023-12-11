@@ -26,6 +26,8 @@ import useSnackbar from "../../../services/snackbarHook";
 import { getPricingServices } from "../../../services/pricingHook";
 
 function Pricing() {
+  const [inputsHabilitados, setInputsHabilitados] = useState("true");
+
   const { showSnackbar, renderSnackbar } = useSnackbar();
   const { id } = useParams();
   const navigate = useNavigate();
@@ -193,8 +195,39 @@ function Pricing() {
   useEffect(async () => {
     if (id) {
       const res = await getPricingServices(id);
-      // Setear todos los datos
-      console.log(res);
+      if (res.ack) {
+        showSnackbar({
+          title: "Pricing",
+          content: res.message,
+          color: res.ack ? "error" : "success",
+          icon: res.ack ? "warning" : "check",
+        });
+      } else {
+        setInputsHabilitados("false");
+        setPricing({
+          companyname: "",
+          language: "",
+          effectiveDate: moment.utc(),
+          revalidated: moment.utc(),
+          observations: "",
+          operationType: "",
+          conditions: "",
+          stage: "",
+          totalCost: 0,
+          totalSale: 0,
+          totalTax: 0,
+          profit: 0,
+          totalCostDol: 0,
+          totalSaleDol: 0,
+          totalTaxDol: 0,
+          profitDol: 0,
+          totalCostEu: 0,
+          totalSaleEu: 0,
+          totalTaxEu: 0,
+          profitEu: 0,
+          client: "",
+        });
+      }
     }
   }, []);
   const deleteItem = (row) => {
@@ -307,6 +340,7 @@ function Pricing() {
   const handleClientSelect = (client) => {
     setPricing({ ...pricing, client: client.id });
   };
+
   return (
     <DashboardLayout>
       <DashboardNavbar />
@@ -339,6 +373,7 @@ function Pricing() {
                     name="companyname"
                     label="Empresa"
                     value={pricing.companyname}
+                    disabled={inputsHabilitados}
                     onChange={handleChangePricing}
                     style={{ height: 40, marginTop: 5 }}
                   >
@@ -358,6 +393,7 @@ function Pricing() {
                     name="language"
                     value={pricing.language}
                     onChange={handleChangePricing}
+                    disabled={inputsHabilitados}
                     style={{ height: 40, marginTop: 5 }}
                   >
                     <MenuItem value="español">Español</MenuItem>
@@ -372,6 +408,7 @@ function Pricing() {
                     id="demo-simple-select-helper"
                     label="Tipo de Servicio"
                     name="operationType"
+                    disabled={inputsHabilitados}
                     value={pricing.operationType}
                     onChange={handleChangePricing}
                     style={{ height: 40, marginTop: 5 }}
@@ -395,13 +432,21 @@ function Pricing() {
                   <InputLabel id="demo-simple-select-helper-label" style={{ marginBottom: 4 }}>
                     Fecha de Vigencia
                   </InputLabel>
-                  <Datepicker value={pricing.effectiveDate} onChange={handleChangeDate} />
+                  <Datepicker
+                    value={pricing.effectiveDate}
+                    disabled={inputsHabilitados}
+                    onChange={handleChangeDate}
+                  />
                 </MDBox>
                 <MDBox mb={2}>
                   <InputLabel id="demo-simple-select-helper-label" style={{ marginBottom: 4 }}>
                     Revalidar
                   </InputLabel>
-                  <Datepicker value={pricing.revalidated} onChange={handleChangeDateRevalidate} />
+                  <Datepicker
+                    value={pricing.revalidated}
+                    disabled={inputsHabilitados}
+                    onChange={handleChangeDateRevalidate}
+                  />
                 </MDBox>
               </MDBox>
             </MDBox>
@@ -439,6 +484,7 @@ function Pricing() {
                       </InputLabel>
                       <Select
                         fullWidth
+                        disabled={inputsHabilitados}
                         labelId="demo-simple-select-helper-label"
                         id="demo-simple-select-helper"
                         name="currency"
@@ -464,6 +510,7 @@ function Pricing() {
                         fullWidth
                         labelId="demo-simple-select-helper-label"
                         id="typeItem"
+                        disabled={inputsHabilitados}
                         name="typeItem"
                         variant="outlined"
                         onChange={itemHandler}
@@ -484,6 +531,7 @@ function Pricing() {
                         name="item"
                         variant="outlined"
                         fullWidth
+                        disabled={inputsHabilitados}
                         value={item.item}
                         onChange={itemHandler}
                         style={{ marginTop: 2 }}
@@ -500,6 +548,7 @@ function Pricing() {
                           labelId="demo-simple-select-helper-label"
                           id="demo-simple-select-helper"
                           name="base"
+                          disabled={inputsHabilitados}
                           variant="outlined"
                           onChange={itemHandler}
                           value={item.base}
@@ -521,6 +570,7 @@ function Pricing() {
                           name="percent"
                           variant="outlined"
                           fullWidth
+                          disabled={inputsHabilitados}
                           value={item.percent}
                           onChange={itemHandler}
                           style={{ marginTop: 2 }}
@@ -535,6 +585,7 @@ function Pricing() {
                         type="number"
                         name="price"
                         variant="outlined"
+                        disabled={inputsHabilitados}
                         fullWidth
                         value={item.price}
                         onChange={itemHandler}
@@ -550,6 +601,7 @@ function Pricing() {
                           type="number"
                           name="units"
                           variant="outlined"
+                          disabled={inputsHabilitados}
                           fullWidth
                           value={item.units}
                           onChange={itemHandler}
@@ -566,6 +618,7 @@ function Pricing() {
                           type="text"
                           name="unitType"
                           variant="outlined"
+                          disabled={inputsHabilitados}
                           fullWidth
                           value={item.unitType}
                           onChange={itemHandler}
@@ -582,6 +635,7 @@ function Pricing() {
                           type="number"
                           name="subtotal"
                           variant="outlined"
+                          disabled={inputsHabilitados}
                           fullWidth
                           value={item.subtotal}
                           onChange={itemHandler}
@@ -790,6 +844,7 @@ function Pricing() {
                         name="observations"
                         onChange={handleChangePricing}
                         rows={4}
+                        disabled={inputsHabilitados}
                         variant="outlined"
                         fullWidth
                       />
@@ -804,6 +859,7 @@ function Pricing() {
                         name="conditions"
                         value={pricing.conditions}
                         rows={4}
+                        disabled={inputsHabilitados}
                         onChange={handleChangePricing}
                         variant="outlined"
                         fullWidth
@@ -819,6 +875,7 @@ function Pricing() {
                     name="stage"
                     id="stage-price"
                     label="Etapa Cotización"
+                    disabled={inputsHabilitados}
                     onChange={handleChangePricing}
                     style={{ height: 40, marginTop: 8, width: 300 }}
                   >
@@ -830,7 +887,12 @@ function Pricing() {
                   </Select>
                 </MDBox>
                 <MDBox mt={4} mb={1}>
-                  <MDButton variant="gradient" color="info" onClick={submitHandlerPricing}>
+                  <MDButton
+                    variant="gradient"
+                    color="info"
+                    onClick={submitHandlerPricing}
+                    disabled={inputsHabilitados}
+                  >
                     Guardar
                   </MDButton>
                 </MDBox>

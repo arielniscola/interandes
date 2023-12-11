@@ -1,17 +1,21 @@
 import { DataTypes, Model, Sequelize } from "sequelize";
 
-interface IFileStructure {
+export interface IFileStructure {
   id?: string;
   path: string;
-  files: [];
-  collection: string;
+  filename: string;
+  size: number;
+  mimeType: string;
+  operation_id?: string;
 }
 
-class FileStructure extends Model<IFileStructure> {
+export class FileStructure extends Model<IFileStructure> {
   public id?: string;
   public path: string;
-  public files: [];
-  public collection: string;
+  public filename: string;
+  public size: number;
+  public mimeType: string;
+  public operation_id: string;
 }
 
 export function initFileStructureModel(sequelize: Sequelize): void {
@@ -27,11 +31,16 @@ export function initFileStructureModel(sequelize: Sequelize): void {
       path: {
         type: DataTypes.STRING,
       },
-      files: {
-        type: DataTypes.ARRAY(DataTypes.STRING),
-      },
-      collection: {
+      filename: {
         type: DataTypes.STRING,
+        allowNull: false,
+      },
+      mimeType: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      size: {
+        type: DataTypes.INTEGER,
       },
     },
     {
@@ -40,5 +49,3 @@ export function initFileStructureModel(sequelize: Sequelize): void {
     }
   );
 }
-
-export { FileStructure };

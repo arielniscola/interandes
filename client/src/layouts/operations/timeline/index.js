@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-// @mui material components
 import Card from "@mui/material/Card";
 import Grid from "@mui/material/Grid";
 import moment from "moment";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
-// Material Dashboard 2 React components
+
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 
@@ -17,10 +16,10 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import Checkbox from "@mui/material/Checkbox";
 
-// Material Dashboard 2 React example components
 import TimelineItem from "examples/Timeline/TimelineItem";
 import { getOperationID } from "services/operationHook";
 import MDButton from "components/MDButton";
+import Filesviews from "components/FileStructure";
 import useSnackbar from "../../../services/snackbarHook";
 
 function OperationTimeLine() {
@@ -54,6 +53,35 @@ function OperationTimeLine() {
       }
     }
   }, []);
+
+  const redirectSalesOrder = () => {
+    if (operation.salesOrder.id) {
+      window.location.replace(`/salesOrder-form/${id}`);
+    } else {
+      showSnackbar({
+        title: "Operaciones",
+        content: "No hay orden de venta asociada",
+        color: "warning",
+        icon: "warning",
+      });
+    }
+  };
+  const redirectPricing = () => {
+    if (operation.pricing.id) {
+      window.location.replace(`/pricing-form/${id}`);
+    } else {
+      showSnackbar({
+        title: "Operaciones",
+        content: "No hay pricing asociado",
+        color: "warning",
+        icon: "warning",
+      });
+    }
+  };
+
+  const redirectFileUpload = () => {
+    window.location.replace(`/file-upload/${id}`);
+  };
   return (
     <DashboardLayout>
       <DashboardNavbar />
@@ -81,6 +109,39 @@ function OperationTimeLine() {
             Tipo de Operación: {`${operation.typeOperation}`}
           </MDTypography>
         </MDBox>
+        <Grid container spacing={2}>
+          <Grid item xs={4}>
+            <MDBox sx={{ margin: 2 }}>
+              <MDButton
+                variant="outlined"
+                size="medium"
+                color="success"
+                onClick={redirectFileUpload}
+              >
+                Subir archivos
+              </MDButton>
+            </MDBox>
+          </Grid>
+          <Grid item xs={4}>
+            <MDBox sx={{ margin: 2 }}>
+              <MDButton
+                variant="outlined"
+                size="medium"
+                color="warning"
+                onClick={redirectSalesOrder}
+              >
+                Orden de Venta
+              </MDButton>
+            </MDBox>
+          </Grid>
+          <Grid item xs={4}>
+            <MDBox sx={{ margin: 2 }}>
+              <MDButton variant="outlined" size="medium" color="primary" onClick={redirectPricing}>
+                Pricing
+              </MDButton>
+            </MDBox>
+          </Grid>
+        </Grid>
       </Card>
 
       <Grid container spacing={2}>
@@ -100,7 +161,7 @@ function OperationTimeLine() {
                       color="success"
                       icon="south"
                       title={item.method}
-                      dateTime={moment.utc(item.date).format("DD-MM-YY HH-MM")}
+                      dateTime={moment.utc(item.date).format("DD-MM-YY HH:MM:SS")}
                     />
                   );
                 })}
@@ -145,6 +206,16 @@ function OperationTimeLine() {
             </MDBox>
           </Card>
         </Grid>
+      </Grid>
+      <Grid item xs={12} md={6}>
+        <Card sx={{ height: "100%", margin: 2 }}>
+          <MDBox pt={3} px={3}>
+            <MDTypography variant="h6" fontWeight="medium">
+              Archivos
+            </MDTypography>
+          </MDBox>
+          <Filesviews id={id} />
+        </Card>
       </Grid>
       {renderSnackbar}
     </DashboardLayout>

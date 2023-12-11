@@ -1,15 +1,32 @@
 import React, { useState } from "react";
-import axios from "axios";
-import { Input } from "@mui/material";
+import { useParams } from "react-router-dom";
+import MDBox from "components/MDBox";
+import { styled } from "@mui/material/styles";
 import FileCard from "layouts/files/FileCard";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import { Grid } from "@mui/material";
+import Button from "@mui/material/Button";
+import { uploadFiles } from "services/filesUploadHook";
 import MDButton from "../MDButton";
+import useSnackbar from "../../services/snackbarHook";
+
+const VisuallyHiddenInput = styled("input")({
+  clip: "rect(0 0 0 0)",
+  clipPath: "inset(50%)",
+  height: 1,
+  overflow: "hidden",
+  position: "absolute",
+  bottom: 0,
+  left: 0,
+  whiteSpace: "nowrap",
+  width: 1,
+});
 
 function FileUploader() {
-  const [selectedFile, setSelectedFile] = useState([]);
+  const { showSnackbar, renderSnackbar } = useSnackbar();
   const [dragging, setDragging] = useState(false);
   const [files, setFiles] = useState([]);
-  console.log(files);
-  console.log(selectedFile);
+  const { id } = useParams();
   const handleDragEnter = (e) => {
     e.preventDefault();
     setDragging(true);
@@ -29,67 +46,84 @@ function FileUploader() {
     setDragging(false);
 
     const filesDrop = Array.from(e.dataTransfer.files);
+    console.log(filesDrop[0]);
     files.push(filesDrop[0]);
     setFiles(files);
     // Aquí puedes procesar los archivos, por ejemplo, cargarlos al servidor o realizar alguna acción adicional.
   };
   const handleFileChange = (event) => {
-    files.push(event.target.files[0]);
-    setFiles(files);
-    setSelectedFile(event.target.files[0]);
+    setFiles([...files, event.target.files[0]]);
   };
 
-  const handleUpload = () => {
-    if (selectedFile) {
-      const formData = new FormData();
-      formData.append("file", selectedFile);
+  const deleteFile = (filename) => {
+    const newFiles = files.filter((item) => item.name !== filename);
+    setFiles(newFiles);
+  };
 
-      axios
-        .post("/upload", formData)
-        .then((response) => {
-          console.log("Archivo subido correctamente");
-          console.log(response);
-          // Realizar cualquier acción adicional después de la subida del archivo
-        })
-        .catch((error) => {
-          console.error("Error al subir el archivo:", error);
-        });
+  const handleUpload = async () => {
+    if (!files.length) {
+      showSnackbar({
+        title: "Carga de Archivos",
+        content: "No hay archivos para subir",
+        color: "warning",
+        icon: "warning",
+      });
+    } else {
+      const res = await uploadFiles(id, files);
+      showSnackbar({
+        title: "Carga de Archivos",
+        content: res.message,
+        color: res.ack ? "error" : "success",
+        icon: res.ack ? "warning" : "check",
+      });
     }
   };
-
   return (
     <div>
-      <div style={{ marginBottom: 20 }}>
-        <Input
-          type="file"
-          variant="gradient"
-          color="success"
-          onClick={handleFileChange}
-          style={{ margin: 10 }}
-        />
-        <MDButton variant="gradient" color="success" onClick={handleUpload}>
-          Subir archivo
-        </MDButton>
-      </div>
+      <Grid container spacing={2}>
+        <Grid item xs={4}>
+          <MDBox sx={{ margin: 2 }}>
+            <Button
+              component="label"
+              variant="contained"
+              onChange={handleFileChange}
+              startIcon={<CloudUploadIcon />}
+              color="success"
+            >
+              Seleccionar Archivo
+              <VisuallyHiddenInput type="file" />
+            </Button>
+          </MDBox>
+        </Grid>
+      </Grid>
+
       <div
         onDragEnter={handleDragEnter}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         style={{
-          border: dragging ? "2px dashed red" : "2px dashed gray",
+          border: dragging ? "2px dashed green" : "2px dashed gray",
           height: 160,
           textAlign: "center",
+          paddingTop: 50,
+          backgroundColor: dragging ? "rgba(200, 200, 200, 1)" : "white",
         }}
       >
-        Arrastra y suelta tus archivos aquí.
+        Arrastra y suelta tus archivos aca.
       </div>
-      <div>
+      <MDBox sx={{ margin: 2 }}>
         {files.length > 0 &&
           files.map((file) => {
-            return <FileCard file={file} />;
+            return <FileCard file={file} deleteFn={deleteFile} />;
           })}
-      </div>
+      </MDBox>
+      <MDBox sx={{ margin: 10 }}>
+        <MDButton variant="gradient" color="success" onClick={handleUpload}>
+          Subir archivos
+        </MDButton>
+      </MDBox>
+      {renderSnackbar}
     </div>
   );
 }

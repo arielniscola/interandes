@@ -3,16 +3,16 @@ import Divider from "@mui/material/Divider";
 import CardMedia from "@mui/material/CardMedia";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
+import DownloadForOfflineIcon from "@mui/icons-material/DownloadForOffline";
 import pdfIcon from "assets/images/pdf-icon.png";
 import wordIcon from "assets/images/word-icon.png";
 import excelIcon from "assets/images/excel-icon.png";
 import fileIcon from "assets/images/logo-sin-extension.png";
-import DeleteIcon from "@mui/icons-material/Delete";
 import MDButton from "components/MDButton";
 
-function FileCard({ file, deleteFn }) {
+function FileCardView({ file, deleteFn }) {
   const getIcon = (fileSelected) => {
-    const splited = fileSelected.name.split(".");
+    const splited = fileSelected.filename.split(".");
     const extension = splited[splited.length - 1];
     switch (extension) {
       case "xls":
@@ -45,19 +45,21 @@ function FileCard({ file, deleteFn }) {
             display="flex"
             justifyContent="center"
             alignItems="center"
-            width="2rem"
-            height="2rem"
+            width="1.5rem"
+            height="1.5rem"
+            ml={2}
+            mt={1}
           >
             <CardMedia
               component="img"
-              height="60"
+              height="55"
               src="assets/images/pdf-icon.png"
               image={getIcon(file)}
             />
           </MDBox>
           <MDBox>
             <MDTypography variant="button" fontWeight="light" color="black">
-              {file.name}
+              {file.filename}
             </MDTypography>
           </MDBox>
           <MDBox>
@@ -67,7 +69,7 @@ function FileCard({ file, deleteFn }) {
           </MDBox>
           <MDBox textAlign="right" lineHeight={1.25}>
             <MDButton variant="text" color="error" onClick={() => deleteFileHandle(file.name)}>
-              <DeleteIcon color="error" />
+              <DownloadForOfflineIcon color="info" />
             </MDButton>
           </MDBox>
         </MDBox>
@@ -77,4 +79,4 @@ function FileCard({ file, deleteFn }) {
   );
 }
 
-export default FileCard;
+export default FileCardView;

@@ -26,6 +26,7 @@ export interface IPricing {
   totalTaxDol: number;
   profitDol: number;
   operation_id?: string;
+  client_id?: string;
 }
 
 export class Pricing extends Model<IPricing> {

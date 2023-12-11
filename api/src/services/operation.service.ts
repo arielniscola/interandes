@@ -1,8 +1,11 @@
+import { FileStructure } from "../models/fileStructure";
 import {
   HistoryOperation,
   IHistoryOperation,
 } from "../models/historyOperation";
 import { IOperation, Operation } from "../models/operation";
+import { Pricing } from "../models/pricing";
+import { SalesOrder } from "../models/salesOrder";
 import { TaskList } from "../models/workList";
 import { createList } from "./workList.service";
 
@@ -18,6 +21,15 @@ export const getOperationID = async (id: string): Promise<Operation> => {
         },
         {
           model: TaskList,
+        },
+        {
+          model: Pricing,
+        },
+        {
+          model: SalesOrder,
+        },
+        {
+          model: FileStructure,
         },
       ],
     });
@@ -56,7 +68,7 @@ export const createOperation = async (type: string): Promise<IOperation> => {
     // Crear lista de tareas
     await createList(op);
     // Crear hitorial
-    await addHistoryOperation(op.id, "Creación de operación");
+    await addHistoryOperation(op.id, "Creación de Pricing");
     return op;
   } catch (error) {
     throw error;

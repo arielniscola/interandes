@@ -123,6 +123,13 @@ const routes = [
     component: <SalesOrder />,
   },
   {
+    type: "route",
+    name: "Formulario Orden de Venta",
+    key: "salesOrder",
+    route: "/salesOrder-form/:id",
+    component: <SalesOrder />,
+  },
+  {
     type: "collapse",
     name: "ORDEN DE VENTA",
     key: "salesOrder",
@@ -141,7 +148,7 @@ const routes = [
     type: "route",
     name: "Files",
     key: "files",
-    route: "/file-upload",
+    route: "/file-upload/:id",
     component: <Files />,
   },
   {

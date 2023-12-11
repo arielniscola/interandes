@@ -16,6 +16,7 @@ import {
 import { TaskList, initTaskListModel } from "./models/workList";
 import { initTaskModel } from "./models/task";
 import { initTypeOperationModel } from "./models/typeOperation";
+import { initProvider } from "./models/provider";
 
 const DB_USER = "postgres";
 const DB_PASSWORD = "1234";
@@ -45,12 +46,13 @@ initHistoryOperation(sequelize);
 initTaskListModel(sequelize);
 initTaskModel(sequelize);
 initTypeOperationModel(sequelize);
+initProvider(sequelize);
 
 /** Pricing relationships */
 Pricing.belongsTo(Client, { foreignKey: "client_id" });
+Client.hasMany(Pricing, { foreignKey: "client_id" });
 Pricing.belongsTo(User, { foreignKey: "user_id" });
-FileStructure.belongsTo(Operation, { foreignKey: "operation_id" });
-Pricing.hasMany(Detail);
+Pricing.hasMany(Detail, { foreignKey: "pricing_id" });
 Detail.belongsTo(Pricing, { foreignKey: "pricing_id" });
 
 /** Sales Order relationships */
@@ -60,10 +62,14 @@ SalesOrder.belongsTo(Client, { foreignKey: "client_id" });
 SalesOrder.belongsTo(User, { foreignKey: "user_id" });
 
 /** Operation relationships */
-Operation.hasMany(HistoryOperation);
+Operation.hasOne(FileStructure, { foreignKey: "operation_id" });
+FileStructure.belongsTo(Operation, { foreignKey: "operation_id" });
+Operation.hasMany(HistoryOperation, { foreignKey: "operation_id" });
 Operation.hasOne(Pricing, { foreignKey: "operation_id" });
 Pricing.belongsTo(Operation);
 Operation.hasOne(SalesOrder, { foreignKey: "operation_id" });
 HistoryOperation.belongsTo(Operation, { foreignKey: "operation_id" });
 Operation.hasOne(TaskList, { foreignKey: "operation_id" });
 TaskList.belongsTo(Operation, { foreignKey: "operation_id" });
+
+/** Provider */

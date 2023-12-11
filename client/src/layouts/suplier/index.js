@@ -2,26 +2,20 @@ import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 
 import { useEffect, useState } from "react";
-import PageviewIcon from "@mui/icons-material/Pageview";
-
+import { getClients } from "services/clientHook";
+import Icon from "@mui/material/Icon";
 import { useMaterialUIController } from "context";
-
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
-import { getOperations } from "services/operationHook";
 import DataTable from "../../examples/Tables/DataTable";
 import MDButton from "../../components/MDButton";
 import MDBox from "../../components/MDBox";
 import MDTypography from "../../components/MDTypography";
 
-function OperationsTable() {
+function SuplierTable() {
   const [controller] = useMaterialUIController();
   const { darkMode } = controller;
-
-  const detailView = (id) => {
-    window.location.replace(`/operations/timeline/${id}`);
-  };
 
   const addOptions = (items) => {
     const itemsWithOptions = items.map((item) => {
@@ -29,13 +23,11 @@ function OperationsTable() {
         ...item,
         options: (
           <div>
-            <MDButton
-              variant="text"
-              size="large"
-              color={darkMode ? "white" : "dark"}
-              onClick={() => detailView(item.id)}
-            >
-              <PageviewIcon color="info" />
+            <MDButton variant="text" color={darkMode ? "white" : "dark"}>
+              <Icon>edit</Icon>
+            </MDButton>
+            <MDButton variant="text" color={darkMode ? "white" : "dark"}>
+              <Icon>launchOutlinedIcon</Icon>
             </MDButton>
           </div>
         ),
@@ -44,24 +36,35 @@ function OperationsTable() {
     return itemsWithOptions;
   };
   // const { columns: pColumns, rows: pRows } = ;
-  const [operations, setOperations] = useState([]);
+  const [clients, setClients] = useState([]);
 
   useEffect(async () => {
-    const res = await getOperations();
-    const response = addOptions(res.data);
-    setOperations(response);
+    const res = await getClients();
+    const response = addOptions(res);
+    setClients(response);
   }, []);
 
   const columns = [
-    { Header: "N°", accessor: "operationNumber", align: "center" },
-    { Header: "Fecha Creación", accessor: "date", align: "center" },
-    { Header: "Tipo de Operación", accessor: "typeOperation", align: "center" },
+    { Header: "N°", accessor: "id", align: "center" },
+    { Header: "Nombre", accessor: "businessName", align: "center" },
+    { Header: "Contacto", accessor: "contactperson", align: "center" },
+    { Header: "Email", accessor: "email", align: "center" },
+    { Header: "Categoria", accessor: "type", align: "center" },
     { Header: "Opciones", accessor: "options", align: "center" },
   ];
 
   return (
     <DashboardLayout>
       <DashboardNavbar />
+      <MDBox mt={4} mb={1}>
+        <MDButton
+          variant="gradient"
+          color="success"
+          onClick={() => window.location.replace("/clients/form")}
+        >
+          Nuevo
+        </MDButton>
+      </MDBox>
       <MDBox pt={6} pb={3}>
         <Grid container spacing={6}>
           <Grid item xs={12}>
@@ -77,11 +80,11 @@ function OperationsTable() {
                 coloredShadow="info"
               >
                 <MDTypography variant="h6" color="white">
-                  Operaciones
+                  Proveedores
                 </MDTypography>
               </MDBox>
               <MDBox pt={3}>
-                <DataTable table={{ columns, rows: operations }} noEndBorder />
+                <DataTable table={{ columns, rows: clients }} noEndBorder />
               </MDBox>
             </Card>
           </Grid>
@@ -92,4 +95,4 @@ function OperationsTable() {
   );
 }
 
-export default OperationsTable;
+export default SuplierTable;

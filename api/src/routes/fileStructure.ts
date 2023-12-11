@@ -1,10 +1,16 @@
 import { Router } from "express";
-import multer from "multer";
-import { uploadFiles, getFilesCollection } from "../controllers/filesStructure";
 
-const upload = multer({ dest: "uploads/" });
+import { FileStorage } from "../utils/multer.config";
+import {
+  downloadFileController,
+  getFilesOperationController,
+  uploadFilesController,
+} from "../controllers/filesStructure";
 
+const fileConfig = new FileStorage("operations");
+const upload = fileConfig.upload;
 export const fileRoutes = Router();
 
-fileRoutes.post("/", upload.single("file"), uploadFiles);
-fileRoutes.get("/", getFilesCollection);
+fileRoutes.post("/:id", upload.array("files", 10), uploadFilesController);
+fileRoutes.get("/:id", getFilesOperationController);
+fileRoutes.get("/download/:id", downloadFileController);

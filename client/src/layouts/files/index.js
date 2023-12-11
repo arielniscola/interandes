@@ -27,11 +27,11 @@ function Files() {
             coloredShadow="info"
           >
             <MDTypography variant="h6" color="white">
-              Subir Archivos
+              Subir Archivos Operación
             </MDTypography>
           </MDBox>
 
-          <MDBox mx={2} mt={15} py={2} px={1} borderRadius="lg">
+          <MDBox mx={2} mt={5} py={2} px={1} borderRadius="lg">
             <FileUploader />
           </MDBox>
         </Card>

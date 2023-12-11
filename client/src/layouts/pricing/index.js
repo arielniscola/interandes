@@ -1,29 +1,11 @@
-/**
-=========================================================
-* Material Dashboard 2 React - v2.1.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/material-dashboard-react
-* Copyright 2022 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
-
-// @mui material components
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 
 import { useEffect, useState } from "react";
 import { getPricings } from "services/pricingHook";
-// Material Dashboard 2 React components
 import Icon from "@mui/material/Icon";
 import PostAddIcon from "@mui/icons-material/PostAdd";
 import PageviewIcon from "@mui/icons-material/Pageview";
-// Material Dashboard 2 React example components
 import { useMaterialUIController } from "context";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
@@ -42,7 +24,6 @@ function PricingTable() {
     window.location.replace(`/salesOrder-form`);
   };
   const viewDetailPricing = (id) => {
-    console.log(id);
     window.location.replace(`/pricing-form/${id}`);
   };
   const addOptions = (items) => {

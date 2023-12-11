@@ -29,11 +29,13 @@ export const getAllPricingsController = async (
 export const getPricingIDController = async (req: Request, res: Response) => {
   try {
     const pricing = await getPricingID(req.params.id);
-    if (!pricing) res.status(404).json({ message: "Pricing not found" });
+    if (!pricing) res.status(404).json(new ResponseApi(0, "", pricing));
 
     res.status(200).json(pricing);
   } catch (error: any) {
-    res.status(404).json({ message: error.message });
+    res
+      .status(404)
+      .json(new ResponseApi(1, `Error al obtener pricing: ${error}`));
   }
 };
 
