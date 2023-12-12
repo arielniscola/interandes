@@ -31,7 +31,8 @@
       }
     ],
     "react/jsx-curly-spacing": [2, "never"],
-    "no-underscore-dangle": "off"
+    "no-underscore-dangle": "off",
+    "no-param-reassign": ["error", { "props": false }]
   },
   "settings": { "import/resolver": { "node": { "paths": ["src"] } } }
 }

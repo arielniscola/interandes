@@ -1,7 +1,5 @@
 // import { Link } from "react-router-dom";
 import React, { useState, useEffect } from "react";
-// @mui material components
-// import table Items
 import MDBox from "components/MDBox";
 
 import Autocomplete from "@mui/material/Autocomplete";
@@ -31,7 +29,6 @@ function TypeOperation() {
   // Obtener todos los tipos de operacion
   useEffect(async () => {
     const res = await getTypeOperations();
-    console.log("tipo de operacion", res);
     if (res.ack) {
       showSnackbar({
         title: "Tipo de Operación",
@@ -43,8 +40,6 @@ function TypeOperation() {
       setTypeOperations(res.data);
     }
   }, []);
-  console.log("ASasdsad");
-  console.log(operationType);
   const operationHandler = (e) => {
     const { name, value } = e.target;
 
@@ -82,7 +77,6 @@ function TypeOperation() {
     const newtasks = tasks.map((el) => el.description);
     const opType = { ...operationType };
     opType.tasks = newtasks;
-    console.log(tasks);
     const res = await updateOperationTypeService(opType);
     if (res) {
       showSnackbar({

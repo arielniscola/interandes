@@ -26,7 +26,7 @@ import useSnackbar from "../../../services/snackbarHook";
 import { getPricingServices } from "../../../services/pricingHook";
 
 function Pricing() {
-  const [inputsHabilitados, setInputsHabilitados] = useState("true");
+  const [inputsHabilitados, setInputsHabilitados] = useState("false");
 
   const { showSnackbar, renderSnackbar } = useSnackbar();
   const { id } = useParams();
@@ -203,7 +203,7 @@ function Pricing() {
           icon: res.ack ? "warning" : "check",
         });
       } else {
-        setInputsHabilitados("false");
+        setInputsHabilitados("true");
         setPricing({
           companyname: "",
           language: "",
@@ -373,7 +373,7 @@ function Pricing() {
                     name="companyname"
                     label="Empresa"
                     value={pricing.companyname}
-                    disabled={inputsHabilitados}
+                    disabled="false"
                     onChange={handleChangePricing}
                     style={{ height: 40, marginTop: 5 }}
                   >
@@ -484,7 +484,6 @@ function Pricing() {
                       </InputLabel>
                       <Select
                         fullWidth
-                        disabled={inputsHabilitados}
                         labelId="demo-simple-select-helper-label"
                         id="demo-simple-select-helper"
                         name="currency"

@@ -78,7 +78,7 @@ function PricingTable() {
   return (
     <DashboardLayout>
       <DashboardNavbar />
-      <MDBox mt={4} mb={1}>
+      <MDBox mt={1} mb={1}>
         <MDButton
           variant="gradient"
           color="success"
@@ -87,7 +87,7 @@ function PricingTable() {
           Nuevo
         </MDButton>
       </MDBox>
-      <MDBox pt={6} pb={3}>
+      <MDBox pt={4} pb={3}>
         <Grid container spacing={6}>
           <Grid item xs={12}>
             <Card>

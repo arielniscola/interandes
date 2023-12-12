@@ -1,5 +1,4 @@
 /** 
-  All of the routes for the Material Dashboard 2 React are added here,
   You can add a new route, customize the routes and delete the routes here.
 
   Once you add a new route on this file it will be visible automatically on
@@ -21,7 +20,6 @@
 */
 import Icon from "@mui/material/Icon";
 
-// Material Dashboard 2 React layouts
 import Dashboard from "layouts/dashboard";
 import Notifications from "layouts/notifications";
 import Profile from "layouts/profile";
@@ -35,7 +33,10 @@ import SalesOrdersTable from "layouts/salesOrder";
 import SalesOrder from "layouts/salesOrder/form";
 import OperationsTable from "layouts/operations";
 import OperationTimeLine from "layouts/operations/timeline";
+import SuplierTable from "layouts/suplier";
+import InvoiceTable from "layouts/invoices";
 import PricingForm from "./layouts/pricing/form";
+import ProviderForm from "./layouts/suplier/suplierForm";
 
 const routes = [
   {
@@ -47,12 +48,28 @@ const routes = [
     component: <Dashboard />,
   },
   {
-    type: "collapse",
+    type: "route",
     name: "PROVEEDORES",
     key: "notifications",
     icon: <Icon fontSize="small">notifications</Icon>,
     route: "/notifications",
     component: <Notifications />,
+  },
+  {
+    type: "collapse",
+    name: "PROVEEDORES",
+    key: "notifications",
+    icon: <Icon fontSize="small">notifications</Icon>,
+    route: "/providers",
+    component: <SuplierTable />,
+  },
+  {
+    type: "route",
+    name: "PROVEEDORES",
+    key: "notifications",
+    icon: <Icon fontSize="small">notifications</Icon>,
+    route: "/providers/form",
+    component: <ProviderForm />,
   },
   {
     type: "route",
@@ -81,6 +98,14 @@ const routes = [
   {
     type: "collapse",
     name: "FACTURACION",
+    key: "invoices",
+    icon: <Icon fontSize="small">login</Icon>,
+    route: "/invoices",
+    component: <InvoiceTable />,
+  },
+  {
+    type: "route",
+    name: "signin",
     key: "sign-in",
     icon: <Icon fontSize="small">login</Icon>,
     route: "/",

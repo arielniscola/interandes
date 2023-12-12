@@ -17,7 +17,7 @@ import ListItemText from "@mui/material/ListItemText";
 import Checkbox from "@mui/material/Checkbox";
 
 import TimelineItem from "examples/Timeline/TimelineItem";
-import { getOperationID } from "services/operationHook";
+import { getOperationID, updateTaskList } from "services/operationHook";
 import MDButton from "components/MDButton";
 import Filesviews from "components/FileStructure";
 import useSnackbar from "../../../services/snackbarHook";
@@ -55,8 +55,8 @@ function OperationTimeLine() {
   }, []);
 
   const redirectSalesOrder = () => {
-    if (operation.salesOrder.id) {
-      window.location.replace(`/salesOrder-form/${id}`);
+    if (operation.SalesOrder) {
+      window.location.replace(`/salesOrder-form/${operation.SalesOrder.id}`);
     } else {
       showSnackbar({
         title: "Operaciones",
@@ -67,8 +67,8 @@ function OperationTimeLine() {
     }
   };
   const redirectPricing = () => {
-    if (operation.pricing.id) {
-      window.location.replace(`/pricing-form/${id}`);
+    if (operation.Pricing) {
+      window.location.replace(`/pricing-form/${operation.Pricing.id}`);
     } else {
       showSnackbar({
         title: "Operaciones",
@@ -78,7 +78,29 @@ function OperationTimeLine() {
       });
     }
   };
-
+  const updateOperationHandle = async () => {
+    const tasklist = {
+      id: operation.TaskList.id,
+      taks: tasks,
+    };
+    console.log(tasklist);
+    const res = await updateTaskList(tasklist);
+    if (!res.ack) {
+      showSnackbar({
+        title: "Operaciones",
+        content: "Tareas actualizadas",
+        color: "success",
+        icon: "check",
+      });
+    } else {
+      showSnackbar({
+        title: "Operaciones",
+        content: "Error al actualizar tareas",
+        color: "error",
+        icon: "warning",
+      });
+    }
+  };
   const redirectFileUpload = () => {
     window.location.replace(`/file-upload/${id}`);
   };
@@ -200,7 +222,7 @@ function OperationTimeLine() {
               </List>
             </MDBox>
             <MDBox sx={{ margin: 4 }}>
-              <MDButton variant="gradient" color="info">
+              <MDButton variant="gradient" color="info" onClick={updateOperationHandle}>
                 Actualizar Lista
               </MDButton>
             </MDBox>

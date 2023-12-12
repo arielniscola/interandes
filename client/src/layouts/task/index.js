@@ -26,9 +26,9 @@ function Task() {
   const [task, setTask] = useState({
     description: "",
   });
+  const [load, setLoad] = useState(false);
   useEffect(async () => {
     const res = await getTasks();
-    console.log(res);
     if (!res.ack) {
       showSnackbar({
         title: "Tareas",
@@ -38,7 +38,7 @@ function Task() {
     } else {
       setTasks(res.data);
     }
-  }, []);
+  }, [load]);
 
   const handleTask = (e) => {
     const { name, value } = e.target;
@@ -60,13 +60,14 @@ function Task() {
   };
   const submitTask = async () => {
     const res = await createTask(task);
-    console.log(res.ack ? "error" : "success");
+    console.log(res);
     showSnackbar({
       title: "Tarea",
       content: res.message,
       color: res.ack ? "error" : "success",
       icon: res.ack ? "warning" : "check",
     });
+    setLoad(!load);
     setTask({ description: "" });
   };
   const deleteTask = async (id) => {
@@ -90,9 +91,9 @@ function Task() {
             Lista de Tareas
           </MDTypography>
         </MDBox>
-        <Grid container spacing={4}>
+        <Grid container spacing={4} marginLeft={4}>
           <Grid item xs={8} md={4} margin={5}>
-            <MDBox pt={3}>
+            <MDBox pt={1}>
               <Typography sx={{ mt: 2, mb: 2 }} variant="h6">
                 Tareas:
               </Typography>

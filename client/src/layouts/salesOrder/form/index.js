@@ -1,19 +1,16 @@
 // import { Link } from "react-router-dom";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { getClients } from "services/clientHook";
 import Autocomplete from "@mui/material/Autocomplete";
-import { useNavigate } from "react-router-dom";
-import { Toaster } from "react-hot-toast";
+import { useNavigate, useParams } from "react-router-dom";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import moment from "moment";
-import { createSalesOrders } from "services/salesOrderHook";
-// import table Items
-// Material Dashboard 2 React components
 import MDBox from "components/MDBox";
 import Card from "@mui/material/Card";
-import { Grid } from "@mui/material";
+import OutlinedInput from "@mui/material/OutlinedInput";
+import { FormControl, Grid } from "@mui/material";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import InputLabel from "@mui/material/InputLabel";
@@ -24,23 +21,39 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
 import TextField from "@mui/material/TextField";
 import ConsigneeForm from "layouts/consignee/form";
+import { getsalesOrder, createSalesOrders } from "services/salesOrderHook";
 import MDInput from "../../../components/MDInput";
 import MDTypography from "../../../components/MDTypography";
 import MDButton from "../../../components/MDButton";
 import DataTable from "../../../examples/Tables/DataTable";
+import useSnackbar from "../../../services/snackbarHook";
 
-// Material Dashboard 2 React example components
-function SalesOrder({ match }) {
+function SalesOrder() {
+  const consigneeRef = useRef();
+  const notifyRef = useRef();
   const navigate = useNavigate();
+  const { id } = useParams();
+  const { showSnackbar, renderSnackbar } = useSnackbar();
   const [clients, setClients] = useState([]);
-  if (match) {
-    const { id } = match.params;
-    console.log(id);
-  }
+
   useEffect(async () => {
     const res = await getClients();
     setClients(res);
   }, []);
+
+  useEffect(async () => {
+    if (id) {
+      const res = await getsalesOrder(id);
+      if (res.ack) {
+        showSnackbar({
+          title: "Orden de Venta",
+          content: res.message,
+          color: res.ack ? "error" : "success",
+          icon: res.ack ? "warning" : "check",
+        });
+      }
+    }
+  });
 
   const [client, setClient] = useState({
     _id: "",
@@ -81,11 +94,11 @@ function SalesOrder({ match }) {
     landedATA: "",
     hasHBL: "",
     hblNumber: "",
-    containerStruk: "",
+    containerStruk: 0,
     chargeLCL: false,
     unity: "",
-    weigth: "",
-    volumen: "",
+    weigth: 0,
+    volumen: 0,
     poRef: "",
     brand: "",
   });
@@ -117,7 +130,7 @@ function SalesOrder({ match }) {
       case "chargeLCL":
         setSaleOrder({
           ...saleOrder,
-          [name]: value === "on",
+          [name]: !saleOrder.chargeLCL,
         });
         break;
       default:
@@ -130,9 +143,28 @@ function SalesOrder({ match }) {
   };
 
   const submitHandlerSaleOrder = async () => {
-    const data = { saleOrder };
+    // Crear OV, contenedores, consignee
+    const consignees = [consigneeRef.current, notifyRef.current];
+    const data = { saleOrder, containers, client, consignees };
     const res = await createSalesOrders(data);
-    if (res) navigate("/sales-order");
+    if (res.ack) {
+      showSnackbar({
+        title: "Orden de Venta",
+        content: res.message,
+        color: "error",
+        icon: "warning",
+      });
+    } else {
+      showSnackbar({
+        title: "Orden de Venta",
+        content: res.message,
+        color: "success",
+        icon: "check",
+      });
+      setTimeout(() => {
+        navigate("/sales-order");
+      }, 1000);
+    }
   };
   const handleChangeDate = (field, date) => {
     setSaleOrder({ ...saleOrder, [field]: date });
@@ -293,10 +325,10 @@ function SalesOrder({ match }) {
           </Grid>
           <Grid container spacing={2} marginBottom={-2} sx={{ m: 1 }}>
             <Grid item xs={5}>
-              <ConsigneeForm title="Consignee" />
+              <ConsigneeForm title="Consignee" isNofify={false} stateRef={consigneeRef} />
             </Grid>
             <Grid item xs={5}>
-              <ConsigneeForm title="Notify" />
+              <ConsigneeForm title="Notify" isNofify stateRef={notifyRef} />
             </Grid>
           </Grid>
           <MDBox pt={3}>
@@ -435,19 +467,22 @@ function SalesOrder({ match }) {
                     />
                   </MDBox>
                   <MDBox mt={3} mb={1} sx={{ m: 2 }}>
-                    <InputLabel id="demo-simple-select-helper-label">Posee HBL</InputLabel>
-                    <Select
-                      labelId="hasHBL"
-                      value={saleOrder.hasHBL}
-                      name="hasHBL"
-                      id="hasHBL"
-                      label="Posee HBL"
-                      onChange={handleChangeSaleOrder}
-                      style={{ height: 40, marginTop: 8, width: 300 }}
-                    >
-                      <MenuItem value="SI">SI</MenuItem>
-                      <MenuItem value="NO">NO</MenuItem>
-                    </Select>
+                    <FormControl sx={{ minWidth: 300 }}>
+                      <InputLabel id="hasHBL">Posee HBL</InputLabel>
+                      <Select
+                        labelId="hasHBL"
+                        value={saleOrder.hasHBL}
+                        name="hasHBL"
+                        id="hasHBL"
+                        label="Posee HBL"
+                        input={<OutlinedInput label="Posee HBL" />}
+                        onChange={handleChangeSaleOrder}
+                        style={{ height: 42, marginTop: 8, width: 300 }}
+                      >
+                        <MenuItem value="SI">SI</MenuItem>
+                        <MenuItem value="NO">NO</MenuItem>
+                      </Select>
+                    </FormControl>
                   </MDBox>
                   {saleOrder.hasHBL === "SI" && (
                     <MDBox mb={2} sx={{ m: 2 }}>
@@ -515,20 +550,10 @@ function SalesOrder({ match }) {
                   </MDBox>
                   <MDBox mb={2} sx={{ m: 2 }}>
                     <MDInput
-                      type="text"
+                      type="number"
                       name="containerStruk"
                       label="Contonedores/Camiones"
                       value={saleOrder.containerStruk}
-                      onChange={handleChangeSaleOrder}
-                      fullWidth
-                    />
-                  </MDBox>
-                  <MDBox mb={2} sx={{ m: 2 }}>
-                    <MDInput
-                      type="text"
-                      name="merchandise"
-                      label="Email"
-                      value={saleOrder.merchandise}
                       onChange={handleChangeSaleOrder}
                       fullWidth
                     />
@@ -722,7 +747,7 @@ function SalesOrder({ match }) {
                       type="text"
                       name="poRef"
                       label="PO/REF"
-                      value={saleOrder.poRef}
+                      value={container.poRef}
                       onChange={handleChangeContainer}
                       fullWidth
                     />
@@ -778,45 +803,57 @@ function SalesOrder({ match }) {
                     />
                   </Grid>
                   <Grid item xs={1.5}>
-                    <MDInput
-                      type="text"
-                      name="hasTemp"
-                      label="Temperatura"
-                      value={saleOrder.hasTemp}
-                      onChange={handleChangeContainer}
-                      fullWidth
-                    />
+                    <FormControl sx={{ minWidth: 160 }}>
+                      <InputLabel id="demo-simple-select-label">Tiene Temperatura</InputLabel>
+                      <Select
+                        id="demo-simple-select-label"
+                        name="hasTemp"
+                        value={container.hasTemp}
+                        onChange={handleChangeContainer}
+                        input={<OutlinedInput label="Tiene Temperatura" />}
+                        style={{ minHeight: "43px" }}
+                      >
+                        <MenuItem value>SI</MenuItem>
+                        <MenuItem value={false}>NO</MenuItem>
+                      </Select>
+                    </FormControl>
                   </Grid>
-                  <Grid item xs={1.5}>
-                    <MDInput
-                      type="text"
-                      name="temperature"
-                      label="Temperatura"
-                      value={saleOrder.temperature}
-                      onChange={handleChangeContainer}
-                      fullWidth
-                    />
-                  </Grid>
-                  <Grid item xs={1.5}>
-                    <MDInput
-                      type="text"
-                      name="ventilation"
-                      label="Ventilacion"
-                      value={saleOrder.ventilation}
-                      onChange={handleChangeContainer}
-                      fullWidth
-                    />
-                  </Grid>
-                  <Grid item xs={1.5}>
-                    <MDInput
-                      type="text"
-                      name="humidity"
-                      label="Humedad"
-                      value={container.humidity}
-                      onChange={handleChangeContainer}
-                      fullWidth
-                    />
-                  </Grid>
+                  {container.hasTemp && (
+                    <Grid item xs={1.5}>
+                      <MDInput
+                        type="text"
+                        name="temperature"
+                        label="Temperatura °"
+                        value={container.temperature}
+                        onChange={handleChangeContainer}
+                        fullWidth
+                      />
+                    </Grid>
+                  )}
+                  {container.hasTemp && (
+                    <Grid item xs={1.5}>
+                      <MDInput
+                        type="text"
+                        name="ventilation"
+                        label="Ventilacion"
+                        value={container.ventilation}
+                        onChange={handleChangeContainer}
+                        fullWidth
+                      />
+                    </Grid>
+                  )}
+                  {container.hasTemp && (
+                    <Grid item xs={1.5}>
+                      <MDInput
+                        type="text"
+                        name="humidity"
+                        label="Humedad"
+                        value={container.humidity}
+                        onChange={handleChangeContainer}
+                        fullWidth
+                      />
+                    </Grid>
+                  )}
                   <Grid style={{ marginTop: 8, marginLeft: 10 }}>
                     <MDButton
                       variant="gradient"
@@ -850,27 +887,27 @@ function SalesOrder({ match }) {
                 />
               </MDBox>
             </MDBox>
+            <Grid container spacing={2}>
+              <Grid item xs={3}>
+                <MDBox mt={4} mb={1} sx={{ m: 2 }}>
+                  <MDButton variant="gradient" color="info" onClick={submitHandlerSaleOrder}>
+                    Guardar
+                  </MDButton>
+                </MDBox>
+              </Grid>
+              <Grid item xs={3}>
+                <MDBox mt={4} mb={1} sx={{ m: 2 }}>
+                  <MDButton variant="gradient" color="warning" onClick={submitHandlerSaleOrder}>
+                    Cancelar
+                  </MDButton>
+                </MDBox>
+              </Grid>
+            </Grid>
           </Card>
         </MDBox>
       )}
-      <Grid container spacing={2}>
-        <Grid item xs={3}>
-          <MDBox mt={4} mb={1} sx={{ m: 2 }}>
-            <MDButton variant="gradient" color="info" onClick={submitHandlerSaleOrder}>
-              Guardar
-            </MDButton>
-          </MDBox>
-        </Grid>
-        <Grid item xs={3}>
-          <MDBox mt={4} mb={1} sx={{ m: 2 }}>
-            <MDButton variant="gradient" color="warning" onClick={submitHandlerSaleOrder}>
-              Cancelar
-            </MDButton>
-          </MDBox>
-        </Grid>
-      </Grid>
 
-      <Toaster />
+      {renderSnackbar}
       <Footer />
     </DashboardLayout>
   );

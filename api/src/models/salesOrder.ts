@@ -1,6 +1,6 @@
 import { DataTypes, Model, Sequelize } from "sequelize";
 
-interface ISalesOrder {
+export interface ISalesOrder {
   id?: string;
   merchandise: string;
   originOfCharge: string;
@@ -33,6 +33,8 @@ interface ISalesOrder {
   volumen: string;
   poRef: string;
   brand: string;
+  operation_id?: string;
+  client_id?: string;
 }
 
 export class SalesOrder extends Model<ISalesOrder> {

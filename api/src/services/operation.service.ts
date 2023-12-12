@@ -59,7 +59,6 @@ export const addHistoryOperation = async (id: string, method: string) => {
 export const createOperation = async (type: string): Promise<IOperation> => {
   try {
     console.log("Creando operacion..");
-
     const op = await Operation.create({
       operationNumber: await generateON(),
       date: new Date(),
@@ -78,6 +77,19 @@ export const getOperations = async () => {
   try {
     const operations = await Operation.findAll();
     return operations;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const updateOperations = async (operation: IOperation) => {
+  try {
+    const opUpdated = await Operation.update(operation, {
+      where: {
+        id: operation.id,
+      },
+    });
+    return opUpdated;
   } catch (error) {
     throw error;
   }

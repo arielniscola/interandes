@@ -1,11 +1,11 @@
 import URL_API from "../config";
 
-export const createCliente = async (clientData) => {
+export const createProvider = async (providerData) => {
   try {
-    const res = await fetch(`${URL_API}/clients`, {
+    const res = await fetch(`${URL_API}/providers`, {
       method: "POST",
       headers: { "Content-type": "application/json" },
-      body: JSON.stringify(clientData),
+      body: JSON.stringify(providerData),
     });
     const data = await res.json();
     return data;
@@ -14,9 +14,9 @@ export const createCliente = async (clientData) => {
   }
 };
 
-export const getClients = async () => {
+export const getProviders = async () => {
   try {
-    const res = await fetch(`${URL_API}/clients`, {
+    const res = await fetch(`${URL_API}/providers`, {
       method: "GET",
       headers: { "Content-type": "application/json" },
     });

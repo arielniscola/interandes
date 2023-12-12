@@ -28,7 +28,7 @@ export const createPricings = async (pricing) => {
     const data = await res.json();
     return data;
   } catch (error) {
-    return null;
+    return error;
   }
 };
 

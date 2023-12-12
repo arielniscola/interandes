@@ -43,10 +43,18 @@ export const updatePricingController = async (req: Request, res: Response) => {
   try {
     const pricingUpdated = await updatePricing(req.body);
     if (!pricingUpdated)
-      res.status(404).json({ message: "Pricing not updated" });
-    res.status(200).json(pricingUpdated);
-  } catch (error: any) {
-    res.status(404).json({ message: error.message });
+      res
+        .status(404)
+        .json(new ResponseApi(1, "Problemas para actualizar pricing"));
+    res
+      .status(200)
+      .json(
+        new ResponseApi(0, "Pricing actualizado correctamente", pricingUpdated)
+      );
+  } catch (error) {
+    res
+      .status(404)
+      .json(new ResponseApi(1, `Error en actualizar pricing: ${error}`));
   }
 };
 

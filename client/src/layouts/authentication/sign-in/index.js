@@ -87,6 +87,7 @@ function Basic() {
   const submitHandle = (event) => {
     event.preventDefault();
     dispatch(signin(inputs));
+    window.location.replace("/dashboard");
   };
 
   return (

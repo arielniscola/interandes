@@ -28,10 +28,10 @@ function SalesOrdersTable() {
         options: (
           <div>
             <MDButton variant="text" color={darkMode ? "white" : "dark"}>
-              <Icon>edit</Icon>
+              <Icon color="warning">edit</Icon>
             </MDButton>
             <MDButton variant="text" color={darkMode ? "white" : "dark"}>
-              <Icon>launchOutlinedIcon</Icon>
+              <Icon color="info">launchOutlinedIcon</Icon>
             </MDButton>
           </div>
         ),
@@ -46,7 +46,8 @@ function SalesOrdersTable() {
 
   useEffect(async () => {
     const res = await getSalesOrders();
-    if (!res.ack) {
+    console.log(res);
+    if (res.ack) {
       showSnackbar({
         title: "Orden de Venta",
         content: res.message,
@@ -59,18 +60,19 @@ function SalesOrdersTable() {
   }, []);
 
   const columns = [
-    { Header: "N°", accessor: "pricingnumber", align: "center" },
+    { Header: "Mercaderia", accessor: "merchandise", align: "center" },
     { Header: "Compañia", accessor: "companyname", align: "center" },
-    { Header: "Creado", accessor: "createdAt", align: "center" },
-    { Header: "Estado", accessor: "stage", align: "center" },
-    { Header: "Importe Total", accessor: "profit", align: "center" },
+    { Header: "Origen Carga", accessor: "originOfCharge", align: "center" },
+    { Header: "Destino Final", accessor: "finalDestination", align: "center" },
+    { Header: "Transporte", accessor: "transportation", align: "center" },
+    { Header: "Cliente", accessor: "client.name", align: "center" },
     { Header: "Opciones", accessor: "options", align: "center" },
   ];
 
   return (
     <DashboardLayout>
       <DashboardNavbar />
-      <MDBox pt={6} pb={3}>
+      <MDBox pt={3} pb={3}>
         <Grid container spacing={6}>
           <Grid item xs={12}>
             <Card>

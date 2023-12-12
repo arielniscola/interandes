@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import MDBox from "components/MDBox";
 import Card from "@mui/material/Card";
@@ -10,7 +10,7 @@ import Typography from "@mui/material/Typography";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import MDInput from "../../components/MDInput";
 
-function ConsigneeForm({ onConsigneeSelect, title, isNotify }) {
+function ConsigneeForm({ stateRef, title, isNotify }) {
   const [consignee, setConsignee] = useState({
     businessName: "",
     contact: "",
@@ -20,8 +20,11 @@ function ConsigneeForm({ onConsigneeSelect, title, isNotify }) {
     phone: "",
     notify: isNotify,
   });
-  console.log(title);
-  console.log(onConsigneeSelect);
+  useEffect(() => {
+    // Actualizamos el valor del estado en el ref
+    stateRef.current = consignee;
+  }, [stateRef, consignee]);
+
   const handleChangeConsignee = (e) => {
     const { name, value } = e.target;
     switch (name) {
@@ -41,7 +44,9 @@ function ConsigneeForm({ onConsigneeSelect, title, isNotify }) {
           aria-controls="panel1a-content"
           id="panel1a-header"
         >
-          <Typography variant="h6">{title}</Typography>
+          <Typography fontSize={13} variant="h6">
+            {title}
+          </Typography>
         </AccordionSummary>
         <AccordionDetails>
           <MDBox pt={0} pb={0}>
@@ -102,7 +107,7 @@ function ConsigneeForm({ onConsigneeSelect, title, isNotify }) {
                             type="Taxt ID"
                             label="taxID"
                             value={consignee.taxID}
-                            name="phonenumber"
+                            name="taxID"
                             variant="outlined"
                             fullWidth
                             onChange={handleChangeConsignee}

@@ -1,30 +1,39 @@
 import { IPricing, Pricing } from "../models/pricing";
 import { Client } from "../models/client";
 import { Detail } from "../models/detail";
+import { addHistoryOperation } from "./operation.service";
 // import { IDetail } from "../interfaces/IDetail";
 
 export const getAllPricings = async () => {
-  const pricings = await Pricing.findAll({
-    attributes: {
-      exclude: ["isDeleted"],
-    },
-  });
+  try {
+    const pricings = await Pricing.findAll({
+      attributes: {
+        exclude: ["deleted"],
+      },
+    });
 
-  if (!pricings) throw new Error("Not found");
+    if (!pricings) throw new Error("Not found");
 
-  return pricings;
+    return pricings;
+  } catch (error) {
+    throw error;
+  }
 };
 
-export const getPricingID = async (id: string): Promise<Object> => {
-  const pricing = await Pricing.findByPk(id, {
-    attributes: {
-      exclude: ["deleted"],
-    },
-    include: [{ model: Client }, { model: Detail }],
-  });
+export const getPricingID = async (id: string): Promise<IPricing> => {
+  try {
+    const pricing = await Pricing.findByPk(id, {
+      attributes: {
+        exclude: ["deleted"],
+      },
+      include: [{ model: Client }, { model: Detail }],
+    });
 
-  if (!pricing) throw new Error("Not found");
-  return pricing;
+    if (!pricing) throw new Error("Not found");
+    return pricing;
+  } catch (error) {
+    throw error;
+  }
 };
 
 export const createPricing = async (pricing: IPricing) => {
@@ -40,20 +49,34 @@ export const createPricing = async (pricing: IPricing) => {
   }
 };
 
-export const updatePricing = async (pricing: Pricing) => {
-  const userUpdated = await Pricing.update(
-    {
-      totalCost: pricing.totalCost,
-    },
-    {
+export const updatePricing = async (pricing: IPricing) => {
+  try {
+    const oldPricing = await Pricing.findOne({
       where: {
         id: pricing.id,
       },
-    }
-  );
+    });
+    if (oldPricing.stage !== pricing.stage)
+      await addHistoryOperation(
+        pricing.operation_id,
+        `Modicación de estado a: ${pricing.stage}`
+      );
+    const pricingUpdated = await Pricing.update(
+      {
+        totalCost: pricing.totalCost,
+      },
+      {
+        where: {
+          id: pricing.id,
+        },
+      }
+    );
 
-  if (!userUpdated) throw "Error at update";
-  return userUpdated;
+    if (!pricingUpdated) throw "Error at update";
+    return pricingUpdated;
+  } catch (error) {
+    throw error;
+  }
 };
 
 /** generador de ID */

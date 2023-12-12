@@ -3,6 +3,8 @@ import {
   getSalesOrderID,
   updateSalesOrder,
   createSalesOrder,
+  createConsignees,
+  createContainers,
 } from "../services/salesOrder.service";
 import { Request, Response } from "express";
 import { generateSalesOrderPDF } from "../utils/salesOrderPdf";
@@ -19,7 +21,7 @@ export const getAllSalesOrdersController = async (
     if (!salesOrders.length) {
       res
         .status(200)
-        .json(new ResponseApi(0, "No se encontraron tareas creadas"));
+        .json(new ResponseApi(0, "No se encontraron ordenes de venta creadas"));
     } else {
       res.status(200).json(new ResponseApi(0, "", salesOrders));
     }
@@ -72,19 +74,32 @@ export const createSalesOrderController = async (
   res: Response
 ) => {
   try {
-    const { salesOrder } = req.body;
-    const salesOrderCreated = await createSalesOrder(salesOrder);
-    if (!salesOrderCreated)
-      res.status(404).json(new ResponseApi(1, "SalesOrder not created"));
-    /** Crear detalles */
+    console.log(req.body);
 
+    const { saleOrder, consignees, client, containers } = req.body;
+    // Asignar cliente
+    saleOrder.client_id = client.id;
+    const salesOrderCreated = await createSalesOrder(saleOrder);
+    if (!salesOrderCreated)
+      res.status(404).json(new ResponseApi(1, "Orden de venta no se genero"));
+    /** Crear contenedores y consignees */
+    consignees.forEach((el: any) => {
+      el.salesOrder_id = salesOrderCreated.id;
+    });
+    containers.forEach((el: any) => {
+      el.salesOrder_id = salesOrderCreated.id;
+    });
+    await createConsignees(consignees);
+    await createContainers(containers);
     res
       .status(200)
       .json(new ResponseApi(0, "Orden de venta generada correctamente"));
   } catch (error: any) {
     res
       .status(400)
-      .json(new ResponseApi(1, `Error al crear Orden de venta: ${error}`));
+      .json(
+        new ResponseApi(1, `Error al crear Orden de venta: ${error.message}`)
+      );
   }
 };
 
