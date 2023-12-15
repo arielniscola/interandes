@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import Jwt from "jsonwebtoken";
-import { User } from "../db";
+import { User } from "../models/user";
 
 interface IPayload {
   id: string;
@@ -21,7 +21,6 @@ export const chekAuth = async (
   ) {
     try {
       token = req.headers.authorization.split(" ")[1];
-      console.log(token);
 
       const decoded = Jwt.verify(
         token,

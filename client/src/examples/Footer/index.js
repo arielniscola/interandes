@@ -47,9 +47,12 @@ function Footer({ company, links }) {
       width="100%"
       display="flex"
       flexDirection={{ xs: "column", lg: "row" }}
-      justifyContent="space-between"
+      justifyContent="space-around"
       alignItems="center"
       px={1.5}
+      position="fixed"
+      marginLeft={0}
+      bottom={5}
     >
       <MDBox
         display="flex"
@@ -99,11 +102,11 @@ function Footer({ company, links }) {
 
 // Setting default values for the props of Footer
 Footer.defaultProps = {
-  company: { href: "https://www.creative-tim.com/", name: "Interantes shipping" },
+  company: { href: "http://www.is-sa.com.ar/", name: "Interantes shipping" },
   links: [
-    { href: "https://www.creative-tim.com/", name: "ISSA SA" },
-    { href: "https://www.creative-tim.com/presentation", name: "About Us" },
-    { href: "https://www.creative-tim.com/blog", name: "Web" },
+    { href: "http://www.is-sa.com.ar/", name: "ISSA SA" },
+    { href: "http://www.is-sa.com.ar", name: "About Us" },
+    { href: "http://www.is-sa.com.ar", name: "Web" },
   ],
 };
 

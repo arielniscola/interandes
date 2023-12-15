@@ -1,7 +1,22 @@
 import { Sequelize } from "sequelize";
 import * as pg from "pg";
-import fs from "fs";
-import path from "path";
+import { Pricing, initPricingModel } from "./models/pricing";
+import { Client, initClientModel } from "./models/client";
+import { User, initUserModel } from "./models/user";
+import { Detail, initDetailModel } from "./models/detail";
+import { FileStructure, initFileStructureModel } from "./models/fileStructure";
+import { SalesOrder, initSalesOrderModel } from "./models/salesOrder";
+import { Container, initContainerModel } from "./models/container";
+import { Consignee, initConsignee } from "./models/consignee";
+import { Operation, initOperation } from "./models/operation";
+import {
+  HistoryOperation,
+  initHistoryOperation,
+} from "./models/historyOperation";
+import { TaskList, initTaskListModel } from "./models/workList";
+import { initTaskModel } from "./models/task";
+import { initTypeOperationModel } from "./models/typeOperation";
+import { initProvider } from "./models/provider";
 
 const DB_USER = "postgres";
 const DB_PASSWORD = "1234";
@@ -16,31 +31,48 @@ export const sequelize = new Sequelize(
   }
 );
 
-const basename = path.basename(__filename);
+/** Inicializar modelos */
 
-const modelDefiners: any = [];
+initPricingModel(sequelize);
+initClientModel(sequelize);
+initUserModel(sequelize);
+initDetailModel(sequelize);
+initFileStructureModel(sequelize);
+initSalesOrderModel(sequelize);
+initContainerModel(sequelize);
+initConsignee(sequelize);
+initOperation(sequelize);
+initHistoryOperation(sequelize);
+initTaskListModel(sequelize);
+initTaskModel(sequelize);
+initTypeOperationModel(sequelize);
+initProvider(sequelize);
 
-fs.readdirSync(path.join(__dirname, "/models"))
-  .filter(
-    (file) =>
-      file.indexOf(".") !== 0 && file !== basename && file.slice(-3) === ".ts"
-  )
-  .forEach((file) => {
-    modelDefiners.push(require(path.join(__dirname, "/models", file)));
-  });
+/** Pricing relationships */
+Pricing.belongsTo(Client, { foreignKey: "client_id" });
+Client.hasMany(Pricing, { foreignKey: "client_id" });
+Client.hasMany(SalesOrder, { foreignKey: "client_id" });
+Pricing.belongsTo(User, { foreignKey: "user_id" });
+Pricing.hasMany(Detail, { foreignKey: "pricing_id" });
+Detail.belongsTo(Pricing, { foreignKey: "pricing_id" });
 
-modelDefiners.forEach((model: any) => model(sequelize));
+/** Sales Order relationships */
+SalesOrder.hasMany(Container, { foreignKey: "salesOrder_id" });
+Container.belongsTo(SalesOrder, { foreignKey: "salesOrder_id" });
+SalesOrder.belongsTo(Client, { foreignKey: "client_id" });
+SalesOrder.belongsTo(User, { foreignKey: "user_id" });
+SalesOrder.hasMany(Consignee, { foreignKey: "salesOrder_id" });
+Consignee.belongsTo(SalesOrder, { foreignKey: "salesOrder_id" });
 
-let entries = Object.entries(sequelize.models);
+/** Operation relationships */
+Operation.hasOne(FileStructure, { foreignKey: "operation_id" });
+FileStructure.belongsTo(Operation, { foreignKey: "operation_id" });
+Operation.hasMany(HistoryOperation, { foreignKey: "operation_id" });
+Operation.hasOne(Pricing, { foreignKey: "operation_id" });
+Pricing.belongsTo(Operation);
+Operation.hasOne(SalesOrder, { foreignKey: "operation_id" });
+HistoryOperation.belongsTo(Operation, { foreignKey: "operation_id" });
+Operation.hasOne(TaskList, { foreignKey: "operation_id" });
+TaskList.belongsTo(Operation, { foreignKey: "operation_id" });
 
-let capsEntries = entries.map((entry) => [
-  entry[0][0].toUpperCase() + entry[0].slice(1),
-  entry[1],
-]);
-(sequelize.models as any) = Object.fromEntries(capsEntries);
-
-export const { Client, Pricing, User } = sequelize.models;
-
-Pricing.belongsTo(Client);
-Pricing.belongsTo(User);
-//relations
+/** Provider */

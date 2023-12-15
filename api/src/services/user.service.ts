@@ -1,5 +1,4 @@
-import { User } from "../db";
-import { IUser } from "../interfaces/IUser";
+import { User } from "../models/user";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
@@ -7,10 +6,10 @@ export const createUser = async (user: any) => {
   const { username, password, repeatPassword, mailaddress } = user;
 
   if (!username || !password || !repeatPassword || !mailaddress)
-    throw "Data required missing";
+    throw new Error("Data required missing");
   user.password = await encryptPassword(user.password);
   if (password !== repeatPassword) throw new Error("Passwords don't match");
-  if (!password && !mailaddress && !username) throw "Required data";
+  if (!password && !mailaddress && !username) throw new Error("Required data");
   const emailRegex = new RegExp(
     "([!#-'*+/-9=?A-Z^-~-]+(.[!#-'*+/-9=?A-Z^-~-]+)*|\"([]!#-[^-~ \t]|(\\[\t -~]))+\")@([!#-'*+/-9=?A-Z^-~-]+(.[!#-'*+/-9=?A-Z^-~-]+)*|[[\t -Z^-~]*])"
   );
@@ -20,7 +19,7 @@ export const createUser = async (user: any) => {
 
   const userCreated = await User.create(user);
 
-  if (!userCreated) throw "Error in DB";
+  if (!userCreated) throw new Error("Error in DB");
 
   return userCreated;
 };
@@ -48,7 +47,7 @@ export const getUserID = async (id: any) => {
   return user;
 };
 
-export const updateUser = async (user: IUser) => {
+export const updateUser = async (user: User) => {
   const userUpdated = await User.update(
     {
       username: user.username,
@@ -69,27 +68,23 @@ export const updateUser = async (user: IUser) => {
 };
 
 export const signin = async (email: string, password: string) => {
-  console.log(
-    await User.findOne({
-      where: { mailaddress: email },
-    })
-  );
-
   const userFind = (await User.findOne({
     where: { mailaddress: email },
-  })) as unknown as IUser;
-  console.log(userFind);
+    attributes: {
+      exclude: ["isActive", "deleted", "phonenumber"],
+    },
+  })) as unknown as User;
 
   if (!userFind) throw new Error("Datos Incorrectos");
 
   const validPass = await validatePassword(password, userFind.password);
-  if (!validPass) throw "Password Incorrect";
+  if (!validPass) throw new Error("Password Incorrect");
   const token = jwt.sign({ id: userFind.id }, "cirilla456852", {
     expiresIn: 60 * 60 * 24, //expira en un dia
   });
-
+  userFind.password = null;
   //res.header("auth-token", token).json(userFind);
-  return token;
+  return { token: token, user: userFind };
 };
 
 const validatePassword = async (password: string, passwordDB: string) => {
