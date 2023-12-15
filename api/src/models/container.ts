@@ -92,6 +92,7 @@ export function initContainerModel(sequelize: Sequelize): void {
     {
       sequelize,
       modelName: "Container",
+      timestamps: false,
     }
   );
 }

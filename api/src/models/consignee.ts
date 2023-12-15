@@ -64,6 +64,7 @@ export function initConsignee(sequelize: Sequelize): void {
     {
       sequelize,
       modelName: "Consignee",
+      timestamps: false,
     }
   );
 }

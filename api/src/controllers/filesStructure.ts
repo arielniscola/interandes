@@ -56,6 +56,8 @@ export const downloadFileController = async (
     let filestream = fs.createReadStream(file.path);
     filestream.pipe(res);
   } catch (error: any) {
-    res.status(400).json({ message: error.message });
+    res
+      .status(400)
+      .json(new ResponseApi(1, `Error al descargar archivo: ${error}`));
   }
 };

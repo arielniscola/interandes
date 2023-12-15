@@ -4,7 +4,6 @@ export interface IPricing {
   id?: string;
   pricingnumber: string;
   companyname: string;
-  typeServices: string;
   revalidate: Date;
   language?: string;
   effectiveDate: Date;
@@ -33,7 +32,6 @@ export class Pricing extends Model<IPricing> {
   public id?: string;
   public pricingnumber: string;
   public companyname: string;
-  public typeServices: string;
   public revalidate: Date;
   public language?: string;
   public effectiveDate: Date;
@@ -72,9 +70,6 @@ export function initPricingModel(sequelize: Sequelize): void {
       companyname: {
         type: DataTypes.STRING,
         allowNull: false,
-      },
-      typeServices: {
-        type: DataTypes.STRING,
       },
       revalidate: {
         type: DataTypes.DATE,

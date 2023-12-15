@@ -1,6 +1,6 @@
 import { DataTypes, Model, Sequelize } from "sequelize";
 
-interface IClient {
+export interface IClient {
   id?: string;
   companyname: string;
   direction: string;

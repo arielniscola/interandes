@@ -11,7 +11,6 @@ function Filesviews({ id }) {
   useEffect(async () => {
     if (id) {
       const res = await getFilesOperation(id);
-      console.log(res);
       if (res.ack) {
         showSnackbar({
           title: "Archivos",

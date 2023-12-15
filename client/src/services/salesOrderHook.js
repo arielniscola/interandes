@@ -39,3 +39,31 @@ export const getsalesOrder = async (id) => {
     return error;
   }
 };
+
+export const generateBL = async (id) => {
+  try {
+    const res = await fetch(`${URL_API}/sales-order/generate-instructivo-pdf/${id}`, {
+      method: "GET",
+      headers: { "Content-type": "application/json" },
+    });
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    return url;
+  } catch (error) {
+    return error;
+  }
+};
+
+export const generateDeclaracion = async (id) => {
+  try {
+    const res = await fetch(`${URL_API}/sales-order/generate-bl/${id}`, {
+      method: "GET",
+      headers: { "Content-type": "application/json" },
+    });
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    return url;
+  } catch (error) {
+    return error;
+  }
+};

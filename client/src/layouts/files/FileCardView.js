@@ -7,8 +7,10 @@ import DownloadForOfflineIcon from "@mui/icons-material/DownloadForOffline";
 import pdfIcon from "assets/images/pdf-icon.png";
 import wordIcon from "assets/images/word-icon.png";
 import excelIcon from "assets/images/excel-icon.png";
+import { Icon } from "@mui/material";
 import fileIcon from "assets/images/logo-sin-extension.png";
 import MDButton from "components/MDButton";
+import { downloadFile } from "services/filesUploadHook";
 
 function FileCardView({ file, deleteFn }) {
   const getIcon = (fileSelected) => {
@@ -29,8 +31,12 @@ function FileCardView({ file, deleteFn }) {
         return fileIcon;
     }
   };
-  const deleteFileHandle = (fileDeleted) => {
-    deleteFn(fileDeleted);
+  const deleteFileHandle = (id) => {
+    deleteFn(id);
+  };
+  const donwloadFile = async (id) => {
+    const url = await downloadFile(id);
+    window.open(url, "_blank");
   };
   return (
     <MDBox mb={2}>
@@ -68,8 +74,11 @@ function FileCardView({ file, deleteFn }) {
             </MDTypography>
           </MDBox>
           <MDBox textAlign="right" lineHeight={1.25}>
-            <MDButton variant="text" color="error" onClick={() => deleteFileHandle(file.name)}>
+            <MDButton variant="text" color="error" onClick={() => donwloadFile(file.id)}>
               <DownloadForOfflineIcon color="info" />
+            </MDButton>
+            <MDButton variant="text" color="error" onClick={() => deleteFileHandle(file.id)}>
+              <Icon color="error">Delete</Icon>
             </MDButton>
           </MDBox>
         </MDBox>

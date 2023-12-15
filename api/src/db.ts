@@ -7,7 +7,7 @@ import { Detail, initDetailModel } from "./models/detail";
 import { FileStructure, initFileStructureModel } from "./models/fileStructure";
 import { SalesOrder, initSalesOrderModel } from "./models/salesOrder";
 import { Container, initContainerModel } from "./models/container";
-import { initConsignee } from "./models/consignee";
+import { Consignee, initConsignee } from "./models/consignee";
 import { Operation, initOperation } from "./models/operation";
 import {
   HistoryOperation,
@@ -51,15 +51,18 @@ initProvider(sequelize);
 /** Pricing relationships */
 Pricing.belongsTo(Client, { foreignKey: "client_id" });
 Client.hasMany(Pricing, { foreignKey: "client_id" });
+Client.hasMany(SalesOrder, { foreignKey: "client_id" });
 Pricing.belongsTo(User, { foreignKey: "user_id" });
 Pricing.hasMany(Detail, { foreignKey: "pricing_id" });
 Detail.belongsTo(Pricing, { foreignKey: "pricing_id" });
 
 /** Sales Order relationships */
-SalesOrder.hasMany(Container);
+SalesOrder.hasMany(Container, { foreignKey: "salesOrder_id" });
 Container.belongsTo(SalesOrder, { foreignKey: "salesOrder_id" });
 SalesOrder.belongsTo(Client, { foreignKey: "client_id" });
 SalesOrder.belongsTo(User, { foreignKey: "user_id" });
+SalesOrder.hasMany(Consignee, { foreignKey: "salesOrder_id" });
+Consignee.belongsTo(SalesOrder, { foreignKey: "salesOrder_id" });
 
 /** Operation relationships */
 Operation.hasOne(FileStructure, { foreignKey: "operation_id" });

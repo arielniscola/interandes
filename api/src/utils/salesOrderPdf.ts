@@ -1,10 +1,20 @@
 import PDFDocument from "pdfkit";
 import fs from "fs";
+import { ISalesOrder } from "../models/salesOrder";
+import { IContainer } from "../models/container";
+import { IClient } from "../models/client";
 
-export const generateSalesOrderPDF = async () => {
+export const generateSalesOrderPDF = async (
+  sales: ISalesOrder,
+  containers: IContainer[],
+  client: IClient
+) => {
   try {
+    console.log(sales, containers, client);
+
     const doc = new PDFDocument();
-    doc.pipe(fs.createWriteStream("files/declaracioEmbarque.pdf"));
+    const stream = fs.createWriteStream("files/declaracionEmbarque.pdf");
+    doc.pipe(stream);
     doc.page.margins.bottom = 0;
     doc
       .font("Helvetica-Bold")
@@ -151,6 +161,7 @@ export const generateSalesOrderPDF = async () => {
     );
     // Finalizar y guardar el PDF
     doc.end();
+    return stream;
   } catch (error) {
     throw error;
   }

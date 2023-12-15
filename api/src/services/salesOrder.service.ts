@@ -1,6 +1,5 @@
 import { ISalesOrder, SalesOrder } from "../models/salesOrder";
 import { Client } from "../models/client";
-import { Detail } from "../models/detail";
 import { Consignee, IConsignee } from "../models/consignee";
 import { Container, IContainer } from "../models/container";
 // import { IDetail } from "../interfaces/IDetail";
@@ -17,12 +16,12 @@ export const getAllSalesOrders = async () => {
   return salesOrders;
 };
 
-export const getSalesOrderID = async (id: string): Promise<SalesOrder> => {
+export const getSalesOrderID = async (id: string): Promise<ISalesOrder> => {
   const salesOrder = await SalesOrder.findByPk(id, {
     attributes: {
       exclude: ["deleted"],
     },
-    include: [{ model: Client }, { model: Detail }],
+    include: [{ model: Client }, { model: Consignee }, { model: Container }],
   });
 
   if (!salesOrder) throw new Error("Not found");
@@ -31,10 +30,12 @@ export const getSalesOrderID = async (id: string): Promise<SalesOrder> => {
 
 export const createSalesOrder = async (salesOrder: ISalesOrder) => {
   try {
+    salesOrder.numberSO = await generateID();
     const salesOrderCreated = await SalesOrder.create(salesOrder);
     if (!salesOrderCreated) throw new Error("Error in DB");
     return salesOrderCreated;
   } catch (error) {
+    console.log(error);
     throw error;
   }
 };
@@ -66,6 +67,22 @@ export const createConsignees = async (consigness: IConsignee[]) => {
 export const createContainers = async (containers: IContainer[]) => {
   try {
     await Container.bulkCreate(containers);
+  } catch (error) {
+    throw error;
+  }
+};
+
+/** generador de ID */
+const generateID = async () => {
+  try {
+    const prefijo = "SO";
+    const lastSO = await SalesOrder.findOne({
+      order: [["createdAt", "DESC"]],
+    });
+    if (!lastSO.numberSO) return `${prefijo}-1`;
+    const sequence = lastSO.numberSO.split("-");
+    const id = `${prefijo}-${parseInt(sequence[1]) + 1}`;
+    return id;
   } catch (error) {
     throw error;
   }

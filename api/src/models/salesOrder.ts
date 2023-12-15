@@ -33,6 +33,7 @@ export interface ISalesOrder {
   volumen: string;
   poRef: string;
   brand: string;
+  numberSO?: string;
   operation_id?: string;
   client_id?: string;
 }
@@ -70,6 +71,7 @@ export class SalesOrder extends Model<ISalesOrder> {
   public volumen: string;
   public poRef: string;
   public brand: string;
+  public numberSO?: string;
 }
 
 export function initSalesOrderModel(sequelize: Sequelize): void {
@@ -173,6 +175,9 @@ export function initSalesOrderModel(sequelize: Sequelize): void {
         type: DataTypes.INTEGER,
       },
       poRef: {
+        type: DataTypes.STRING,
+      },
+      numberSO: {
         type: DataTypes.STRING,
       },
     },

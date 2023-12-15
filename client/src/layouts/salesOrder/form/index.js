@@ -2,11 +2,14 @@
 import React, { useState, useEffect, useRef } from "react";
 import { getClients } from "services/clientHook";
 import Autocomplete from "@mui/material/Autocomplete";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
+import Box from "@mui/material/Box";
 import moment from "moment";
+import Fab from "@mui/material/Fab";
+import EditIcon from "@mui/icons-material/Edit";
 import MDBox from "components/MDBox";
 import Card from "@mui/material/Card";
 import OutlinedInput from "@mui/material/OutlinedInput";
@@ -22,6 +25,7 @@ import Checkbox from "@mui/material/Checkbox";
 import TextField from "@mui/material/TextField";
 import ConsigneeForm from "layouts/consignee/form";
 import { getsalesOrder, createSalesOrders } from "services/salesOrderHook";
+import { getPricingServices } from "services/pricingHook";
 import MDInput from "../../../components/MDInput";
 import MDTypography from "../../../components/MDTypography";
 import MDButton from "../../../components/MDButton";
@@ -29,46 +33,15 @@ import DataTable from "../../../examples/Tables/DataTable";
 import useSnackbar from "../../../services/snackbarHook";
 
 function SalesOrder() {
+  const location = useLocation();
+  const [inputsHabilitados, setInputsHabilitados] = useState(false);
   const consigneeRef = useRef();
   const notifyRef = useRef();
   const navigate = useNavigate();
   const { id } = useParams();
   const { showSnackbar, renderSnackbar } = useSnackbar();
   const [clients, setClients] = useState([]);
-
-  useEffect(async () => {
-    const res = await getClients();
-    setClients(res);
-  }, []);
-
-  useEffect(async () => {
-    if (id) {
-      const res = await getsalesOrder(id);
-      if (res.ack) {
-        showSnackbar({
-          title: "Orden de Venta",
-          content: res.message,
-          color: res.ack ? "error" : "success",
-          icon: res.ack ? "warning" : "check",
-        });
-      }
-    }
-  });
-
-  const [client, setClient] = useState({
-    _id: "",
-    taxID: "",
-    companyname: "",
-    direction: "",
-    contactperson: "",
-    mailaddress: "",
-    phonenumber: "",
-    category: "",
-  });
-  const defaultOptions = {
-    options: clients.length > 0 ? clients : [],
-    getOptionLabel: (option) => option.companyname,
-  };
+  const [pricing, setPricing] = useState({});
   const [saleOrder, setSaleOrder] = useState({
     merchandise: "",
     originOfCharge: "",
@@ -101,9 +74,61 @@ function SalesOrder() {
     volumen: 0,
     poRef: "",
     brand: "",
+    operation_id: "",
+    client_id: "",
   });
-
   const [containers, setContainers] = useState([]);
+
+  useEffect(async () => {
+    if (location.state && location.state.pricingId) {
+      const res = await getPricingServices(location.state.pricingId);
+
+      setPricing(res.data);
+    }
+  }, []);
+
+  useEffect(async () => {
+    const res = await getClients();
+    setClients(res);
+  }, []);
+
+  useEffect(async () => {
+    if (id) {
+      const res = await getsalesOrder(id);
+      if (res.ack) {
+        showSnackbar({
+          title: "Orden de Venta",
+          content: res.message,
+          color: res.ack ? "error" : "success",
+          icon: res.ack ? "warning" : "check",
+        });
+      } else {
+        res.data.chargeDate = moment().utc(res.data.chargeDate);
+        res.data.dischargeDate = moment().utc(res.data.dischargeDate);
+        res.data.physicalCutOffDate = moment().utc(res.data.physicalCutOffDate);
+        res.data.documentaryCutOffDate = moment().utc(res.data.documentaryCutOffDate);
+        res.data.loadingPortDepartureDate = moment().utc(res.data.loadingPortDepartureDate);
+        res.data.dischargePortArrivalDate = moment().utc(res.data.dischargePortArrivalDate);
+        setSaleOrder(res.data);
+        setContainers(res.data.Containers);
+      }
+    }
+  }, []);
+
+  const [client, setClient] = useState({
+    _id: "",
+    taxID: "",
+    companyname: "",
+    direction: "",
+    contactperson: "",
+    mailaddress: "",
+    phonenumber: "",
+    category: "",
+  });
+  const defaultOptions = {
+    options: clients.length > 0 ? clients : [],
+    getOptionLabel: (option) => option.companyname,
+  };
 
   const [container, setContainer] = useState({
     containerNumber: "",
@@ -146,6 +171,7 @@ function SalesOrder() {
     // Crear OV, contenedores, consignee
     const consignees = [consigneeRef.current, notifyRef.current];
     const data = { saleOrder, containers, client, consignees };
+    data.saleOrder.operation_id = pricing.operation_id;
     const res = await createSalesOrders(data);
     if (res.ack) {
       showSnackbar({
@@ -254,7 +280,6 @@ function SalesOrder() {
     { Header: "Patente Tractor", accessor: "truckPlate", align: "center" },
     { Header: "Patente Semi", accessor: "semiPlate", align: "center" },
     { Header: "Tipo Contenedor", accessor: "containerType", align: "center" },
-    { Header: "Tiene Temp", accessor: "hasTemp", align: "center" },
     { Header: "Temperatura", accessor: "temperature", align: "center" },
     { Header: "Humedad", accessor: "humidity", align: "center" },
     { Header: "Ventilacion", accessor: "ventilation", align: "center" },
@@ -325,10 +350,10 @@ function SalesOrder() {
           </Grid>
           <Grid container spacing={2} marginBottom={-2} sx={{ m: 1 }}>
             <Grid item xs={5}>
-              <ConsigneeForm title="Consignee" isNofify={false} stateRef={consigneeRef} />
+              <ConsigneeForm title="Consignee" isNotify={false} stateRef={consigneeRef} />
             </Grid>
             <Grid item xs={5}>
-              <ConsigneeForm title="Notify" isNofify stateRef={notifyRef} />
+              <ConsigneeForm title="Notify" isNotify stateRef={notifyRef} />
             </Grid>
           </Grid>
           <MDBox pt={3}>
@@ -903,6 +928,20 @@ function SalesOrder() {
                 </MDBox>
               </Grid>
             </Grid>
+            {id && inputsHabilitados && (
+              <Box
+                sx={{
+                  "& > :not(style)": { m: 1 },
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  alignItems: "flex-end",
+                }}
+              >
+                <Fab color="info" aria-label="edit" onClick={() => setInputsHabilitados(false)}>
+                  <EditIcon />
+                </Fab>
+              </Box>
+            )}
           </Card>
         </MDBox>
       )}

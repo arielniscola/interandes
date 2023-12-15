@@ -11,6 +11,7 @@ import { createOperation } from "../services/operation.service";
 import { IPricing } from "../models/pricing";
 import { IDetail } from "../models/detail";
 import { ResponseApi } from "../utils/responseApi";
+import fs from "fs";
 
 export const getAllPricingsController = async (
   _req: Request,
@@ -29,9 +30,7 @@ export const getAllPricingsController = async (
 export const getPricingIDController = async (req: Request, res: Response) => {
   try {
     const pricing = await getPricingID(req.params.id);
-    if (!pricing) res.status(404).json(new ResponseApi(0, "", pricing));
-
-    res.status(200).json(pricing);
+    res.status(200).json(new ResponseApi(0, "", pricing));
   } catch (error: any) {
     res
       .status(404)
@@ -83,41 +82,24 @@ export const createPricingController = async (
   }
 };
 
-export const pdfPricingController = async (_req: Request, res: Response) => {
+export const pdfPricingController = async (req: Request, res: Response) => {
   try {
-    // const id = req.params.id;
-    // const pricingRes = await getPricingID(id);
-    const pricing = {
-      pricingnumber: "PRI-1",
-      companyname: "Interandes",
-      typeServices: "Multimodal",
-      revalidate: new Date(),
-      totalCost: 300,
-      totalTax: 200,
-      profit: 100,
-      stage: "Aceptado",
-      observations: "nada",
-      conditions: "nada de nada",
-      effectiveDate: new Date(),
-      operationType: "asdasda",
-      totalSale: 500,
-      language: "español",
-      deleted: false,
-    };
-    const items = [
-      {
-        item: "Item1",
-        price: 45,
-        currency: "EURO",
-        typeItem: "Costo",
-        units: 2,
-        subtotal: 12,
-        base: 20,
-        unitType: "sdasd",
-      },
-    ];
-    await generatePDF(pricing, items);
-    res.status(200).json({ message: "ok" });
+    const id = req.params.id;
+    const pricing = (await getPricingID(id)) as IPricing & { Details: IDetail };
+    const pdfStrem = await generatePDF(pricing, pricing.Details);
+    pdfStrem.on("finish", () => {
+      console.log("Escritura en el archivo PDF completada");
+      // Configurar encabezados y enviar el archivo como respuesta HTTP
+      res.setHeader(
+        "Content-Disposition",
+        `attachment; filename=cotizacion_${pricing.pricingnumber}.pdf`
+      );
+      res.setHeader("Content-type", "application/pdf");
+
+      // Crear un nuevo stream para leer el archivo PDF y enviarlo en la respuesta
+      const filestream = fs.createReadStream("files/cotizacion.pdf");
+      filestream.pipe(res);
+    });
   } catch (error: any) {
     res.status(400).json({ message: error.message });
   }

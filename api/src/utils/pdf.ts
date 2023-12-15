@@ -1,15 +1,12 @@
 import PDFDocument from "pdfkit";
 import fs from "fs";
-import { Detail } from "../models/detail";
+import { IDetail } from "../models/detail";
 import moment from "moment";
 
-export const generatePDF = async (data: any, items: Detail[] | any) => {
+export const generatePDF = async (data: any, items: IDetail[] | any) => {
   try {
-    console.log(items);
-
     // Stream para escribir en un archivo
     const doc = new PDFDocument();
-
     // Stream for writing to a file
     const stream = fs.createWriteStream("files/cotizacion.pdf");
     doc.page.margins.bottom = 0;
@@ -110,9 +107,17 @@ export const generatePDF = async (data: any, items: Detail[] | any) => {
     doc.font("Helvetica-Bold").fontSize(10);
 
     drawCell("CLIENTE", 30, 170, 250, 15, "left");
-    drawCell(``, 280, 170, 250, 15, "center", "Helvetica");
+    drawCell(
+      `${data.Client.companyname}`,
+      280,
+      170,
+      250,
+      15,
+      "center",
+      "Helvetica"
+    );
     drawCell("TIPO DE SERVICIO", 30, 185, 250, 15, "left");
-    drawCell(``, 280, 185, 250, 15, "center", "Helvetica");
+    drawCell(`${data.operationType}`, 280, 185, 250, 15, "center", "Helvetica");
     drawCell("CANTIDAD", 30, 200, 250, 15, "left");
     drawCell(``, 280, 200, 250, 15, "center", "Helvetica");
     drawCell("SALE TERM", 30, 215, 250, 15, "left");
@@ -134,22 +139,65 @@ export const generatePDF = async (data: any, items: Detail[] | any) => {
     drawCell("Unitario", 155, 325, 125, 15, "center", "Helvetica");
     drawCell("Cantidad", 280, 325, 125, 15, "center", "Helvetica");
     drawCell("Total", 405, 325, 125, 15, "center", "Helvetica");
-    drawCell("Flete Terrestre", 30, 340, 125, 15, "center", "Helvetica");
-    drawCell("USD 2.090,00", 155, 340, 125, 15, "center", "Helvetica");
-    drawCell("1", 280, 340, 125, 15, "center", "Helvetica");
-    drawCell("USD 2.090,00", 405, 340, 125, 15, "center", "Helvetica");
-    drawCell("Emisión MIC /CRT", 30, 355, 125, 15, "center", "Helvetica");
-    drawCell("USD 50,00", 155, 355, 125, 15, "center", "Helvetica");
-    drawCell("1", 280, 355, 125, 15, "center", "Helvetica");
-    drawCell("USD 50,00", 405, 355, 125, 15, "center", "Helvetica");
-    drawCell("", 30, 370, 500, 20);
+
+    // Calcular el total
+    let total = 0;
+    let currency = "";
+    let line = 0;
+    items.forEach((item: IDetail) => {
+      drawCell(item.item, 30, 340 + line, 125, 15, "center", "Helvetica");
+      drawCell(
+        `${item.currency}  ${item.price}`,
+        155,
+        340 + line,
+        125,
+        15,
+        "center",
+        "Helvetica"
+      );
+      drawCell(
+        `${item.units}`,
+        280,
+        340 + line,
+        125,
+        15,
+        "center",
+        "Helvetica"
+      );
+      drawCell(
+        `${item.currency}  ${item.subtotal}`,
+        405,
+        340 + line,
+        125,
+        15,
+        "center",
+        "Helvetica"
+      );
+      total += item.subtotal;
+      currency = item.currency;
+      line += 15;
+    });
+
+    // drawCell("Emisión MIC /CRT", 30, 355, 125, 15, "center", "Helvetica");
+    // drawCell("USD 50,00", 155, 355, 125, 15, "center", "Helvetica");
+    // drawCell("1", 280, 355, 125, 15, "center", "Helvetica");
+    // drawCell("USD 50,00", 405, 355, 125, 15, "center", "Helvetica");
+    // drawCell("", 30, 370, 500, 20);
     drawCell("MONTO TOTAL", 30, 390, 250, 20, "", "Helvetica-Bold");
-    drawCell("USD 2.190,00", 280, 390, 250, 20, "center", "Helvetica-Bold");
+    drawCell(
+      `${currency} ${total}`,
+      280,
+      390,
+      250,
+      20,
+      "center",
+      "Helvetica-Bold"
+    );
     //Incluye y no Incluye
     drawCell("INCLUYE", 30, 410, 500, 20);
-    drawCell("", 30, 430, 500, 100);
+    drawCell(data.observations, 30, 430, 500, 100);
     drawCell("NO INCLUYE", 30, 530, 500, 20);
-    drawCell("", 30, 550, 500, 100);
+    drawCell(data.conditions, 30, 550, 500, 100);
     doc
       .font("Times-Italic")
       .fontSize(11)
@@ -165,7 +213,7 @@ export const generatePDF = async (data: any, items: Detail[] | any) => {
       );
     // Save and close the PDF
     doc.end();
-    console.log("Plantilla de PDF de factura generada correctamente.");
+    return stream;
   } catch (error) {
     throw error;
   }

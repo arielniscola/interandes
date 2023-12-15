@@ -9,13 +9,14 @@ import MDInput from "../../../components/MDInput";
 import MDButton from "../../../components/MDButton";
 import MDTypography from "../../../components/MDTypography";
 
-function ClientForm({ onClientSelect }) {
+function ClientForm({ onClientSelect, id }) {
   const [clients, setClients] = useState([]);
 
   useEffect(async () => {
     const res = await getClients();
     setClients(res);
   }, []);
+
   const [client, setClient] = useState({
     _id: "",
     taxID: "",
@@ -26,6 +27,13 @@ function ClientForm({ onClientSelect }) {
     phonenumber: "",
     category: "",
   });
+  useEffect(() => {
+    if (id) {
+      const clientSel = clients.find((el) => el.id === id);
+      setClient(clientSel);
+      onClientSelect(clientSel);
+    }
+  }, [id]);
   const defaultOptions = {
     options: clients.length > 0 ? clients : [],
     getOptionLabel: (option) => option.companyname,

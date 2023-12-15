@@ -3,17 +3,20 @@ import { useParams, useNavigate } from "react-router-dom";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
+import Box from "@mui/material/Box";
 import moment from "moment";
-
-import { createPricings } from "services/pricingHook";
+import Fab from "@mui/material/Fab";
+import EditIcon from "@mui/icons-material/Edit";
+import { createPricings, updatePricings } from "services/pricingHook";
 // import table Items
 import DataTable from "examples/Tables/DataTable";
 import MDBox from "components/MDBox";
 import Card from "@mui/material/Card";
+import OutlinedInput from "@mui/material/OutlinedInput";
 import MenuItem from "@mui/material/MenuItem";
 import InputLabel from "@mui/material/InputLabel";
 import Select from "@mui/material/Select";
-import { Grid } from "@mui/material";
+import { Grid, FormControl } from "@mui/material";
 import TextField from "@mui/material/TextField";
 import ClientForm from "layouts/clients/form/form";
 
@@ -26,8 +29,8 @@ import useSnackbar from "../../../services/snackbarHook";
 import { getPricingServices } from "../../../services/pricingHook";
 
 function Pricing() {
-  const [inputsHabilitados, setInputsHabilitados] = useState("false");
-
+  const [inputsHabilitados, setInputsHabilitados] = useState(false);
+  const [clientId, setClientId] = useState("");
   const { showSnackbar, renderSnackbar } = useSnackbar();
   const { id } = useParams();
   const navigate = useNavigate();
@@ -35,7 +38,7 @@ function Pricing() {
     companyname: "",
     language: "",
     effectiveDate: moment.utc(),
-    revalidated: moment.utc(),
+    revalidate: moment.utc(),
     observations: "",
     operationType: "",
     conditions: "",
@@ -52,7 +55,7 @@ function Pricing() {
     totalSaleEu: 0,
     totalTaxEu: 0,
     profitEu: 0,
-    client: "",
+    client_id: "",
   });
   const columnsCost = [
     { Header: "Moneda", accessor: "currency", align: "center" },
@@ -203,30 +206,18 @@ function Pricing() {
           icon: res.ack ? "warning" : "check",
         });
       } else {
-        setInputsHabilitados("true");
-        setPricing({
-          companyname: "",
-          language: "",
-          effectiveDate: moment.utc(),
-          revalidated: moment.utc(),
-          observations: "",
-          operationType: "",
-          conditions: "",
-          stage: "",
-          totalCost: 0,
-          totalSale: 0,
-          totalTax: 0,
-          profit: 0,
-          totalCostDol: 0,
-          totalSaleDol: 0,
-          totalTaxDol: 0,
-          profitDol: 0,
-          totalCostEu: 0,
-          totalSaleEu: 0,
-          totalTaxEu: 0,
-          profitEu: 0,
-          client: "",
-        });
+        setInputsHabilitados(true);
+        // Separar items
+        const costs = res.data.Details.filter((it) => it.typeItem === "cost");
+        const sales = res.data.Details.filter((it) => it.typeItem === "sale");
+        const taxs = res.data.Details.filter((it) => it.typeItem === "tax");
+        setRowsCost(costs);
+        setRowsSale(sales);
+        setRowsTax(taxs);
+        setClientId(res.data.client_id);
+        res.data.revalidate = moment().utc(res.data.revalidate);
+        res.data.effectiveDate = moment().utc(res.data.effectiveDate);
+        setPricing(res.data);
       }
     }
   }, []);
@@ -320,14 +311,22 @@ function Pricing() {
 
   const submitHandlerPricing = async () => {
     const data = { pricing, details: [...rowsCost, ...rowsSale, ...rowsTax] };
-
-    const res = await createPricings(data);
+    let res;
+    if (id) {
+      res = await updatePricings(data, id);
+    } else {
+      res = await createPricings(data);
+    }
     showSnackbar({
       title: "Pricing",
       content: res.message,
       icon: res.ack ? "error" : "success",
     });
-    if (!res.ack) navigate("/pricing");
+    if (!res.ack) {
+      setTimeout(() => {
+        navigate("/pricing");
+      }, 1000);
+    }
   };
   const handleChangeDate = (e) => {
     setPricing({ ...pricing, effectiveDate: e });
@@ -338,13 +337,14 @@ function Pricing() {
 
   // Relaciono cliente
   const handleClientSelect = (client) => {
-    setPricing({ ...pricing, client: client.id });
+    console.log(client);
+    setPricing({ ...pricing, client_id: client.id });
   };
 
   return (
     <DashboardLayout>
       <DashboardNavbar />
-      <ClientForm onClientSelect={handleClientSelect} />
+      <ClientForm onClientSelect={handleClientSelect} id={clientId} />
       <MDBox pt={6} pb={3}>
         <Card>
           <MDBox
@@ -361,93 +361,115 @@ function Pricing() {
               Unidad de Negocio
             </MDTypography>
           </MDBox>
-          <MDBox pt={3}>
-            <MDBox pt={4} pb={3} px={3}>
+          <MDBox pt={1}>
+            <MDBox pt={3} pb={3} px={3}>
               <MDBox component="form" role="form">
-                <MDBox mb={2}>
-                  <InputLabel id="demo-simple-select-helper-label">Compañia</InputLabel>
-                  <Select
-                    fullWidth
-                    labelId="demo-simple-select-helper-label"
-                    id="demo-simple-select"
-                    name="companyname"
-                    label="Empresa"
-                    value={pricing.companyname}
-                    disabled="false"
-                    onChange={handleChangePricing}
-                    style={{ height: 40, marginTop: 5 }}
-                  >
-                    <MenuItem value="">-</MenuItem>
-                    <MenuItem value="Interandes">INTERANDES</MenuItem>
-                    <MenuItem value="Transitarios Acuarios">TACSA</MenuItem>
-                    <MenuItem value="Allin">ALLIN</MenuItem>
-                  </Select>
-                </MDBox>
-                <MDBox mb={2}>
-                  <InputLabel id="demo-simple-select-helper-label">Idioma</InputLabel>
-                  <Select
-                    fullWidth
-                    labelId="demo-simple-select-helper-label"
-                    id="demo-simple-select-helper"
-                    label="Idioma"
-                    name="language"
-                    value={pricing.language}
-                    onChange={handleChangePricing}
-                    disabled={inputsHabilitados}
-                    style={{ height: 40, marginTop: 5 }}
-                  >
-                    <MenuItem value="español">Español</MenuItem>
-                    <MenuItem value="ingles">Ingles</MenuItem>
-                  </Select>
-                </MDBox>
-                <MDBox mb={2}>
-                  <InputLabel id="demo-simple-select-helper-label">Tipo de Servicio</InputLabel>
-                  <Select
-                    fullWidth
-                    labelId="demo-simple-select-helper-label"
-                    id="demo-simple-select-helper"
-                    label="Tipo de Servicio"
-                    name="operationType"
-                    disabled={inputsHabilitados}
-                    value={pricing.operationType}
-                    onChange={handleChangePricing}
-                    style={{ height: 40, marginTop: 5 }}
-                  >
-                    <MenuItem value="">-</MenuItem>
-                    <MenuItem value="E.1 - MARITIMO - FCL / LC">
-                      {" "}
-                      E.1 - MARITIMO - FCL / LCL
-                    </MenuItem>
-                    <MenuItem value="E.2 - TERRESTRE - FCL / LCL">
-                      E.2 - TERRESTRE - FCL / LCL
-                    </MenuItem>
-                    <MenuItem value="E.3 - MULTIMODAL - FCL / LCL">
-                      {" "}
-                      E.3 - MULTIMODAL - FCL / LCL
-                    </MenuItem>
-                    <MenuItem value="E.4 - AEREO"> E.4 - AEREO</MenuItem>
-                  </Select>
-                </MDBox>
-                <MDBox mb={2}>
-                  <InputLabel id="demo-simple-select-helper-label" style={{ marginBottom: 4 }}>
-                    Fecha de Vigencia
-                  </InputLabel>
-                  <Datepicker
-                    value={pricing.effectiveDate}
-                    disabled={inputsHabilitados}
-                    onChange={handleChangeDate}
-                  />
-                </MDBox>
-                <MDBox mb={2}>
-                  <InputLabel id="demo-simple-select-helper-label" style={{ marginBottom: 4 }}>
-                    Revalidar
-                  </InputLabel>
-                  <Datepicker
-                    value={pricing.revalidated}
-                    disabled={inputsHabilitados}
-                    onChange={handleChangeDateRevalidate}
-                  />
-                </MDBox>
+                <Grid container spacing={1} marginBottom={-2} sx={{ m: 1 }}>
+                  <Grid item xs={4}>
+                    <MDBox mb={2}>
+                      <FormControl fullWidth disabled={inputsHabilitados}>
+                        <InputLabel id="demo-simple-select-helper-label">Compañia</InputLabel>
+                        <Select
+                          fullWidth
+                          labelId="demo-simple-select-helper-label"
+                          id="demo-simple-select"
+                          name="companyname"
+                          label="Empresa"
+                          input={<OutlinedInput label="Compañia" />}
+                          value={pricing.companyname}
+                          onChange={handleChangePricing}
+                          style={{ height: 50, marginTop: 1 }}
+                        >
+                          <MenuItem value="">-</MenuItem>
+                          <MenuItem value="Interandes">INTERANDES</MenuItem>
+                          <MenuItem value="Transitarios Acuarios">TACSA</MenuItem>
+                          <MenuItem value="Allin">ALLIN</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </MDBox>
+                  </Grid>
+                  <Grid item xs={4}>
+                    <MDBox mb={2}>
+                      <FormControl fullWidth disabled={inputsHabilitados}>
+                        <InputLabel id="demo-simple-select-helper-label">Idioma</InputLabel>
+                        <Select
+                          fullWidth
+                          labelId="demo-simple-select-helper-label"
+                          id="demo-simple-select-helper"
+                          label="Idioma"
+                          name="language"
+                          input={<OutlinedInput label="Idioma" />}
+                          value={pricing.language}
+                          onChange={handleChangePricing}
+                          // disabled={inputsHabilitados}
+                          style={{ height: 50, marginTop: 1 }}
+                        >
+                          <MenuItem value="español">Español</MenuItem>
+                          <MenuItem value="ingles">Ingles</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </MDBox>
+                  </Grid>
+                  <Grid item xs={4}>
+                    <MDBox mb={2}>
+                      <FormControl fullWidth disabled={inputsHabilitados}>
+                        <InputLabel id="demo-simple-select-helper-label">
+                          Tipo de Servicio
+                        </InputLabel>
+                        <Select
+                          fullWidth
+                          labelId="demo-simple-select-helper-label"
+                          id="demo-simple-select-helper"
+                          label="Tipo de Servicio"
+                          name="operationType"
+                          input={<OutlinedInput label="Tipo de Servico" />}
+                          // disabled={inputsHabilitados}
+                          value={pricing.operationType}
+                          onChange={handleChangePricing}
+                          style={{ height: 50, marginTop: 1 }}
+                        >
+                          <MenuItem value="">-</MenuItem>
+                          <MenuItem value="E.1 - MARITIMO - FCL / LC">
+                            {" "}
+                            E.1 - MARITIMO - FCL / LCL
+                          </MenuItem>
+                          <MenuItem value="E.2 - TERRESTRE - FCL / LCL">
+                            E.2 - TERRESTRE - FCL / LCL
+                          </MenuItem>
+                          <MenuItem value="E.3 - MULTIMODAL - FCL / LCL">
+                            {" "}
+                            E.3 - MULTIMODAL - FCL / LCL
+                          </MenuItem>
+                          <MenuItem value="E.4 - AEREO"> E.4 - AEREO</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </MDBox>
+                  </Grid>
+                </Grid>
+                <Grid container spacing={2} marginBottom={-2} sx={{ m: 1 }}>
+                  <Grid item xs={4}>
+                    <MDBox mb={2}>
+                      <InputLabel id="demo-simple-select-helper-label" style={{ marginBottom: 4 }}>
+                        Fecha de Vigencia
+                      </InputLabel>
+                      <FormControl disabled={inputsHabilitados}>
+                        <Datepicker value={pricing.effectiveDate} onChange={handleChangeDate} />
+                      </FormControl>
+                    </MDBox>
+                  </Grid>
+                  <Grid item xs={4}>
+                    <MDBox mb={2}>
+                      <InputLabel id="demo-simple-select-helper-label" style={{ marginBottom: 4 }}>
+                        Revalidar
+                      </InputLabel>
+                      <Datepicker
+                        value={pricing.revalidate}
+                        // disabled={inputsHabilitados}
+                        onChange={handleChangeDateRevalidate}
+                      />
+                    </MDBox>
+                  </Grid>
+                </Grid>
               </MDBox>
             </MDBox>
           </MDBox>
@@ -476,131 +498,142 @@ function Pricing() {
                 <Grid container spacing={2}>
                   <Grid xs={1}>
                     <MDBox mb={2}>
-                      <InputLabel
-                        id="demo-simple-select-helper-label"
-                        style={{ marginBottom: 4, marginLeft: 4 }}
-                      >
-                        Moneda
-                      </InputLabel>
-                      <Select
-                        fullWidth
-                        labelId="demo-simple-select-helper-label"
-                        id="demo-simple-select-helper"
-                        name="currency"
-                        onChange={itemHandler}
-                        value={item.currency}
-                        style={{ height: 40, marginTop: 8 }}
-                      >
-                        <MenuItem value="USD">DOLAR</MenuItem>
-                        <MenuItem value="ARS">PESO ARGENTINO</MenuItem>
-                        <MenuItem value="EU">EURO</MenuItem>
-                      </Select>
+                      <FormControl fullWidth disabled={inputsHabilitados}>
+                        <InputLabel id="demo-simple-select-helper-label" style={{ margin: 4 }}>
+                          Moneda
+                        </InputLabel>
+                        <Select
+                          fullWidth
+                          labelId="demo-simple-select-helper-label"
+                          id="demo-simple-select-helper"
+                          name="currency"
+                          input={<OutlinedInput label="Moneda" />}
+                          onChange={itemHandler}
+                          value={item.currency}
+                          style={{ height: 45, marginTop: 7 }}
+                        >
+                          <MenuItem value="USD">DOLAR</MenuItem>
+                          <MenuItem value="ARS">PESO ARGENTINO</MenuItem>
+                          <MenuItem value="EU">EURO</MenuItem>
+                        </Select>
+                      </FormControl>
                     </MDBox>
                   </Grid>
                   <Grid xs={1}>
-                    <MDBox mb={2}>
-                      <InputLabel
-                        id="demo-simple-select-helper-label"
-                        style={{ marginBottom: 4, marginLeft: 4 }}
-                      >
-                        Tipo de Item
-                      </InputLabel>
-                      <Select
-                        fullWidth
-                        labelId="demo-simple-select-helper-label"
-                        id="typeItem"
-                        disabled={inputsHabilitados}
-                        name="typeItem"
-                        variant="outlined"
-                        onChange={itemHandler}
-                        value={item.typeItem}
-                        style={{ height: 40, marginTop: 8, marginLeft: 5 }}
-                      >
-                        <MenuItem value="cost">Costo</MenuItem>
-                        <MenuItem value="sale">Venta</MenuItem>
-                        <MenuItem value="tax">Impuesto</MenuItem>
-                      </Select>
+                    <MDBox mb={2} ml={1}>
+                      <FormControl fullWidth disabled={inputsHabilitados}>
+                        <InputLabel id="demo-simple-select-helper-label" style={{ margin: 4 }}>
+                          Tipo de Item
+                        </InputLabel>
+                        <Select
+                          fullWidth
+                          labelId="demo-simple-select-helper-label"
+                          id="typeItem"
+                          // disabled={inputsHabilitados}
+                          name="typeItem"
+                          variant="outlined"
+                          input={<OutlinedInput label="Tipo de Item" />}
+                          onChange={itemHandler}
+                          value={item.typeItem}
+                          style={{ height: 45, marginTop: 7 }}
+                        >
+                          <MenuItem value="cost">Costo</MenuItem>
+                          <MenuItem value="sale">Venta</MenuItem>
+                          <MenuItem value="tax">Impuesto</MenuItem>
+                        </Select>
+                      </FormControl>
                     </MDBox>
                   </Grid>
                   <Grid xs={3}>
                     <MDBox mb={2} sx={{ m: 1 }}>
-                      <InputLabel id="demo-simple-select-helper-label">Item</InputLabel>
-                      <MDInput
-                        type="text"
-                        name="item"
-                        variant="outlined"
-                        fullWidth
-                        disabled={inputsHabilitados}
-                        value={item.item}
-                        onChange={itemHandler}
-                        style={{ marginTop: 2 }}
-                      />
+                      <FormControl fullWidth>
+                        <MDInput
+                          type="text"
+                          name="item"
+                          label="Item"
+                          variant="outlined"
+                          fullWidth
+                          disabled={inputsHabilitados}
+                          value={item.item}
+                          onChange={itemHandler}
+                          style={{ marginTop: 2 }}
+                        />
+                      </FormControl>
                     </MDBox>
                   </Grid>
 
                   {item.typeItem === "tax" && (
                     <Grid xs={2}>
                       <MDBox mb={2} sx={{ m: 1 }}>
-                        <InputLabel id="demo-simple-select-helper-label">Base</InputLabel>
-                        <Select
-                          fullWidth
-                          labelId="demo-simple-select-helper-label"
-                          id="demo-simple-select-helper"
-                          name="base"
-                          disabled={inputsHabilitados}
-                          variant="outlined"
-                          onChange={itemHandler}
-                          value={item.base}
-                          style={{ height: 40, marginTop: 2 }}
-                        >
-                          {rowsSale?.map((itemBase) => (
-                            <MenuItem value={itemBase.price}>{itemBase.item}</MenuItem>
-                          ))}
-                        </Select>
+                        <FormControl fullWidth>
+                          <InputLabel id="demo-simple-select-helper-label" style={{ margin: 4 }}>
+                            Base
+                          </InputLabel>
+                          <Select
+                            fullWidth
+                            labelId="demo-simple-select-helper-label"
+                            id="demo-simple-select-helper"
+                            name="base"
+                            // disabled={inputsHabilitados}
+                            variant="outlined"
+                            input={<OutlinedInput label="Base" />}
+                            onChange={itemHandler}
+                            value={item.base}
+                            style={{ height: 45, marginTop: 7 }}
+                          >
+                            {rowsSale?.map((itemBase) => (
+                              <MenuItem value={itemBase.price}>{itemBase.item}</MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
                       </MDBox>
                     </Grid>
                   )}
                   {item.typeItem === "tax" && (
                     <Grid xs={1}>
                       <MDBox mb={2} sx={{ m: 1 }}>
-                        <InputLabel id="demo-simple-select-helper-label">Porcentaje</InputLabel>
-                        <MDInput
-                          type="number"
-                          name="percent"
-                          variant="outlined"
-                          fullWidth
-                          disabled={inputsHabilitados}
-                          value={item.percent}
-                          onChange={itemHandler}
-                          style={{ marginTop: 2 }}
-                        />
+                        <FormControl fullWidth>
+                          <MDInput
+                            type="number"
+                            name="percent"
+                            label="Porcentaje"
+                            variant="outlined"
+                            fullWidth
+                            //  disabled={inputsHabilitados}
+                            value={item.percent}
+                            onChange={itemHandler}
+                            style={{ marginTop: 2 }}
+                          />
+                        </FormControl>
                       </MDBox>
                     </Grid>
                   )}
                   <Grid xs={2}>
                     <MDBox mb={2} sx={{ m: 1 }}>
-                      <InputLabel id="demo-simple-select-helper-label">Importe</InputLabel>
-                      <MDInput
-                        type="number"
-                        name="price"
-                        variant="outlined"
-                        disabled={inputsHabilitados}
-                        fullWidth
-                        value={item.price}
-                        onChange={itemHandler}
-                        style={{ marginTop: 2 }}
-                      />
+                      <FormControl fullWidtd>
+                        <MDInput
+                          type="number"
+                          name="price"
+                          variant="outlined"
+                          label="Importe"
+                          disabled={inputsHabilitados}
+                          fullWidth
+                          value={item.price}
+                          onChange={itemHandler}
+                          style={{ marginTop: 2 }}
+                        />
+                      </FormControl>
                     </MDBox>
                   </Grid>
                   {(item.typeItem === "sale" || item.typeItem === "cost") && (
                     <Grid xs={1}>
                       <MDBox mb={2} sx={{ m: 1 }}>
-                        <InputLabel id="demo-simple-select-helper-label">Cantidad</InputLabel>
                         <MDInput
                           type="number"
                           name="units"
                           variant="outlined"
-                          disabled={inputsHabilitados}
+                          label="Cantidad"
+                          // disabled={inputsHabilitados}
                           fullWidth
                           value={item.units}
                           onChange={itemHandler}
@@ -612,12 +645,12 @@ function Pricing() {
                   {(item.typeItem === "sale" || item.typeItem === "cost") && (
                     <Grid xs={2}>
                       <MDBox mb={2} sx={{ m: 1 }}>
-                        <InputLabel id="demo-simple-select-helper-label">Criterio</InputLabel>
                         <MDInput
                           type="text"
                           name="unitType"
                           variant="outlined"
-                          disabled={inputsHabilitados}
+                          label="Criterio"
+                          // disabled={inputsHabilitados}
                           fullWidth
                           value={item.unitType}
                           onChange={itemHandler}
@@ -629,23 +662,30 @@ function Pricing() {
                   {(item.typeItem === "sale" || item.typeItem === "cost") && (
                     <Grid xs={2}>
                       <MDBox mb={2} sx={{ m: 1 }}>
-                        <InputLabel id="demo-simple-select-helper-label">Subtotal</InputLabel>
-                        <MDInput
-                          type="number"
-                          name="subtotal"
-                          variant="outlined"
-                          disabled={inputsHabilitados}
-                          fullWidth
-                          value={item.subtotal}
-                          onChange={itemHandler}
-                          style={{ marginTop: 2 }}
-                        />
+                        <FormControl fullWidth>
+                          <MDInput
+                            type="number"
+                            name="subtotal"
+                            variant="outlined"
+                            label="Subtotal"
+                            // disabled={inputsHabilitados}
+                            fullWidth
+                            value={item.subtotal}
+                            onChange={itemHandler}
+                            style={{ marginTop: 2 }}
+                          />
+                        </FormControl>
                       </MDBox>
                     </Grid>
                   )}
                 </Grid>
                 <MDBox mt={1} mb={1}>
-                  <MDButton variant="gradient" color="info" onClick={addItem}>
+                  <MDButton
+                    variant="gradient"
+                    color="info"
+                    onClick={addItem}
+                    disabled={inputsHabilitados}
+                  >
                     Agregar
                   </MDButton>
                 </MDBox>
@@ -843,7 +883,7 @@ function Pricing() {
                         name="observations"
                         onChange={handleChangePricing}
                         rows={4}
-                        disabled={inputsHabilitados}
+                        // disabled={inputsHabilitados}
                         variant="outlined"
                         fullWidth
                       />
@@ -858,7 +898,7 @@ function Pricing() {
                         name="conditions"
                         value={pricing.conditions}
                         rows={4}
-                        disabled={inputsHabilitados}
+                        // disabled={inputsHabilitados}
                         onChange={handleChangePricing}
                         variant="outlined"
                         fullWidth
@@ -867,34 +907,52 @@ function Pricing() {
                   </Grid>
                 </Grid>
                 <MDBox mt={3} mb={1}>
-                  <InputLabel id="demo-simple-select-helper-label">Etapa Cotización</InputLabel>
-                  <Select
-                    labelId="stage-price"
-                    value={pricing.stage}
-                    name="stage"
-                    id="stage-price"
-                    label="Etapa Cotización"
-                    disabled={inputsHabilitados}
-                    onChange={handleChangePricing}
-                    style={{ height: 40, marginTop: 8, width: 300 }}
-                  >
-                    <MenuItem value="">-</MenuItem>
-                    <MenuItem value="COTIZADO">COTIZADO</MenuItem>
-                    <MenuItem value="A COTIZAR">A COTIZAR</MenuItem>
-                    <MenuItem value="APROBADO">APROBADO</MenuItem>
-                    <MenuItem value="RECHAZADO">RECHAZADO</MenuItem>
-                  </Select>
+                  <FormControl disabled={inputsHabilitados}>
+                    <InputLabel id="hasHBL">Etapa de Cotización</InputLabel>
+                    <Select
+                      labelId="cotizacion"
+                      value={pricing.stage}
+                      name="stage"
+                      id="stage-price"
+                      label="Etapa Cotización"
+                      input={<OutlinedInput label="Etapa de cotizacion" />}
+                      onChange={handleChangePricing}
+                      style={{ height: 50, marginTop: 4, width: 400 }}
+                    >
+                      <MenuItem value="">-</MenuItem>
+                      <MenuItem value="COTIZADO">COTIZADO</MenuItem>
+                      <MenuItem value="A COTIZAR">A COTIZAR</MenuItem>
+                      <MenuItem value="APROBADO">APROBADO</MenuItem>
+                      <MenuItem value="RECHAZADO">RECHAZADO</MenuItem>
+                    </Select>
+                  </FormControl>
                 </MDBox>
-                <MDBox mt={4} mb={1}>
-                  <MDButton
-                    variant="gradient"
-                    color="info"
-                    onClick={submitHandlerPricing}
-                    disabled={inputsHabilitados}
+                {!inputsHabilitados && (
+                  <MDBox mt={4} mb={1}>
+                    <MDButton
+                      variant="gradient"
+                      color="info"
+                      onClick={submitHandlerPricing}
+                      disabled={inputsHabilitados}
+                    >
+                      Guardar
+                    </MDButton>
+                  </MDBox>
+                )}
+                {id && inputsHabilitados && (
+                  <Box
+                    sx={{
+                      "& > :not(style)": { m: 1 },
+                      display: "flex",
+                      justifyContent: "flex-end",
+                      alignItems: "flex-end",
+                    }}
                   >
-                    Guardar
-                  </MDButton>
-                </MDBox>
+                    <Fab color="info" aria-label="edit" onClick={() => setInputsHabilitados(false)}>
+                      <EditIcon />
+                    </Fab>
+                  </Box>
+                )}
               </MDBox>
             </MDBox>
           </MDBox>

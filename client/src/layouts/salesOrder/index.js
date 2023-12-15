@@ -2,10 +2,11 @@ import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 
 import { useEffect, useState } from "react";
-import { getSalesOrders } from "services/salesOrderHook";
-
-import Icon from "@mui/material/Icon";
-
+import { getSalesOrders, generateBL, generateDeclaracion } from "services/salesOrderHook";
+import Tooltip from "@mui/material/Tooltip";
+import ArticleIcon from "@mui/icons-material/Article";
+import ContentPasteIcon from "@mui/icons-material/ContentPaste";
+import PageviewIcon from "@mui/icons-material/Pageview";
 import { useMaterialUIController } from "context";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
@@ -21,17 +22,47 @@ function SalesOrdersTable() {
   const [controller] = useMaterialUIController();
   const { darkMode } = controller;
 
+  const viewDetailSaleOrder = (id) => {
+    window.location.replace(`/salesOrder-form/${id}`);
+  };
+  const generatedBLhandle = async (id) => {
+    const url = await generateBL(id);
+    window.open(url, "_blank");
+  };
+  const generatedDeclaracionhandle = async (id) => {
+    const url = await generateDeclaracion(id);
+    window.open(url, "_blank");
+  };
   const addOptions = (items) => {
     const itemsWithOptions = items.map((item) => {
       return {
         ...item,
         options: (
           <div>
-            <MDButton variant="text" color={darkMode ? "white" : "dark"}>
-              <Icon color="warning">edit</Icon>
+            <MDButton
+              variant="text"
+              color={darkMode ? "white" : "dark"}
+              onClick={() => viewDetailSaleOrder(item.id)}
+            >
+              <PageviewIcon color="success" />
             </MDButton>
-            <MDButton variant="text" color={darkMode ? "white" : "dark"}>
-              <Icon color="info">launchOutlinedIcon</Icon>
+            <MDButton
+              variant="text"
+              color={darkMode ? "white" : "dark"}
+              onClick={() => generatedBLhandle(item.id)}
+            >
+              <Tooltip title="Generar Instructivo">
+                <ArticleIcon color="gray" />
+              </Tooltip>
+            </MDButton>
+            <MDButton
+              variant="text"
+              color={darkMode ? "white" : "dark"}
+              onClick={() => generatedDeclaracionhandle(item.id)}
+            >
+              <Tooltip title="Generar Declaracion">
+                <ContentPasteIcon color="warning" />
+              </Tooltip>
             </MDButton>
           </div>
         ),
@@ -65,7 +96,7 @@ function SalesOrdersTable() {
     { Header: "Origen Carga", accessor: "originOfCharge", align: "center" },
     { Header: "Destino Final", accessor: "finalDestination", align: "center" },
     { Header: "Transporte", accessor: "transportation", align: "center" },
-    { Header: "Cliente", accessor: "client.name", align: "center" },
+    { Header: "Cliente", accessor: "Client.companyname", align: "center" },
     { Header: "Opciones", accessor: "options", align: "center" },
   ];
 

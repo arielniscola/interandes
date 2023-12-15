@@ -34,8 +34,9 @@ export const downloadFile = async (id) => {
       method: "GET",
       headers: { "Content-type": "application/json" },
     });
-    const data = await res.json();
-    return data;
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    return url;
   } catch (error) {
     return error;
   }

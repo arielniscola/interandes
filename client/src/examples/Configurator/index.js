@@ -4,14 +4,12 @@ import { useState, useEffect } from "react";
 import Divider from "@mui/material/Divider";
 import Icon from "@mui/material/Icon";
 
-// Material Dashboard 2 React components
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 
 // Custom styles for the Configurator
 import ConfiguratorRoot from "examples/Configurator/ConfiguratorRoot";
 
-// Material Dashboard 2 React context
 import { useMaterialUIController, setOpenConfigurator } from "context";
 
 function Configurator({ id, price }) {

@@ -13,4 +13,4 @@ pricingRoutes.get("/", getAllPricingsController);
 pricingRoutes.get("/:id", getPricingIDController);
 pricingRoutes.post("/", createPricingController);
 pricingRoutes.put("/", updatePricingController);
-pricingRoutes.post("/pdf/:id", pdfPricingController);
+pricingRoutes.get("/pdf/:id", pdfPricingController);
