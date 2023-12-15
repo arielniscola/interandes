@@ -17,13 +17,10 @@ import { TaskList, initTaskListModel } from "./models/workList";
 import { initTaskModel } from "./models/task";
 import { initTypeOperationModel } from "./models/typeOperation";
 import { initProvider } from "./models/provider";
-
-const DB_USER = "postgres";
-const DB_PASSWORD = "1234";
-const DB_HOST = "localhost:5432";
+require("dotenv").config();
 
 export const sequelize = new Sequelize(
-  `postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/interandes`,
+  process.env.POSTGRES_URL + "?sslmode=require",
   {
     logging: false,
     native: false,
