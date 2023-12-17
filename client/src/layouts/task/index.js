@@ -98,7 +98,7 @@ function Task() {
                 Tareas:
               </Typography>
               <List>
-                {tasks.length && 
+                {tasks.length &&
                   tasks.map((el) => {
                     return (
                       <ListItem
@@ -117,7 +117,7 @@ function Task() {
                         <ListItemText primary={el.description} />
                       </ListItem>
                     );
-                })}
+                  })}
               </List>
             </MDBox>
           </Grid>
