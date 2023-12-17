@@ -117,7 +117,7 @@ function Task() {
                         <ListItemText primary={el.description} />
                       </ListItem>
                     );
-                })}
+                  })}
               </List>
             </MDBox>
           </Grid>
