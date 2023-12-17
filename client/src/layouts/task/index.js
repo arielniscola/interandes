@@ -98,7 +98,8 @@ function Task() {
                 Tareas:
               </Typography>
               <List>
-                {tasks.length &&
+                {tasks &&
+                  tasks.length &&
                   tasks.map((el) => {
                     return (
                       <ListItem
