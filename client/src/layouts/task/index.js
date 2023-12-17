@@ -98,25 +98,26 @@ function Task() {
                 Tareas:
               </Typography>
               <List>
-                {tasks.map((el) => {
-                  return (
-                    <ListItem
-                      id={el.id}
-                      divider="true"
-                      alignItems="center"
-                      secondaryAction={
-                        <IconButton onClick={() => deleteTask(el.id)} aria-label="delete">
-                          <DeleteIcon color="error" />
-                        </IconButton>
-                      }
-                    >
-                      <ListItemAvatar>
-                        <CheckIcon color="success" />
-                      </ListItemAvatar>
-                      <ListItemText primary={el.description} />
-                    </ListItem>
-                  );
-                })}
+                {tasks.length &&
+                  tasks.map((el) => {
+                    return (
+                      <ListItem
+                        id={el.id}
+                        divider="true"
+                        alignItems="center"
+                        secondaryAction={
+                          <IconButton onClick={() => deleteTask(el.id)} aria-label="delete">
+                            <DeleteIcon color="error" />
+                          </IconButton>
+                        }
+                      >
+                        <ListItemAvatar>
+                          <CheckIcon color="success" />
+                        </ListItemAvatar>
+                        <ListItemText primary={el.description} />
+                      </ListItem>
+                    );
+                  })}
               </List>
             </MDBox>
           </Grid>
