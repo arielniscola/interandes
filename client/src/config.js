@@ -1,3 +1,3 @@
-const URL_API = "http://localhost:3001";
+const URL_API = "https://interandes-api.onrender.com";
 
 export default URL_API;
