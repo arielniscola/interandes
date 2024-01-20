@@ -17,6 +17,7 @@ import { TaskList, initTaskListModel } from "./models/workList";
 import { initTaskModel } from "./models/task";
 import { initTypeOperationModel } from "./models/typeOperation";
 import { initProvider } from "./models/provider";
+import { initCompanyModel } from "./models/company";
 
 const DB_USER = "postgres";
 const DB_PASSWORD = "1234";
@@ -47,6 +48,7 @@ initTaskListModel(sequelize);
 initTaskModel(sequelize);
 initTypeOperationModel(sequelize);
 initProvider(sequelize);
+initCompanyModel(sequelize);
 
 /** Pricing relationships */
 Pricing.belongsTo(Client, { foreignKey: "client_id" });

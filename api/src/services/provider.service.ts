@@ -1,4 +1,5 @@
 import { IProvider, Provider } from "../models/provider";
+import { FindOptions } from "sequelize";
 
 export const getProviderID = async (id: string): Promise<IProvider> => {
   try {
@@ -7,7 +8,6 @@ export const getProviderID = async (id: string): Promise<IProvider> => {
         id: id,
       },
     });
-    // Si no encuentra operacion retornar error
     if (!provider) throw Error("Proveedor no encontrado");
     return provider;
   } catch (error) {
@@ -25,9 +25,9 @@ export const createProvider = async (
     throw error;
   }
 };
-export const getProviders = async () => {
+export const getProviders = async (options?: FindOptions) => {
   try {
-    const providers = await Provider.findAll();
+    const providers = await Provider.findAll(options);
     return providers;
   } catch (error) {
     throw error;

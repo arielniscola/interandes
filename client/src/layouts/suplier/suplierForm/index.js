@@ -1,11 +1,14 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
-import { createProvider } from "services/providerHook";
+import { createProvider, getProviderID, updateProvider } from "services/providerHook";
+import Box from "@mui/material/Box";
+import Fab from "@mui/material/Fab";
+import EditIcon from "@mui/icons-material/Edit";
 import MDBox from "components/MDBox";
 import Card from "@mui/material/Card";
-import { Grid } from "@mui/material";
+import { Grid, FormControl } from "@mui/material";
 import MDInput from "../../../components/MDInput";
 import MDButton from "../../../components/MDButton";
 import MDTypography from "../../../components/MDTypography";
@@ -13,9 +16,11 @@ import useSnackbar from "../../../services/snackbarHook";
 
 function ProviderForm() {
   const { showSnackbar, renderSnackbar } = useSnackbar();
+  const [inputsHabilitados, setInputsHabilitados] = useState(false);
   const navigate = useNavigate();
+  const { id } = useParams();
   const [provider, setProvider] = useState({
-    _id: "",
+    id: "",
     businessName: "",
     address: "",
     email: "",
@@ -25,6 +30,22 @@ function ProviderForm() {
     accountBank: "",
     files: [],
   });
+  useEffect(async () => {
+    if (id) {
+      const res = await getProviderID(id);
+      if (res.ack) {
+        showSnackbar({
+          title: "Proveedores",
+          content: res.message,
+          color: res.ack ? "error" : "success",
+          icon: res.ack ? "warning" : "check",
+        });
+      } else {
+        setInputsHabilitados(true);
+        setProvider(res.data);
+      }
+    }
+  }, []);
   const handleChangeProvider = (e) => {
     const { name, value } = e.target;
     switch (name) {
@@ -37,7 +58,12 @@ function ProviderForm() {
     }
   };
   const submitHandlerProvider = async () => {
-    const res = await createProvider(provider);
+    let res;
+    if (id) {
+      res = await updateProvider(provider);
+    } else {
+      res = await createProvider(provider);
+    }
     if (res.ack) {
       showSnackbar({
         title: "Proveedores",
@@ -46,7 +72,10 @@ function ProviderForm() {
         icon: res.ack ? "warning" : "check",
       });
     }
-    if (!res.ack) navigate("/providers");
+    if (!res.ack)
+      setTimeout(() => {
+        navigate("/providers");
+      }, 1000);
   };
   return (
     <DashboardLayout>
@@ -73,26 +102,32 @@ function ProviderForm() {
                 <Grid container spacing={2}>
                   <Grid item xs={6}>
                     <MDBox mb={2} sx={{ m: 2 }}>
-                      <MDInput
-                        type="text"
-                        label="Razón Social"
-                        name="businessName"
-                        value={provider.businessName}
-                        variant="outlined"
-                        fullWidth
-                        onChange={handleChangeProvider}
-                      />
+                      <FormControl fullWidth disabled={inputsHabilitados}>
+                        <MDInput
+                          type="text"
+                          label="Razón Social"
+                          name="businessName"
+                          value={provider.businessName}
+                          variant="outlined"
+                          fullWidth
+                          onChange={handleChangeProvider}
+                          disabled={inputsHabilitados}
+                        />
+                      </FormControl>
                     </MDBox>
                     <MDBox mb={2} sx={{ m: 2 }}>
-                      <MDInput
-                        type="text"
-                        label="Dirección"
-                        name="address"
-                        value={provider.address}
-                        variant="outlined"
-                        fullWidth
-                        onChange={handleChangeProvider}
-                      />
+                      <FormControl fullWidth disabled={inputsHabilitados}>
+                        <MDInput
+                          type="text"
+                          label="Dirección"
+                          name="address"
+                          value={provider.address}
+                          variant="outlined"
+                          fullWidth
+                          onChange={handleChangeProvider}
+                          disabled={inputsHabilitados}
+                        />
+                      </FormControl>
                     </MDBox>
                     <MDBox mb={2} sx={{ m: 2 }}>
                       <MDInput
@@ -103,6 +138,7 @@ function ProviderForm() {
                         variant="outlined"
                         fullWidth
                         onChange={handleChangeProvider}
+                        disabled={inputsHabilitados}
                       />
                     </MDBox>
                     <MDBox mb={2} sx={{ m: 2 }}>
@@ -114,6 +150,7 @@ function ProviderForm() {
                         variant="outlined"
                         onChange={handleChangeProvider}
                         fullWidth
+                        disabled={inputsHabilitados}
                       />
                     </MDBox>
                   </Grid>
@@ -127,6 +164,7 @@ function ProviderForm() {
                         variant="outlined"
                         fullWidth
                         onChange={handleChangeProvider}
+                        disabled={inputsHabilitados}
                       />
                     </MDBox>
                     <MDBox mb={2} sx={{ m: 2 }}>
@@ -138,6 +176,7 @@ function ProviderForm() {
                         variant="outlined"
                         fullWidth
                         onChange={handleChangeProvider}
+                        disabled={inputsHabilitados}
                       />
                     </MDBox>
                     <MDBox mb={2} sx={{ m: 2 }}>
@@ -149,17 +188,37 @@ function ProviderForm() {
                         variant="outlined"
                         fullWidth
                         onChange={handleChangeProvider}
+                        disabled={inputsHabilitados}
                       />
                     </MDBox>
                   </Grid>
                 </Grid>
                 <MDBox mt={4} mb={1}>
-                  {!provider.id && (
-                    <MDButton variant="gradient" color="info" onClick={submitHandlerProvider}>
-                      Crear Proveedor
+                  {!inputsHabilitados && (
+                    <MDButton
+                      variant="gradient"
+                      color="info"
+                      onClick={submitHandlerProvider}
+                      disabled={inputsHabilitados}
+                    >
+                      Guardar
                     </MDButton>
                   )}
                 </MDBox>
+                {id && inputsHabilitados && (
+                  <Box
+                    sx={{
+                      "& > :not(style)": { m: 1 },
+                      display: "flex",
+                      justifyContent: "flex-end",
+                      alignItems: "flex-end",
+                    }}
+                  >
+                    <Fab color="info" aria-label="edit" onClick={() => setInputsHabilitados(false)}>
+                      <EditIcon />
+                    </Fab>
+                  </Box>
+                )}
               </MDBox>
             </MDBox>
           </MDBox>

@@ -1,13 +1,12 @@
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
-
 import { useEffect, useState } from "react";
-import Icon from "@mui/material/Icon";
 import { useMaterialUIController } from "context";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
+import EditIcon from "@mui/icons-material/Edit";
 import Footer from "examples/Footer";
-import { getProviders } from "services/providerHook";
+import { getProviders, downloadExcel } from "services/providerHook";
 import DataTable from "../../examples/Tables/DataTable";
 import MDButton from "../../components/MDButton";
 import MDBox from "../../components/MDBox";
@@ -17,17 +16,22 @@ function SuplierTable() {
   const [controller] = useMaterialUIController();
   const { darkMode } = controller;
 
+  const viewDetailSuplier = (id) => {
+    window.location.replace(`/providers/form/${id}`);
+  };
+
   const addOptions = (items) => {
     const itemsWithOptions = items.map((item) => {
       return {
         ...item,
         options: (
           <div>
-            <MDButton variant="text" color={darkMode ? "white" : "dark"}>
-              <Icon>edit</Icon>
-            </MDButton>
-            <MDButton variant="text" color={darkMode ? "white" : "dark"}>
-              <Icon>launchOutlinedIcon</Icon>
+            <MDButton
+              variant="text"
+              color={darkMode ? "white" : "dark"}
+              onClick={() => viewDetailSuplier(item.id)}
+            >
+              <EditIcon color="info" />
             </MDButton>
           </div>
         ),
@@ -43,6 +47,11 @@ function SuplierTable() {
     const response = addOptions(res.data);
     setProviders(response);
   }, []);
+
+  const downloadExcelView = async (id) => {
+    const url = await downloadExcel(id);
+    window.open(url, "_blank");
+  };
 
   const columns = [
     { Header: "Nombre", accessor: "businessName", align: "center" },
@@ -63,10 +72,18 @@ function SuplierTable() {
         >
           Nuevo
         </MDButton>
+        <MDButton
+          variant="outlined"
+          color="success"
+          onClick={() => downloadExcelView()}
+          style={{ marginLeft: 5 }}
+        >
+          Exportar Excel
+        </MDButton>
       </MDBox>
-      <MDBox pt={4} pb={3}>
+      <MDBox pt={2} pb={2}>
         <Card>
-          <MDBox pt={6} pb={3}>
+          <MDBox pt={2} pb={3}>
             <Grid container spacing={6}>
               <Grid item xs={12}>
                 <Card>
@@ -84,7 +101,7 @@ function SuplierTable() {
                       Proveedores
                     </MDTypography>
                   </MDBox>
-                  <MDBox pt={3}>
+                  <MDBox pt={2}>
                     <DataTable table={{ columns, rows: providers }} noEndBorder />
                   </MDBox>
                 </Card>
