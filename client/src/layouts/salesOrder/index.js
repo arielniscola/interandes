@@ -77,7 +77,6 @@ function SalesOrdersTable() {
 
   useEffect(async () => {
     const res = await getSalesOrders();
-    console.log(res);
     if (res.ack) {
       showSnackbar({
         title: "Orden de Venta",
@@ -91,6 +90,7 @@ function SalesOrdersTable() {
   }, []);
 
   const columns = [
+    { Header: "N°", accessor: "numberSO", align: "center" },
     { Header: "Mercaderia", accessor: "merchandise", align: "center" },
     { Header: "Compañia", accessor: "companyname", align: "center" },
     { Header: "Origen Carga", accessor: "originOfCharge", align: "center" },

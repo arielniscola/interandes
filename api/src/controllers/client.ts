@@ -5,6 +5,7 @@ import {
   createClient,
 } from "../services/client.service";
 import { Request, Response } from "express";
+import { ResponseApi } from "../utils/responseApi";
 
 export const getAllClientsController = async (_req: Request, res: Response) => {
   try {
@@ -20,21 +21,27 @@ export const getAllClientsController = async (_req: Request, res: Response) => {
 export const getClientIDController = async (req: Request, res: Response) => {
   try {
     const client = await getClientID(req.params.id);
-    if (!client) res.status(404).json({ message: "Client not found" });
+    if (!client)
+      res.status(404).json(new ResponseApi(0, "Cliente no encontrado"));
 
-    res.status(200).json(client);
+    res.status(200).json(new ResponseApi(0, "", client));
   } catch (error: any) {
-    res.status(404).json({ message: error.message });
+    res.status(404).json(new ResponseApi(0, `Error en el servicio: ${error}`));
   }
 };
 
 export const updateClientController = async (req: Request, res: Response) => {
   try {
     const clientUpdated = await updateClient(req.body);
-    if (!clientUpdated) res.status(404).json({ message: "Client not updated" });
-    res.status(200).json(clientUpdated);
+    if (!clientUpdated)
+      res.status(404).json(new ResponseApi(1, `Error al modificar cliente`));
+    res
+      .status(200)
+      .json(
+        new ResponseApi(0, "Cliente modificado correctamente", clientUpdated)
+      );
   } catch (error: any) {
-    res.status(404).json({ message: error.message });
+    res.status(404).json(new ResponseApi(1, `Error en el servicio: ${error}`));
   }
 };
 

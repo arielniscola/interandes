@@ -3,10 +3,8 @@ import Card from "@mui/material/Card";
 
 import { useEffect, useState } from "react";
 import { getClients } from "services/clientHook";
-import Icon from "@mui/material/Icon";
-// Material Dashboard 2 React components
 import { useMaterialUIController } from "context";
-// Material Dashboard 2 React example components
+import EditIcon from "@mui/icons-material/Edit";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
@@ -19,17 +17,22 @@ function ClientTable() {
   const [controller] = useMaterialUIController();
   const { darkMode } = controller;
 
+  const viewDetailClient = (id) => {
+    window.location.replace(`/clients/edit/${id}`);
+  };
+
   const addOptions = (items) => {
     const itemsWithOptions = items.map((item) => {
       return {
         ...item,
         options: (
           <div>
-            <MDButton variant="text" color={darkMode ? "white" : "dark"}>
-              <Icon>edit</Icon>
-            </MDButton>
-            <MDButton variant="text" color={darkMode ? "white" : "dark"}>
-              <Icon>launchOutlinedIcon</Icon>
+            <MDButton
+              variant="text"
+              color={darkMode ? "white" : "dark"}
+              onClick={() => viewDetailClient(item.id)}
+            >
+              <EditIcon color="info" />
             </MDButton>
           </div>
         ),
@@ -58,7 +61,7 @@ function ClientTable() {
   return (
     <DashboardLayout>
       <DashboardNavbar />
-      <MDBox mt={4} mb={1}>
+      <MDBox mt={1} mb={1}>
         <MDButton
           variant="gradient"
           color="success"
@@ -67,7 +70,7 @@ function ClientTable() {
           Nuevo
         </MDButton>
       </MDBox>
-      <MDBox pt={6} pb={3}>
+      <MDBox pt={3} pb={3}>
         <Grid container spacing={6}>
           <Grid item xs={12}>
             <Card>

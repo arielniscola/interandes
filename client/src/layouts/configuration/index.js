@@ -7,6 +7,7 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import Task from "layouts/task";
 import TypeOperation from "layouts/typeOperation";
 import UsersTable from "layouts/users";
+import Company from "layouts/company";
 import MDBox from "../../components/MDBox";
 import MDTypography from "../../components/MDTypography";
 import Configuration from "./generalConfigs";
@@ -19,7 +20,7 @@ export default function BasicButtonGroup() {
       <DashboardNavbar />
       <Card>
         <MDBox
-          mx={5}
+          mx={3}
           mt={-1}
           py={2}
           px={4}
@@ -61,6 +62,11 @@ export default function BasicButtonGroup() {
                 Tipo de Operación
               </MDTypography>
             </Button>
+            <Button onClick={() => changeMenu("company")}>
+              <MDTypography variant="h6" color="white">
+                Compañia
+              </MDTypography>
+            </Button>
             <Button onClick={() => changeMenu("configurations")}>
               <MDTypography variant="h6" color="white">
                 Configuraciones
@@ -71,7 +77,8 @@ export default function BasicButtonGroup() {
         {(menu === "users" && <UsersTable />) ||
           (menu === "typeOperations" && <TypeOperation />) ||
           (menu === "tasks" && <Task />) ||
-          (menu === "configurations" && <Configuration />)}
+          (menu === "configurations" && <Configuration />) ||
+          (menu === "company" && <Company />)}
       </Card>
     </DashboardLayout>
   );
