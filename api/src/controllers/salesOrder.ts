@@ -5,6 +5,7 @@ import {
   createSalesOrder,
   createConsignees,
   createContainers,
+  getConsignees,
 } from "../services/salesOrder.service";
 import { Request, Response } from "express";
 import { generateSalesOrderPDF } from "../utils/salesOrderPdf";
@@ -122,14 +123,12 @@ export const pdfSalesOrderController = async (req: Request, res: Response) => {
       sales.Client
     );
     pdfStream.on("finish", () => {
-      console.log("Escritura en el archivo PDF completada");
       // Configurar encabezados y enviar el archivo como respuesta HTTP
       res.setHeader(
         "Content-Disposition",
         `attachment; filename=BL_${sales.numberSO}.pdf`
       );
       res.setHeader("Content-type", "application/pdf");
-
       // Crear un nuevo stream para leer el archivo PDF y enviarlo en la respuesta
       const filestream = fs.createReadStream("files/declaracionEmbarque.pdf");
       filestream.pipe(res);
@@ -169,5 +168,16 @@ export const generateInstructivoController = async (
     });
   } catch (error: any) {
     res.status(400).json({ message: error.message });
+  }
+};
+
+export const getConsigneesController = async (_req: Request, res: Response) => {
+  try {
+    const consignees = await getConsignees();
+    res.status(200).json(new ResponseApi(0, "", consignees));
+  } catch (error) {
+    res
+      .status(200)
+      .json(new ResponseApi(1, `Error en buscar consignee: ${error}`));
   }
 };

@@ -27,7 +27,7 @@ import SignIn from "layouts/authentication/sign-in";
 import Pricing from "layouts/pricing";
 import Configuration from "layouts/configuration";
 import ClientTable from "layouts/clients";
-import ClientForm from "layouts/clients/form";
+import ClientEditView from "layouts/clients/form";
 import Files from "layouts/files";
 import SalesOrdersTable from "layouts/salesOrder";
 import SalesOrder from "layouts/salesOrder/form";
@@ -35,6 +35,7 @@ import OperationsTable from "layouts/operations";
 import OperationTimeLine from "layouts/operations/timeline";
 import SuplierTable from "layouts/suplier";
 import InvoiceTable from "layouts/invoices";
+import ClientNewForm from "layouts/clients/form/newForm";
 import PricingForm from "./layouts/pricing/form";
 import ProviderForm from "./layouts/suplier/suplierForm";
 
@@ -67,8 +68,14 @@ const routes = [
     type: "route",
     name: "PROVEEDORES",
     key: "notifications",
-    icon: <Icon fontSize="small">notifications</Icon>,
     route: "/providers/form",
+    component: <ProviderForm />,
+  },
+  {
+    type: "route",
+    name: "PROVEEDORES",
+    key: "notifications",
+    route: "/providers/form/:id",
     component: <ProviderForm />,
   },
   {
@@ -90,10 +97,17 @@ const routes = [
   {
     type: "route",
     name: "CLIENTES",
+    key: "clientEdit",
+    route: "/clients/edit/:id",
+    component: <ClientEditView />,
+  },
+  {
+    type: "route",
+    name: "CLIENTES",
     key: "clientForm",
     icon: <Icon fontSize="small">person</Icon>,
     route: "/clients/form",
-    component: <ClientForm />,
+    component: <ClientNewForm />,
   },
   {
     type: "collapse",

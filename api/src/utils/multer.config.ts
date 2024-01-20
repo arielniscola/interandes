@@ -12,6 +12,7 @@ export class FileStorage {
       destination: async function (req, _file, cb) {
         try {
           let directorySave: string;
+          console.log(moduleName);
           if (moduleName === "company") {
             directorySave = path.join(process.cwd(), "uploads");
           } else {
@@ -22,12 +23,12 @@ export class FileStorage {
               `operation_N°${operacion.operationNumber}`
             );
           }
-          if (await !fs.existsSync(directorySave)) {
+          if (!fs.existsSync(directorySave)) {
             console.log(
               `La carpeta ${directorySave} no existe. Se creara a continuación`
             );
             try {
-              await fs.mkdirSync(directorySave, { recursive: true });
+              fs.mkdirSync(directorySave, { recursive: true });
               console.log(
                 `El directorio ${directorySave} se creo correctamente`
               );
@@ -35,6 +36,7 @@ export class FileStorage {
               console.log("No se creo directorio: ", error);
             }
           }
+          console.log(directorySave);
           cb(null, directorySave);
         } catch (error) {
           console.log(`Error en crear carpeta upload: ${error}`);

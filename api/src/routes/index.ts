@@ -8,6 +8,7 @@ import { operationRoutes } from "./operation";
 import { operationTypeRoutes } from "./operationType";
 import { providerRoutes } from "./provider";
 import { fileRoutes } from "./fileStructure";
+import { companyRoutes } from "./company";
 
 const router = Router();
 
@@ -20,5 +21,6 @@ router.use("/operations", operationRoutes);
 router.use("/operationType", operationTypeRoutes);
 router.use("/providers", providerRoutes);
 router.use("/files", fileRoutes);
+router.use("/company", companyRoutes);
 
 export default router;

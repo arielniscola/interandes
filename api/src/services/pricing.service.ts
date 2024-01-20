@@ -10,6 +10,10 @@ export const getAllPricings = async () => {
       attributes: {
         exclude: ["deleted"],
       },
+      where: {
+        deleted: false,
+      },
+      order: [["createdAt", "DESC"]],
     });
 
     if (!pricings) throw new Error("Not found");
@@ -79,11 +83,39 @@ export const updatePricing = async (pricing: IPricing) => {
   }
 };
 
+export const deletePricing = async (id: string) => {
+  try {
+    const pricingExist: IPricing = await Pricing.findOne({ where: { id: id } });
+    if (!pricingExist) throw "Pricing no se encuentra almacenado";
+    const pricingDeleted = await Pricing.update(
+      {
+        deleted: true,
+        operation_id: null,
+      },
+      {
+        where: {
+          id: id,
+        },
+      }
+    );
+    await addHistoryOperation(
+      pricingExist.operation_id,
+      `Eliminación Pricing: ${pricingExist.pricingnumber}`
+    );
+    return pricingDeleted;
+  } catch (error) {
+    throw error;
+  }
+};
+
 /** generador de ID */
 const generateID = async () => {
   try {
     const prefijo = "PRI";
     const lastPricing = await Pricing.findOne({
+      where: {
+        deleted: false,
+      },
       order: [["createdAt", "DESC"]],
     });
     if (!lastPricing) return `${prefijo}-1`;

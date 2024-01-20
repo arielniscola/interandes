@@ -3,6 +3,7 @@ import {
   createSalesOrderController,
   generateInstructivoController,
   getAllSalesOrdersController,
+  getConsigneesController,
   getSalesOrderIDController,
   pdfSalesOrderController,
 } from "../controllers/salesOrder";
@@ -17,3 +18,4 @@ salesOrderRoutes.get(
   "/generate-instructivo-pdf/:id",
   generateInstructivoController
 );
+salesOrderRoutes.get("/consignees", getConsigneesController);

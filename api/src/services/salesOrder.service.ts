@@ -9,6 +9,7 @@ export const getAllSalesOrders = async () => {
     attributes: {
       exclude: ["isDeleted"],
     },
+    order: [["createdAt", "DESC"]],
   });
 
   if (!salesOrders) throw new Error("Not found");
@@ -67,6 +68,15 @@ export const createConsignees = async (consigness: IConsignee[]) => {
 export const createContainers = async (containers: IContainer[]) => {
   try {
     await Container.bulkCreate(containers);
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getConsignees = async () => {
+  try {
+    const consignees = await Consignee.findAll();
+    return consignees;
   } catch (error) {
     throw error;
   }

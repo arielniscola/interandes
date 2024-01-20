@@ -3,6 +3,7 @@ import {
   getPricingID,
   updatePricing,
   createPricing,
+  deletePricing,
 } from "../services/pricing.service";
 import { createDetailPricing } from "../services/detail.service";
 import { Request, Response } from "express";
@@ -102,5 +103,19 @@ export const pdfPricingController = async (req: Request, res: Response) => {
     });
   } catch (error: any) {
     res.status(400).json({ message: error.message });
+  }
+};
+
+export const deletePricingController = async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id;
+    const pricingDeleted = await deletePricing(id);
+    res
+      .status(200)
+      .json(
+        new ResponseApi(0, "Pricing eliminado correctamente", pricingDeleted)
+      );
+  } catch (error) {
+    res.status(200).json(new ResponseApi(1, "Error al eliminar pricing"));
   }
 };

@@ -75,7 +75,9 @@ export const createOperation = async (type: string): Promise<IOperation> => {
 };
 export const getOperations = async () => {
   try {
-    const operations = await Operation.findAll();
+    const operations = await Operation.findAll({
+      order: [["createdAt", "DESC"]],
+    });
     return operations;
   } catch (error) {
     throw error;

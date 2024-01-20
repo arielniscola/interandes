@@ -145,6 +145,7 @@ export const generatePDF = async (data: any, items: IDetail[] | any) => {
     let currency = "";
     let line = 0;
     items.forEach((item: IDetail) => {
+      // if(item.typeItem === "sale")
       drawCell(item.item, 30, 340 + line, 125, 15, "center", "Helvetica");
       drawCell(
         `${item.currency}  ${item.price}`,
@@ -183,21 +184,21 @@ export const generatePDF = async (data: any, items: IDetail[] | any) => {
     // drawCell("1", 280, 355, 125, 15, "center", "Helvetica");
     // drawCell("USD 50,00", 405, 355, 125, 15, "center", "Helvetica");
     // drawCell("", 30, 370, 500, 20);
-    drawCell("MONTO TOTAL", 30, 390, 250, 20, "", "Helvetica-Bold");
+    drawCell("MONTO TOTAL", 30, 390 + line - 30, 250, 20, "", "Helvetica-Bold");
     drawCell(
       `${currency} ${total}`,
       280,
-      390,
+      390 + line - 30,
       250,
       20,
       "center",
       "Helvetica-Bold"
     );
     //Incluye y no Incluye
-    drawCell("INCLUYE", 30, 410, 500, 20);
-    drawCell(data.observations, 30, 430, 500, 100);
-    drawCell("NO INCLUYE", 30, 530, 500, 20);
-    drawCell(data.conditions, 30, 550, 500, 100);
+    drawCell("INCLUYE", 30, 410 + line - 30, 500, 20);
+    drawCell(data.observations, 30, 430 + line - 30, 500, 100);
+    drawCell("NO INCLUYE", 30, 530 + line - 30, 500, 20);
+    drawCell(data.conditions, 30, 550 + line - 30, 500, 100);
     doc
       .font("Times-Italic")
       .fontSize(11)
@@ -208,7 +209,7 @@ export const generatePDF = async (data: any, items: IDetail[] | any) => {
           www.is-sa.com.ar
         `,
         350,
-        680,
+        680 + line - 30,
         { align: "right" }
       );
     // Save and close the PDF
