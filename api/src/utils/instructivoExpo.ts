@@ -140,33 +140,84 @@ export const generateInstructivoPDF = async (
     drawCell("CANTIDAD DE CNTR", 30, 495, 250, 15, "center");
     drawCell("", 280, 495, 250, 15, "center");
 
-    // Iterar por cada contenedor
+    /** Imprimir la tabla de contenedores */
+    const pageHeight = doc.page.height;
+
     let y = 0;
     let count = 1;
+    let baseY = 560;
     for (const container of containers) {
-      drawCell("DATOS TRANSPORTE", 30, 560 + y, 500, 20, "center");
-      drawCell("CONTENEDOR", 30, 580 + y, 250, 15, "center");
-      drawCell(`${count}`, 280, 580 + y, 90, 15, "center");
-      drawCell("DE", 370, 580 + y, 70, 15, "center");
-      drawCell(`${containers.length}`, 440, 580 + y, 90, 15, "center");
-      drawCell("N° CONTENEDOR/TARA", 30, 595 + y, 250, 15, "center");
-      drawCell(container.containerNumber, 280, 595 + y, 250, 15, "center");
-      drawCell("N° CHOFER", 30, 610 + y, 250, 15, "center");
-      drawCell(container.driver, 280, 610 + y, 250, 15, "center", "Helvetica");
-      drawCell("TRANSPORTE", 30, 625 + y, 250, 15, "center", "Helvetica");
-      drawCell("", 280, 625 + y, 250, 15, "center");
-      drawCell("DNI", 30, 640 + y, 250, 15, "center", "Helvetica");
-      drawCell(container.dni, 280, 640 + y, 250, 15, "center");
-      drawCell("PATENTE TRACTOR", 30, 655 + y, 250, 15, "center", "Helvetica");
-      drawCell(container.truckPlate, 280, 655 + y, 250, 15, "center");
-      drawCell("PATENTE SEMI", 30, 670 + y, 250, 15, "center", "Helvetica");
-      drawCell(container.semiPlate, 280, 670 + y, 250, 15, "center");
-      drawCell("PRECINTO NAVIERA", 30, 685 + y, 250, 15, "center", "Helvetica");
-      drawCell("", 280, 685 + y, 250, 15, "center");
-      drawCell("PRECINTO ADUANA", 30, 700 + y, 250, 15, "center", "Helvetica");
-      drawCell("", 280, 700 + y, 250, 15, "center");
-      drawCell("NUMERO DE LOTE", 30, 715 + y, 250, 15, "center", "Helvetica");
-      drawCell(container.poRef, 280, 715 + y, 250, 15, "center");
+      /** Si la tabla excede el tamaño de la pagina, saltar de hoja */
+      if (pageHeight < y + 560 + 175) {
+        doc.addPage();
+        baseY = 20;
+        y = 0;
+      }
+      drawCell("DATOS TRANSPORTE", 30, baseY + y, 500, 20, "center");
+      baseY += 20;
+      drawCell("CONTENEDOR", 30, baseY + y, 250, 15, "center");
+      drawCell(`${count}`, 280, baseY + y, 90, 15, "center");
+      drawCell("DE", 370, baseY + y, 70, 15, "center");
+      drawCell(`${containers.length}`, 440, baseY + y, 90, 15, "center");
+      baseY += 15;
+      drawCell("N° CONTENEDOR/TARA", 30, baseY + y, 250, 15, "center");
+      drawCell(container.containerNumber, 280, baseY + y, 250, 15, "center");
+      baseY += 15;
+      drawCell("N° CHOFER", 30, baseY + y, 250, 15, "center");
+      drawCell(
+        container.driver,
+        280,
+        baseY + y,
+        250,
+        15,
+        "center",
+        "Helvetica"
+      );
+      baseY += 15;
+      drawCell("TRANSPORTE", 30, baseY + y, 250, 15, "center", "Helvetica");
+      drawCell("", 280, baseY + y, 250, 15, "center");
+      baseY += 15;
+      drawCell("DNI", 30, baseY + y, 250, 15, "center", "Helvetica");
+      drawCell(container.dni, 280, baseY + y, 250, 15, "center");
+      baseY += 15;
+      drawCell(
+        "PATENTE TRACTOR",
+        30,
+        baseY + y,
+        250,
+        15,
+        "center",
+        "Helvetica"
+      );
+      drawCell(container.truckPlate, 280, baseY + y, 250, 15, "center");
+      baseY += 15;
+      drawCell("PATENTE SEMI", 30, baseY + y, 250, 15, "center", "Helvetica");
+      drawCell(container.semiPlate, 280, baseY + y, 250, 15, "center");
+      baseY += 15;
+      drawCell(
+        "PRECINTO NAVIERA",
+        30,
+        baseY + y,
+        250,
+        15,
+        "center",
+        "Helvetica"
+      );
+      drawCell("", 280, baseY + y, 250, 15, "center");
+      baseY += 15;
+      drawCell(
+        "PRECINTO ADUANA",
+        30,
+        baseY + y,
+        250,
+        15,
+        "center",
+        "Helvetica"
+      );
+      drawCell("", 280, baseY + y, 250, 15, "center");
+      baseY += 15;
+      drawCell("NUMERO DE LOTE", 30, baseY + y, 250, 15, "center", "Helvetica");
+      drawCell(container.poRef, 280, baseY + y, 250, 15, "center");
 
       y = y + 175; // Sumamos tamaño de tabla
       count++;

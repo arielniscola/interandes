@@ -64,7 +64,7 @@ function ProviderForm() {
     } else {
       res = await createProvider(provider);
     }
-    if (res.ack) {
+    if (res) {
       showSnackbar({
         title: "Proveedores",
         content: res.message,
@@ -195,14 +195,25 @@ function ProviderForm() {
                 </Grid>
                 <MDBox mt={4} mb={1}>
                   {!inputsHabilitados && (
-                    <MDButton
-                      variant="gradient"
-                      color="info"
-                      onClick={submitHandlerProvider}
-                      disabled={inputsHabilitados}
-                    >
-                      Guardar
-                    </MDButton>
+                    <MDBox>
+                      <MDButton
+                        variant="gradient"
+                        color="info"
+                        onClick={submitHandlerProvider}
+                        disabled={inputsHabilitados}
+                      >
+                        Guardar
+                      </MDButton>
+                      <MDButton
+                        variant="gradient"
+                        color="warning"
+                        onClick={() => setInputsHabilitados(true)}
+                        disabled={inputsHabilitados}
+                        style={{ marginLeft: 5 }}
+                      >
+                        Cancelar
+                      </MDButton>
+                    </MDBox>
                   )}
                 </MDBox>
                 {id && inputsHabilitados && (

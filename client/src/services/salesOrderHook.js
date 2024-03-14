@@ -67,3 +67,16 @@ export const generateDeclaracion = async (id) => {
     return error;
   }
 };
+
+export const getConsignees = async () => {
+  try {
+    const res = await fetch(`${URL_API}/sales-order/consignees`, {
+      method: "GET",
+      headers: { "Content-type": "application/json" },
+    });
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    return error;
+  }
+};

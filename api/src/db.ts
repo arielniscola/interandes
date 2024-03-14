@@ -18,6 +18,7 @@ import { initTaskModel } from "./models/task";
 import { initTypeOperationModel } from "./models/typeOperation";
 import { initProvider } from "./models/provider";
 import { initCompanyModel } from "./models/company";
+import { initSeaPort } from "./models/seaPort";
 
 const DB_USER = "postgres";
 const DB_PASSWORD = "1234";
@@ -49,6 +50,7 @@ initTaskModel(sequelize);
 initTypeOperationModel(sequelize);
 initProvider(sequelize);
 initCompanyModel(sequelize);
+initSeaPort(sequelize);
 
 /** Pricing relationships */
 Pricing.belongsTo(Client, { foreignKey: "client_id" });

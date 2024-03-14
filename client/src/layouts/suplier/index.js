@@ -81,34 +81,30 @@ function SuplierTable() {
           Exportar Excel
         </MDButton>
       </MDBox>
-      <MDBox pt={2} pb={2}>
-        <Card>
-          <MDBox pt={2} pb={3}>
-            <Grid container spacing={6}>
-              <Grid item xs={12}>
-                <Card>
-                  <MDBox
-                    mx={2}
-                    mt={-3}
-                    py={3}
-                    px={2}
-                    variant="gradient"
-                    bgColor="info"
-                    borderRadius="lg"
-                    coloredShadow="info"
-                  >
-                    <MDTypography variant="h6" color="white">
-                      Proveedores
-                    </MDTypography>
-                  </MDBox>
-                  <MDBox pt={2}>
-                    <DataTable table={{ columns, rows: providers }} noEndBorder />
-                  </MDBox>
-                </Card>
-              </Grid>
-            </Grid>
-          </MDBox>
-        </Card>
+      <MDBox pt={2} pb={3} mt={2}>
+        <Grid container spacing={6}>
+          <Grid item xs={12}>
+            <Card>
+              <MDBox
+                mx={2}
+                mt={-3}
+                py={3}
+                px={2}
+                variant="gradient"
+                bgColor="info"
+                borderRadius="lg"
+                coloredShadow="info"
+              >
+                <MDTypography variant="h6" color="white">
+                  Proveedores
+                </MDTypography>
+              </MDBox>
+              <MDBox>
+                <DataTable table={{ columns, rows: providers }} noEndBorder />
+              </MDBox>
+            </Card>
+          </Grid>
+        </Grid>
       </MDBox>
       <Footer />
     </DashboardLayout>

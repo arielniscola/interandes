@@ -12,7 +12,6 @@ export class FileStorage {
       destination: async function (req, _file, cb) {
         try {
           let directorySave: string;
-          console.log(moduleName);
           if (moduleName === "company") {
             directorySave = path.join(process.cwd(), "uploads");
           } else {

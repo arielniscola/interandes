@@ -11,7 +11,7 @@ import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
-import { getCompanies, uploadImage } from "services/companyHook";
+import { getCompanies, uploadImage, getLogoCompany } from "services/companyHook";
 import useSnackbar from "../../services/snackbarHook";
 import MDButton from "../../components/MDButton";
 import MDTypography from "../../components/MDTypography";
@@ -37,8 +37,7 @@ function Company() {
     companyname: "",
     logo: "",
   });
-
-  // Obtener todos los tipos de operacion
+  const [imageSrc, setImageSrc] = useState("");
   useEffect(async () => {
     const res = await getCompanies();
     if (res.ack) {
@@ -52,8 +51,22 @@ function Company() {
       setCompanies(res.data);
     }
   }, []);
+  useEffect(async () => {
+    if (company.id) {
+      const data = await getLogoCompany(company.id);
+      setImageSrc(`data:image/png;base64, ${data.data}`);
+    }
+  }, [company]);
   const handleFileChange = (event) => {
-    setFiles([...files, event.target.files[0]]);
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setImageSrc(e.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+    setFiles([...files, file]);
   };
 
   const submitCompany = async () => {
@@ -108,8 +121,9 @@ function Company() {
                       setCompany({
                         id: "",
                         companyname: "",
-                        logo: [],
+                        logo: "",
                       });
+                      setImageSrc("");
                     } else {
                       setCompany(newValue);
                     }
@@ -120,11 +134,11 @@ function Company() {
           </Grid>
           <Grid item xs={8} md={4} margin={2}>
             <Card sx={{ maxWidth: 500 }}>
-              <CardMedia component="img" height="350" image={company.logo} />
+              <CardMedia component="img" height="350" image={imageSrc} />
               <CardContent style={{ maxWidth: "80%" }}>
                 <Grid item xs={4}>
                   <Typography gutterBottom variant="h5" component="div">
-                    All In SA
+                    {company.companyname}
                   </Typography>
                   <MDBox sx={{ margin: 2 }}>
                     <Button
@@ -146,6 +160,14 @@ function Company() {
         <MDBox mb={2} sx={{ ml: 5 }}>
           <MDButton variant="gradient" color="info" onClick={submitCompany}>
             Actualizar
+          </MDButton>
+          <MDButton
+            variant="gradient"
+            color="warning"
+            style={{ marginLeft: 5 }}
+            onClick={() => window.history.back()}
+          >
+            Volver
           </MDButton>
         </MDBox>
       </MDBox>

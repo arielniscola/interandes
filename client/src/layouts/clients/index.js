@@ -88,7 +88,7 @@ function ClientTable() {
                   Clientes
                 </MDTypography>
               </MDBox>
-              <MDBox pt={3}>
+              <MDBox>
                 <DataTable table={{ columns, rows: clients }} noEndBorder />
               </MDBox>
             </Card>

@@ -725,183 +725,185 @@ function SalesOrder() {
               </MDTypography>
             </MDBox>
             <MDBox pt={3} style={{ margin: 7 }}>
-              <MDBox component="form" role="form">
-                <Grid container spacing={1}>
-                  <Grid item xs={1.5}>
-                    <MDInput
-                      type="text"
-                      name="containerNumber"
-                      label="Numero"
-                      value={container.containerNumber}
-                      onChange={handleChangeContainer}
-                      fullWidth
-                    />
-                  </Grid>
-                  <Grid item xs={1.5}>
-                    <MDInput
-                      type="text"
-                      name="ptoLinea"
-                      label="PTO Linea"
-                      value={container.ptoLinea}
-                      onChange={handleChangeContainer}
-                      fullWidth
-                    />
-                  </Grid>
-                  <Grid item xs={1.5}>
-                    <MDInput
-                      type="text"
-                      name="ptoAduana"
-                      label="PTO Aduana"
-                      value={container.ptoAduana}
-                      onChange={handleChangeContainer}
-                      fullWidth
-                    />
-                  </Grid>
-                  <Grid item xs={1.5}>
-                    <MDInput
-                      type="text"
-                      name="otherSeals"
-                      label="Otros Sellos"
-                      value={container.otherSeals}
-                      onChange={handleChangeContainer}
-                      fullWidth
-                    />
-                  </Grid>
-                  <Grid item xs={1.5}>
-                    <MDInput
-                      type="text"
-                      name="poRef"
-                      label="PO/REF"
-                      value={container.poRef}
-                      onChange={handleChangeContainer}
-                      fullWidth
-                    />
-                  </Grid>
-                  <Grid item xs={1.5}>
-                    <MDInput
-                      type="text"
-                      name="driver"
-                      label="Conductor"
-                      value={container.driver}
-                      onChange={handleChangeContainer}
-                      fullWidth
-                    />
-                  </Grid>
-                  <Grid item xs={1.5}>
-                    <MDInput
-                      type="text"
-                      name="dni"
-                      label="DNI"
-                      value={container.dni}
-                      onChange={handleChangeContainer}
-                      fullWidth
-                    />
-                  </Grid>
-                  <Grid item xs={1.5}>
-                    <MDInput
-                      type="text"
-                      name="truckPlate"
-                      label="Patente tractor"
-                      value={container.truckPlate}
-                      onChange={handleChangeContainer}
-                      fullWidth
-                    />
-                  </Grid>
-                  <Grid item xs={1.5}>
-                    <MDInput
-                      type="text"
-                      name="semiPlate"
-                      label="Patente semi"
-                      value={container.semiPlate}
-                      onChange={handleChangeContainer}
-                      fullWidth
-                    />
-                  </Grid>
-                  <Grid item xs={1.5}>
-                    <MDInput
-                      type="text"
-                      name="containerType"
-                      label="Tipo Contenedor"
-                      value={container.containerType}
-                      onChange={handleChangeContainer}
-                      fullWidth
-                    />
-                  </Grid>
-                  <Grid item xs={1.5}>
-                    <FormControl sx={{ minWidth: 160 }}>
-                      <InputLabel id="demo-simple-select-label">Tiene Temperatura</InputLabel>
-                      <Select
-                        id="demo-simple-select-label"
-                        name="hasTemp"
-                        value={container.hasTemp}
+              {saleOrder.containerStruk - containers.length !== 0 && (
+                <MDBox component="form" role="form">
+                  <Grid container spacing={1}>
+                    <Grid item xs={1.5}>
+                      <MDInput
+                        type="text"
+                        name="containerNumber"
+                        label="Numero"
+                        value={container.containerNumber}
                         onChange={handleChangeContainer}
-                        input={<OutlinedInput label="Tiene Temperatura" />}
-                        style={{ minHeight: "43px" }}
+                        fullWidth
+                      />
+                    </Grid>
+                    <Grid item xs={1.5}>
+                      <MDInput
+                        type="text"
+                        name="ptoLinea"
+                        label="PTO Linea"
+                        value={container.ptoLinea}
+                        onChange={handleChangeContainer}
+                        fullWidth
+                      />
+                    </Grid>
+                    <Grid item xs={1.5}>
+                      <MDInput
+                        type="text"
+                        name="ptoAduana"
+                        label="PTO Aduana"
+                        value={container.ptoAduana}
+                        onChange={handleChangeContainer}
+                        fullWidth
+                      />
+                    </Grid>
+                    <Grid item xs={1.5}>
+                      <MDInput
+                        type="text"
+                        name="otherSeals"
+                        label="Otros Sellos"
+                        value={container.otherSeals}
+                        onChange={handleChangeContainer}
+                        fullWidth
+                      />
+                    </Grid>
+                    <Grid item xs={1.5}>
+                      <MDInput
+                        type="text"
+                        name="poRef"
+                        label="PO/REF"
+                        value={container.poRef}
+                        onChange={handleChangeContainer}
+                        fullWidth
+                      />
+                    </Grid>
+                    <Grid item xs={1.5}>
+                      <MDInput
+                        type="text"
+                        name="driver"
+                        label="Conductor"
+                        value={container.driver}
+                        onChange={handleChangeContainer}
+                        fullWidth
+                      />
+                    </Grid>
+                    <Grid item xs={1.5}>
+                      <MDInput
+                        type="text"
+                        name="dni"
+                        label="DNI"
+                        value={container.dni}
+                        onChange={handleChangeContainer}
+                        fullWidth
+                      />
+                    </Grid>
+                    <Grid item xs={1.5}>
+                      <MDInput
+                        type="text"
+                        name="truckPlate"
+                        label="Patente tractor"
+                        value={container.truckPlate}
+                        onChange={handleChangeContainer}
+                        fullWidth
+                      />
+                    </Grid>
+                    <Grid item xs={1.5}>
+                      <MDInput
+                        type="text"
+                        name="semiPlate"
+                        label="Patente semi"
+                        value={container.semiPlate}
+                        onChange={handleChangeContainer}
+                        fullWidth
+                      />
+                    </Grid>
+                    <Grid item xs={1.5}>
+                      <MDInput
+                        type="text"
+                        name="containerType"
+                        label="Tipo Contenedor"
+                        value={container.containerType}
+                        onChange={handleChangeContainer}
+                        fullWidth
+                      />
+                    </Grid>
+                    <Grid item xs={1.5}>
+                      <FormControl sx={{ minWidth: 160 }}>
+                        <InputLabel id="demo-simple-select-label">Tiene Temperatura</InputLabel>
+                        <Select
+                          id="demo-simple-select-label"
+                          name="hasTemp"
+                          value={container.hasTemp}
+                          onChange={handleChangeContainer}
+                          input={<OutlinedInput label="Tiene Temperatura" />}
+                          style={{ minHeight: "43px" }}
+                        >
+                          <MenuItem value>SI</MenuItem>
+                          <MenuItem value={false}>NO</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                    {container.hasTemp && (
+                      <Grid item xs={1.5}>
+                        <MDInput
+                          type="text"
+                          name="temperature"
+                          label="Temperatura °"
+                          value={container.temperature}
+                          onChange={handleChangeContainer}
+                          fullWidth
+                        />
+                      </Grid>
+                    )}
+                    {container.hasTemp && (
+                      <Grid item xs={1.5}>
+                        <MDInput
+                          type="text"
+                          name="ventilation"
+                          label="Ventilacion"
+                          value={container.ventilation}
+                          onChange={handleChangeContainer}
+                          fullWidth
+                        />
+                      </Grid>
+                    )}
+                    {container.hasTemp && (
+                      <Grid item xs={1.5}>
+                        <MDInput
+                          type="text"
+                          name="humidity"
+                          label="Humedad"
+                          value={container.humidity}
+                          onChange={handleChangeContainer}
+                          fullWidth
+                        />
+                      </Grid>
+                    )}
+                    <Grid style={{ marginTop: 8, marginLeft: 10 }}>
+                      <MDButton
+                        variant="gradient"
+                        color="success"
+                        size="small"
+                        onClick={addContainer}
                       >
-                        <MenuItem value>SI</MenuItem>
-                        <MenuItem value={false}>NO</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                  {container.hasTemp && (
-                    <Grid item xs={1.5}>
-                      <MDInput
-                        type="text"
-                        name="temperature"
-                        label="Temperatura °"
-                        value={container.temperature}
-                        onChange={handleChangeContainer}
-                        fullWidth
-                      />
+                        Agregar
+                      </MDButton>
                     </Grid>
-                  )}
-                  {container.hasTemp && (
-                    <Grid item xs={1.5}>
-                      <MDInput
-                        type="text"
-                        name="ventilation"
-                        label="Ventilacion"
-                        value={container.ventilation}
-                        onChange={handleChangeContainer}
-                        fullWidth
-                      />
+                    <Grid style={{ marginTop: 8, marginLeft: 10 }}>
+                      <MDButton
+                        variant="gradient"
+                        color="primary"
+                        size="small"
+                        onClick={deleteFormContainer}
+                      >
+                        Borrar
+                      </MDButton>
                     </Grid>
-                  )}
-                  {container.hasTemp && (
-                    <Grid item xs={1.5}>
-                      <MDInput
-                        type="text"
-                        name="humidity"
-                        label="Humedad"
-                        value={container.humidity}
-                        onChange={handleChangeContainer}
-                        fullWidth
-                      />
-                    </Grid>
-                  )}
-                  <Grid style={{ marginTop: 8, marginLeft: 10 }}>
-                    <MDButton
-                      variant="gradient"
-                      color="success"
-                      size="small"
-                      onClick={addContainer}
-                    >
-                      Agregar
-                    </MDButton>
                   </Grid>
-                  <Grid style={{ marginTop: 8, marginLeft: 10 }}>
-                    <MDButton
-                      variant="gradient"
-                      color="primary"
-                      size="small"
-                      onClick={deleteFormContainer}
-                    >
-                      Borrar
-                    </MDButton>
-                  </Grid>
-                </Grid>
-                <Divider />
-              </MDBox>
+                  <Divider />
+                </MDBox>
+              )}
               <MDBox pt={3}>
                 <DataTable
                   table={{ columns, rows: containers }}
@@ -918,11 +920,12 @@ function SalesOrder() {
                   <MDButton variant="gradient" color="info" onClick={submitHandlerSaleOrder}>
                     Guardar
                   </MDButton>
-                </MDBox>
-              </Grid>
-              <Grid item xs={3}>
-                <MDBox mt={4} mb={1} sx={{ m: 2 }}>
-                  <MDButton variant="gradient" color="warning" onClick={submitHandlerSaleOrder}>
+                  <MDButton
+                    variant="gradient"
+                    color="warning"
+                    onClick={() => window.location.replace(`/salesOrder`)}
+                    style={{ marginLeft: 10 }}
+                  >
                     Cancelar
                   </MDButton>
                 </MDBox>

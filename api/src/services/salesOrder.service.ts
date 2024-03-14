@@ -59,7 +59,14 @@ export const updateSalesOrder = async (salesOrder: SalesOrder) => {
 
 export const createConsignees = async (consigness: IConsignee[]) => {
   try {
-    await Consignee.bulkCreate(consigness);
+    for (const consignee of consigness) {
+      const exist = await Consignee.findOne({
+        where: {
+          taxID: consignee.taxID,
+        },
+      });
+      if (!exist) await Consignee.create(consignee);
+    }
   } catch (error) {
     throw error;
   }

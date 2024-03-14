@@ -162,7 +162,7 @@ function DataTable({
                 renderInput={(params) => <MDInput {...params} />}
               />
               <MDTypography variant="caption" color="secondary">
-                &nbsp;&nbsp;registros por pag
+                &nbsp;&nbsp;registros por pág.
               </MDTypography>
             </MDBox>
           )}

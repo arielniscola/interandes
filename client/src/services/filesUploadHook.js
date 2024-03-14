@@ -3,7 +3,9 @@ import URL_API from "../config";
 export const uploadFiles = async (id, files) => {
   try {
     const formData = new FormData();
-    formData.append("files", files);
+    files.forEach((file) => {
+      formData.append("files", file);
+    });
     const res = await fetch(`${URL_API}/files/${id}`, {
       method: "POST",
       body: formData,

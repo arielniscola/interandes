@@ -190,14 +190,25 @@ function ClientEditView() {
                 </Grid>
                 <MDBox mt={4} mb={1}>
                   {!inputsHabilitados && (
-                    <MDButton
-                      variant="gradient"
-                      color="info"
-                      disabled={inputsHabilitados}
-                      onClick={submitHandlerClient}
-                    >
-                      Guardar
-                    </MDButton>
+                    <MDBox>
+                      <MDButton
+                        variant="gradient"
+                        color="success"
+                        disabled={inputsHabilitados}
+                        onClick={submitHandlerClient}
+                      >
+                        Guardar
+                      </MDButton>
+                      <MDButton
+                        variant="gradient"
+                        color="warning"
+                        disabled={inputsHabilitados}
+                        onClick={() => setInputsHabilitados(true)}
+                        style={{ marginLeft: 5 }}
+                      >
+                        Cancelar
+                      </MDButton>
+                    </MDBox>
                   )}
                 </MDBox>
                 {id && inputsHabilitados && (

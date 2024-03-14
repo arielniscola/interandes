@@ -4,6 +4,7 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import Box from "@mui/material/Box";
+import Autocomplete from "@mui/material/Autocomplete";
 import moment from "moment";
 import Fab from "@mui/material/Fab";
 import EditIcon from "@mui/icons-material/Edit";
@@ -26,10 +27,11 @@ import MDInput from "../../../components/MDInput";
 import MDButton from "../../../components/MDButton";
 import MDTypography from "../../../components/MDTypography";
 import useSnackbar from "../../../services/snackbarHook";
-import { getPricingServices } from "../../../services/pricingHook";
+import { getPricingServices, getSeaPorts } from "../../../services/pricingHook";
 
 function Pricing() {
   const [inputsHabilitados, setInputsHabilitados] = useState(false);
+  const [seaPorts, setSeaPorts] = useState([]);
   const [clientId, setClientId] = useState("");
   const { showSnackbar, renderSnackbar } = useSnackbar();
   const { id } = useParams();
@@ -56,6 +58,13 @@ function Pricing() {
     totalTaxEu: 0,
     profitEu: 0,
     client_id: "",
+    qty: 0,
+    saleTerm: "",
+    origin: "",
+    customDestiny: "",
+    finalDestiny: "",
+    estimateTransitTime: "",
+    transshipment: "",
   });
   const columnsCost = [
     { Header: "Moneda", accessor: "currency", align: "center" },
@@ -101,6 +110,14 @@ function Pricing() {
     row: 1,
   });
 
+  /** Buscar los puertos maritimos */
+  useEffect(async () => {
+    const res = await getSeaPorts();
+    if (res.ack === 0) {
+      setSeaPorts(res.data);
+    }
+  }, []);
+
   const handleChangePricing = (e) => {
     const { name, value } = e.target;
     switch (name) {
@@ -113,6 +130,7 @@ function Pricing() {
     }
   };
 
+  /** Realizar calculos de totales */
   const totalCalculations = () => {
     let totalCostEu = 0;
     let totalSaleEu = 0;
@@ -233,6 +251,7 @@ function Pricing() {
     totalCalculations();
   };
 
+  /**  Agrear items al detalle */
   const addItem = () => {
     item.actions = (
       <MDBox mr={1}>
@@ -309,6 +328,7 @@ function Pricing() {
     }
   };
 
+  /** Enviar peticion de creacion/modificacion a la api */
   const submitHandlerPricing = async () => {
     const data = { pricing, details: [...rowsCost, ...rowsSale, ...rowsTax] };
     let res;
@@ -335,10 +355,15 @@ function Pricing() {
     setPricing({ ...pricing, revalidated: e });
   };
 
-  // Relaciono cliente
+  /** Relacionar con cliente  */
   const handleClientSelect = (client) => {
-    console.log(client);
     setPricing({ ...pricing, client_id: client.id });
+  };
+
+  /** Opciones de autocompletar puertos */
+  const defaultOptions = {
+    options: seaPorts.length > 0 ? seaPorts : [],
+    getOptionLabel: (option) => `${option.portName}, ${option.country}`,
   };
 
   return (
@@ -470,6 +495,135 @@ function Pricing() {
                     </MDBox>
                   </Grid>
                 </Grid>
+                <Grid container spacing={1} marginBottom={-2} sx={{ m: 1 }}>
+                  <Grid item xs={3}>
+                    <MDBox mb={2}>
+                      <FormControl fullWidth>
+                        <Autocomplete
+                          {...defaultOptions}
+                          freeSolo
+                          id="origin-select"
+                          name="origin"
+                          multiple={false}
+                          options={seaPorts}
+                          style={{ height: 40 }}
+                          renderInput={(params) => (
+                            <TextField {...params} label="Origen" variant="outlined" />
+                          )}
+                          onChange={(value) => {
+                            if (value) {
+                              setPricing({
+                                ...pricing,
+                                origin: value.portName,
+                              });
+                            }
+                          }}
+                        />
+                      </FormControl>
+                    </MDBox>
+                  </Grid>
+                  <Grid item xs={3}>
+                    <MDBox mb={2}>
+                      <FormControl fullWidth>
+                        <Autocomplete
+                          {...defaultOptions}
+                          freeSolo
+                          id="finalDestiny-select"
+                          name="finalDestiny"
+                          multiple={false}
+                          options={seaPorts}
+                          style={{ height: 40 }}
+                          renderInput={(params) => (
+                            <TextField {...params} label="Destino Final" variant="outlined" />
+                          )}
+                          onChange={handleChangePricing}
+                        />
+                      </FormControl>
+                    </MDBox>
+                  </Grid>
+                  <Grid item xs={3}>
+                    <MDBox mb={2}>
+                      <FormControl fullWidth>
+                        <MDInput
+                          type="text"
+                          label="Aduana Destino"
+                          value={pricing.customDestiny}
+                          name="customDestiny"
+                          variant="outlined"
+                          fullWidth
+                          onChange={handleChangePricing}
+                        />
+                      </FormControl>
+                    </MDBox>
+                  </Grid>
+                  <Grid item xs={3}>
+                    <MDBox mb={2}>
+                      <FormControl fullWidth>
+                        <MDInput
+                          type="text"
+                          label="Sale Term"
+                          value={pricing.saleTerm}
+                          name="saleTerm"
+                          variant="outlined"
+                          fullWidth
+                          onChange={handleChangePricing}
+                        />
+                      </FormControl>
+                    </MDBox>
+                  </Grid>
+                  <Grid item xs={3}>
+                    <MDBox mb={2}>
+                      <FormControl fullWidth disabled={inputsHabilitados}>
+                        <InputLabel id="demo-simple-select-helper-label">Transbordo</InputLabel>
+                        <Select
+                          fullWidth
+                          labelId="transbordo"
+                          id="transshipment"
+                          name="transshipment"
+                          label="Transbordo"
+                          input={<OutlinedInput label="Transbordo" />}
+                          value={pricing.transshipment}
+                          onChange={handleChangePricing}
+                          style={{ height: 45 }}
+                        >
+                          <MenuItem value="">--</MenuItem>
+                          <MenuItem value="NO">NO</MenuItem>
+                          <MenuItem value="SI">SI</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </MDBox>
+                  </Grid>
+                  <Grid item xs={3}>
+                    <MDBox mb={2}>
+                      <FormControl fullWidth>
+                        <MDInput
+                          type="text"
+                          label="Transit Time Estimado"
+                          value={pricing.estimateTransitTime}
+                          name="estimateTransitTime"
+                          variant="outlined"
+                          fullWidth
+                          onChange={handleChangePricing}
+                        />
+                      </FormControl>
+                    </MDBox>
+                  </Grid>
+                  <Grid item xs={3}>
+                    <MDBox mb={2}>
+                      <FormControl fullWidth>
+                        <MDInput
+                          type="number"
+                          label="Cantidad"
+                          value={pricing.qty}
+                          name="qty"
+                          variant="outlined"
+                          fullWidth
+                          onChange={handleChangePricing}
+                        />
+                      </FormControl>
+                    </MDBox>
+                  </Grid>
+                </Grid>
               </MDBox>
             </MDBox>
           </MDBox>
@@ -481,7 +635,7 @@ function Pricing() {
           <MDBox
             mx={2}
             mt={-3}
-            py={2}
+            py={1}
             px={1}
             variant="gradient"
             bgColor="info"
@@ -492,11 +646,11 @@ function Pricing() {
               Items
             </MDTypography>
           </MDBox>
-          <MDBox pt={3}>
-            <MDBox pt={4} pb={3} px={3}>
+          <MDBox pt={1}>
+            <MDBox pt={1} pb={3} px={3}>
               <MDBox component="form" role="form">
                 <Grid container spacing={2}>
-                  <Grid xs={1}>
+                  <Grid item xs={1}>
                     <MDBox mb={2}>
                       <FormControl fullWidth disabled={inputsHabilitados}>
                         <InputLabel id="demo-simple-select-helper-label" style={{ margin: 4 }}>
@@ -519,7 +673,7 @@ function Pricing() {
                       </FormControl>
                     </MDBox>
                   </Grid>
-                  <Grid xs={1}>
+                  <Grid item xs={1}>
                     <MDBox mb={2} ml={1}>
                       <FormControl fullWidth disabled={inputsHabilitados}>
                         <InputLabel id="demo-simple-select-helper-label" style={{ margin: 4 }}>
@@ -544,7 +698,7 @@ function Pricing() {
                       </FormControl>
                     </MDBox>
                   </Grid>
-                  <Grid xs={3}>
+                  <Grid item xs={3}>
                     <MDBox mb={2} sx={{ m: 1 }}>
                       <FormControl fullWidth>
                         <MDInput
@@ -563,7 +717,7 @@ function Pricing() {
                   </Grid>
 
                   {item.typeItem === "tax" && (
-                    <Grid xs={2}>
+                    <Grid item xs={2}>
                       <MDBox mb={2} sx={{ m: 1 }}>
                         <FormControl fullWidth>
                           <InputLabel id="demo-simple-select-helper-label" style={{ margin: 4 }}>
@@ -579,7 +733,7 @@ function Pricing() {
                             input={<OutlinedInput label="Base" />}
                             onChange={itemHandler}
                             value={item.base}
-                            style={{ height: 45, marginTop: 7 }}
+                            style={{ height: 45 }}
                           >
                             {rowsSale?.map((itemBase) => (
                               <MenuItem value={itemBase.price}>{itemBase.item}</MenuItem>
@@ -590,7 +744,7 @@ function Pricing() {
                     </Grid>
                   )}
                   {item.typeItem === "tax" && (
-                    <Grid xs={1}>
+                    <Grid item xs={1}>
                       <MDBox mb={2} sx={{ m: 1 }}>
                         <FormControl fullWidth>
                           <MDInput
@@ -608,9 +762,9 @@ function Pricing() {
                       </MDBox>
                     </Grid>
                   )}
-                  <Grid xs={2}>
+                  <Grid item xs={2}>
                     <MDBox mb={2} sx={{ m: 1 }}>
-                      <FormControl fullWidtd>
+                      <FormControl>
                         <MDInput
                           type="number"
                           name="price"
@@ -626,7 +780,7 @@ function Pricing() {
                     </MDBox>
                   </Grid>
                   {(item.typeItem === "sale" || item.typeItem === "cost") && (
-                    <Grid xs={1}>
+                    <Grid item xs={1}>
                       <MDBox mb={2} sx={{ m: 1 }}>
                         <MDInput
                           type="number"
@@ -643,7 +797,7 @@ function Pricing() {
                     </Grid>
                   )}
                   {(item.typeItem === "sale" || item.typeItem === "cost") && (
-                    <Grid xs={2}>
+                    <Grid item xs={2}>
                       <MDBox mb={2} sx={{ m: 1 }}>
                         <MDInput
                           type="text"
@@ -660,7 +814,7 @@ function Pricing() {
                     </Grid>
                   )}
                   {(item.typeItem === "sale" || item.typeItem === "cost") && (
-                    <Grid xs={2}>
+                    <Grid item xs={2}>
                       <MDBox mb={2} sx={{ m: 1 }}>
                         <FormControl fullWidth>
                           <MDInput
@@ -741,7 +895,7 @@ function Pricing() {
             <MDBox pt={4} pb={3} px={3}>
               <MDBox component="form" role="form">
                 <Grid container spacing={2}>
-                  <Grid xs={4}>
+                  <Grid item xs={4}>
                     <MDBox mb={1} ml={5} mr={5}>
                       <TextField
                         id="filled-multiline-static"
@@ -782,7 +936,7 @@ function Pricing() {
                       />
                     </MDBox>
                   </Grid>
-                  <Grid xs={4}>
+                  <Grid item xs={4}>
                     <MDBox mb={1} ml={5} mr={5}>
                       <TextField
                         id="filled-multiline-static"
@@ -823,7 +977,7 @@ function Pricing() {
                       />
                     </MDBox>
                   </Grid>
-                  <Grid xs={4}>
+                  <Grid item xs={4}>
                     <MDBox mb={1} ml={5} mr={5}>
                       <TextField
                         id="filled-multiline-static"
@@ -873,7 +1027,7 @@ function Pricing() {
             <MDBox pt={4} pb={3} px={3}>
               <MDBox component="form" role="form">
                 <Grid container spacing={2}>
-                  <Grid xs={6}>
+                  <Grid item xs={6}>
                     <MDBox mb={1} ml={5} mr={5}>
                       <TextField
                         id="filled-multiline-static"
@@ -889,7 +1043,7 @@ function Pricing() {
                       />
                     </MDBox>
                   </Grid>
-                  <Grid xs={6}>
+                  <Grid item xs={6}>
                     <MDBox mb={1} ml={5} mr={5}>
                       <TextField
                         id="filled-multiline-static"

@@ -76,6 +76,9 @@ export const createOperation = async (type: string): Promise<IOperation> => {
 export const getOperations = async () => {
   try {
     const operations = await Operation.findAll({
+      where: {
+        deleted: false,
+      },
       order: [["createdAt", "DESC"]],
     });
     return operations;
@@ -92,6 +95,24 @@ export const updateOperations = async (operation: IOperation) => {
       },
     });
     return opUpdated;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const deleteOperation = async (id: string) => {
+  try {
+    const opDeleted = await Operation.update(
+      {
+        deleted: true,
+      },
+      {
+        where: {
+          id: id,
+        },
+      }
+    );
+    return opDeleted;
   } catch (error) {
     throw error;
   }

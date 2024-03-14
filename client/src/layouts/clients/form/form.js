@@ -74,13 +74,12 @@ function ClientForm({ onClientSelect, id }) {
           <MDBox pt={4} pb={3} px={3}>
             <Autocomplete
               {...defaultOptions}
+              freeSolo
               id="client-select"
               multiple={false}
               style={{ width: 300, marginBottom: 8, marginTop: -20 }}
               options={clients}
-              renderInput={(params) => (
-                <TextField {...params} label="Buscar cliente" variant="outlined" />
-              )}
+              renderInput={(params) => <TextField {...params} label="Cliente" variant="outlined" />}
               onChange={(event, newValue) => {
                 if (!newValue) {
                   setClient({

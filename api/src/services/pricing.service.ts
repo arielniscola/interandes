@@ -1,7 +1,7 @@
 import { IPricing, Pricing } from "../models/pricing";
 import { Client } from "../models/client";
 import { Detail } from "../models/detail";
-import { addHistoryOperation } from "./operation.service";
+import { addHistoryOperation, deleteOperation } from "./operation.service";
 // import { IDetail } from "../interfaces/IDetail";
 
 export const getAllPricings = async () => {
@@ -98,10 +98,7 @@ export const deletePricing = async (id: string) => {
         },
       }
     );
-    await addHistoryOperation(
-      pricingExist.operation_id,
-      `Eliminación Pricing: ${pricingExist.pricingnumber}`
-    );
+    if (pricingDeleted) await deleteOperation(pricingExist.operation_id);
     return pricingDeleted;
   } catch (error) {
     throw error;

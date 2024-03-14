@@ -2,6 +2,8 @@ import PDFDocument from "pdfkit";
 import fs from "fs";
 import { IDetail } from "../models/detail";
 import moment from "moment";
+import { getCompanyByName } from "../services/company";
+import path from "path";
 
 export const generatePDF = async (data: any, items: IDetail[] | any) => {
   try {
@@ -57,7 +59,11 @@ export const generatePDF = async (data: any, items: IDetail[] | any) => {
       .font("Helvetica-Bold")
       .fontSize(20)
       .text("Cotización", { align: "center" });
-    const imagePath = "./assets/allin.png"; // Reemplaza con la ruta de tu imagen
+    // const imagePath = "./assets/allin.png";
+    /** Buscar logo de la empresa */
+    const company = await getCompanyByName(data.companyname);
+    const imagePathSplit = company.logo.split("\\");
+    const imagePath = path.join("uploads", imagePathSplit.at(-1));
     const mx = 0;
     const my = -20;
     doc.image(imagePath, mx, my, {
@@ -119,19 +125,27 @@ export const generatePDF = async (data: any, items: IDetail[] | any) => {
     drawCell("TIPO DE SERVICIO", 30, 185, 250, 15, "left");
     drawCell(`${data.operationType}`, 280, 185, 250, 15, "center", "Helvetica");
     drawCell("CANTIDAD", 30, 200, 250, 15, "left");
-    drawCell(``, 280, 200, 250, 15, "center", "Helvetica");
+    drawCell(`${data.qty}`, 280, 200, 250, 15, "center", "Helvetica");
     drawCell("SALE TERM", 30, 215, 250, 15, "left");
-    drawCell(``, 280, 215, 250, 15, "center", "Helvetica");
+    drawCell(`${data.saleTerm}`, 280, 215, 250, 15, "center", "Helvetica");
     drawCell("ORIGEN", 30, 230, 250, 15, "left");
-    drawCell(``, 280, 230, 250, 15, "center", "Helvetica");
+    drawCell(`${data.origin}`, 280, 230, 250, 15, "center", "Helvetica");
     drawCell("ADUANA DESTINO", 30, 245, 250, 15, "left");
-    drawCell(``, 280, 245, 250, 15, "center", "Helvetica");
+    drawCell(`${data.customDestiny}`, 280, 245, 250, 15, "center", "Helvetica");
     drawCell("DESTINO FINAL", 30, 260, 250, 15, "left");
-    drawCell(``, 280, 260, 250, 15, "center", "Helvetica");
+    drawCell(`${data.finalDestiny}`, 280, 260, 250, 15, "center", "Helvetica");
     drawCell("TRANSIT TIME ESTIMADO", 30, 275, 250, 15, "left");
-    drawCell(``, 280, 275, 90, 15, "center", "Helvetica");
+    drawCell(
+      `${data.estimateTransitTime}`,
+      280,
+      275,
+      90,
+      15,
+      "center",
+      "Helvetica"
+    );
     drawCell("TRASBORDO", 370, 275, 90, 15, "left");
-    drawCell(``, 460, 275, 70, 15, "center", "Helvetica");
+    drawCell(`${data.transshipment}`, 460, 275, 70, 15, "center", "Helvetica");
     drawCell("", 30, 290, 500, 20);
     // Items
     drawCell("TARIFA", 30, 310, 500, 15, "left");

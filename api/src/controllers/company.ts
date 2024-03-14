@@ -5,12 +5,13 @@ import fs from "fs";
 import {
   createCompany,
   getCompanies,
+  getLogo,
   updateCompany,
 } from "../services/company";
 
 export const uploadLogoController = async (req: Request, res: Response) => {
   try {
-    const files = req.body.files;
+    const files = req.files;
     const companyID = req.params.id;
     const companyUpdated = await updateCompany(companyID, files);
     res
@@ -71,5 +72,15 @@ export const getCompaniesController = async (_req: Request, res: Response) => {
     res
       .status(200)
       .json(new ResponseApi(1, `Error al buscar compañias: ${error}`));
+  }
+};
+
+export const getLogoView = async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id;
+    const data = await getLogo(id);
+    res.status(200).json(new ResponseApi(0, "", data));
+  } catch (error) {
+    res.status(200).json(new ResponseApi(1, `Error al buscar logo: ${error}`));
   }
 };

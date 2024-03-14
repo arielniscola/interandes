@@ -54,3 +54,12 @@ export const deletePricing = async (id) => {
   const data = await res.json();
   return data;
 };
+
+export const getSeaPorts = async () => {
+  const res = await fetch(`${URL_API}/ports`, {
+    method: "GET",
+    headers: { "Content-type": "application/json" },
+  });
+  const data = await res.json();
+  return data;
+};

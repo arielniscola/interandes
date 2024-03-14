@@ -11,6 +11,7 @@ import { useMaterialUIController } from "context";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
+import moment from "moment";
 import DataTable from "../../examples/Tables/DataTable";
 import MDButton from "../../components/MDButton";
 import MDBox from "../../components/MDBox";
@@ -91,12 +92,17 @@ function SalesOrdersTable() {
 
   const columns = [
     { Header: "N°", accessor: "numberSO", align: "center" },
-    { Header: "Mercaderia", accessor: "merchandise", align: "center" },
     { Header: "Compañia", accessor: "companyname", align: "center" },
     { Header: "Origen Carga", accessor: "originOfCharge", align: "center" },
     { Header: "Destino Final", accessor: "finalDestination", align: "center" },
     { Header: "Transporte", accessor: "transportation", align: "center" },
     { Header: "Cliente", accessor: "Client.companyname", align: "center" },
+    {
+      Header: "Fecha",
+      accessor: "createdAt",
+      align: "center",
+      Cell: ({ value }) => moment(value).format("DD/MM/YYYY"),
+    },
     { Header: "Opciones", accessor: "options", align: "center" },
   ];
 

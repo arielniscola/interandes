@@ -10,6 +10,7 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import { getOperations } from "services/operationHook";
+import moment from "moment";
 import DataTable from "../../examples/Tables/DataTable";
 import MDButton from "../../components/MDButton";
 import MDBox from "../../components/MDBox";
@@ -54,7 +55,12 @@ function OperationsTable() {
 
   const columns = [
     { Header: "N°", accessor: "operationNumber", align: "center" },
-    { Header: "Fecha Creación", accessor: "date", align: "center" },
+    {
+      Header: "Fecha Creación",
+      accessor: "date",
+      align: "center",
+      Cell: ({ value }) => moment(value).format("DD/MM/YYYY"),
+    },
     { Header: "Tipo de Operación", accessor: "typeOperation", align: "center" },
     { Header: "Opciones", accessor: "options", align: "center" },
   ];

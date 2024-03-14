@@ -42,7 +42,9 @@ export const createProviderController = async (
   try {
     const provider = req.body;
     const data = await createProvider(provider);
-    res.status(200).json(new ResponseApi(0, "", data));
+    res
+      .status(200)
+      .json(new ResponseApi(0, "Proveedor creado correctamente", data));
   } catch (error) {
     res
       .status(400)
@@ -57,7 +59,9 @@ export const updateProviderController = async (
   try {
     const provider = req.body;
     const data = await updateProvider(provider);
-    res.status(200).json(new ResponseApi(0, "", data));
+    res
+      .status(200)
+      .json(new ResponseApi(0, "Proveedor actualizado correctamente", data));
   } catch (error) {
     res
       .status(400)

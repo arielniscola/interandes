@@ -13,6 +13,7 @@ export const uploadFilesController = async (
 ) => {
   try {
     const files = req.files;
+    if (files.length) throw "No hay archivos cargados ";
     const id = req.params.id;
     await createFiles(id, files);
     res
@@ -20,7 +21,7 @@ export const uploadFilesController = async (
       .json(new ResponseApi(0, "Archivos subidos correctamente", files));
   } catch (error: any) {
     res
-      .status(400)
+      .status(200)
       .json(new ResponseApi(1, `Error en la carga de archivos ${error}`));
   }
 };

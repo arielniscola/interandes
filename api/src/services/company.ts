@@ -10,6 +10,20 @@ export const getCompanies = async (): Promise<ICompany[]> => {
     throw error;
   }
 };
+export const getCompanyByName = async (
+  companyname: string
+): Promise<ICompany> => {
+  try {
+    const company = await Company.findOne({
+      where: {
+        companyname: companyname,
+      },
+    });
+    return company;
+  } catch (error) {
+    throw error;
+  }
+};
 
 export const createCompany = async (company: ICompany) => {
   try {
@@ -34,8 +48,29 @@ export const updateCompany = async (companyId: string, files: any) => {
         },
       }
     );
-    fs.unlinkSync(companyExist.logo);
+    if (companyExist.logo) {
+      fs.unlinkSync(companyExist.logo);
+    }
     return companyUpdated;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getLogo = async (companyId: string) => {
+  try {
+    const company = await Company.findOne({
+      where: {
+        id: companyId,
+      },
+    });
+    if (!company.logo) throw "Compañia no tiene logo";
+    if (!fs.existsSync(company.logo))
+      throw "Archivo no existe en ruta especificada";
+
+    const image = fs.readFileSync(company.logo);
+    const base64Image = Buffer.from(image).toString("base64");
+    return base64Image;
   } catch (error) {
     throw error;
   }

@@ -12,10 +12,10 @@ export const salesOrderRoutes = Router();
 
 salesOrderRoutes.get("/", getAllSalesOrdersController);
 salesOrderRoutes.post("/", createSalesOrderController);
-salesOrderRoutes.get("/:id", getSalesOrderIDController);
-salesOrderRoutes.get("/generate-bl/:id", pdfSalesOrderController);
 salesOrderRoutes.get(
   "/generate-instructivo-pdf/:id",
   generateInstructivoController
 );
 salesOrderRoutes.get("/consignees", getConsigneesController);
+salesOrderRoutes.get("/generate-bl/:id", pdfSalesOrderController);
+salesOrderRoutes.get("/:id", getSalesOrderIDController);

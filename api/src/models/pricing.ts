@@ -26,6 +26,13 @@ export interface IPricing {
   profitDol: number;
   operation_id?: string;
   client_id?: string;
+  qty: number;
+  saleTerm: string;
+  origin: string;
+  customDestiny: string;
+  finalDestiny: string;
+  estimateTransitTime: string;
+  transshipment: string;
 }
 
 export class Pricing extends Model<IPricing> {
@@ -52,6 +59,13 @@ export class Pricing extends Model<IPricing> {
   public totalSaleDol: number;
   public totalTaxDol: number;
   public profitDol: number;
+  public qty: number;
+  public saleTerm: string;
+  public origin: string;
+  public customDestiny: string;
+  public finalDestiny: string;
+  public estimateTransitTime: string;
+  public transshipment: string;
 }
 
 export function initPricingModel(sequelize: Sequelize): void {
@@ -132,6 +146,27 @@ export function initPricingModel(sequelize: Sequelize): void {
       },
       profitDol: {
         type: DataTypes.FLOAT,
+      },
+      qty: {
+        type: DataTypes.INTEGER,
+      },
+      transshipment: {
+        type: DataTypes.STRING,
+      },
+      finalDestiny: {
+        type: DataTypes.STRING,
+      },
+      customDestiny: {
+        type: DataTypes.STRING,
+      },
+      estimateTransitTime: {
+        type: DataTypes.STRING,
+      },
+      origin: {
+        type: DataTypes.STRING,
+      },
+      saleTerm: {
+        type: DataTypes.STRING,
       },
     },
     {

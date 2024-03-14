@@ -5,6 +5,7 @@ export interface IOperation {
   operationNumber: number;
   date: Date;
   typeOperation: string;
+  deleted: boolean;
 }
 
 export class Operation extends Model<IOperation> {
@@ -12,6 +13,7 @@ export class Operation extends Model<IOperation> {
   public operationNumber: number;
   public date: Date;
   public typeOperation: string;
+  public deleted: boolean;
 }
 
 export function initOperation(sequelize: Sequelize): void {
@@ -34,6 +36,10 @@ export function initOperation(sequelize: Sequelize): void {
       },
       typeOperation: {
         type: DataTypes.STRING,
+      },
+      deleted: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
       },
     },
     {

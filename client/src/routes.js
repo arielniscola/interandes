@@ -89,7 +89,7 @@ const routes = [
   {
     type: "collapse",
     name: "CLIENTES",
-    key: "profile",
+    key: "clientes",
     icon: <Icon fontSize="small">person</Icon>,
     route: "/clients",
     component: <ClientTable />,
